@@ -21,21 +21,22 @@ class individual:
         self.parent_string = "random_initialized,"
         self.born_from_crossover = False
 
+        print("ind_count, matrix", self.ind_count, self.material_matrix)
     def create_random_pattern(self):
 
         self.pattern = collections.OrderedDict()
         number_of_fuel = random.randint(self.options['minimum_fuel_elements'], self.options['maximum_fuel_elements'])
         self.fuel_locations = []
         total_number_of_locations = self.grid_y * self.grid_x
-
+        print("NUMBER OF FUEL: " , number_of_fuel, self.ind_count)
         ### Assigning fuel locations
         for _ in range(number_of_fuel):
-            fuel_location = random.randint(0, total_number_of_locations)
+            fuel_location = random.randint(1, total_number_of_locations)
             while fuel_location in self.fuel_locations:
-                fuel_location = random.randint(0, total_number_of_locations)
+                fuel_location = random.randint(1, total_number_of_locations )
             self.fuel_locations.append(fuel_location)
 
-        # print(self.fuel_locations)
+        print("fuel locations:", self.fuel_locations)
 
         self.create_material_matrix()
 
@@ -47,7 +48,8 @@ class individual:
             minor_material = []
             for __ in range(self.grid_y):
                 material_count += 1
-                material = 2
+                material_index = random.randint(2, len(self.options['material_types']))
+                material = self.options['material_types'][material_index - 1]
                 if material_count in self.fuel_locations:
                     material = 1
                 minor_material.append(material)
@@ -161,7 +163,7 @@ class individual:
     def enforce_material_count(self, material_value, material_count_to_enforce):
         ### Getting list of material in question locations
         material_location_list = []
-        for mat_count, material_ in enumerate(options['material_types']):
+        for mat_count, material_ in enumerate(self.options['material_types']):
             material_location_list.append([])
             for list_count, _ in enumerate(self.material_matrix):
                 for material_count, material in enumerate(_):
@@ -192,7 +194,7 @@ class individual:
             material_list_index_0 = material_location_list[material_index][material_location_index][0]
             material_list_index_1 = material_location_list[material_index][material_location_index][1]
 
-            self.material_matrix[material_list_index_0][material_list_index_1] = options['material_types'][
+            self.material_matrix[material_list_index_0][material_list_index_1] = self.options['material_types'][
                 replacement_int]
 
             adjustment = material_count_to_enforce - self.count_material(material_value)
@@ -212,7 +214,7 @@ class individual:
             material_list_index_0 = material_location_list[target_int][material_location_index][0]
             material_list_index_1 = material_location_list[target_int][material_location_index][1]
 
-            self.material_matrix[material_list_index_0][material_list_index_1] = options['material_types'][
+            self.material_matrix[material_list_index_0][material_list_index_1] = self.options['material_types'][
                 material_index]
 
             adjustment = material_count_to_enforce - self.count_material(material_value)

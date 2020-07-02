@@ -15,10 +15,11 @@ class genetic_algorithm:
         self.options = options_dict
         self.individuals = []
         self.generation = 0
+        self.individual_count = 0
         ### Creating initial population
         for ind in range(self.options['number_of_individuals']):
-            self.individuals.append(individual(options_dict, self.generation))
-
+            self.individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
+            self.individual_count += 1
         ### Loading CNN if needed
         #if 'cnn' in self.options['solver']:
         #    model_string = "CNN_3d_11x11_fm_cad_4x4_kern_v2.hdf5"
@@ -243,7 +244,8 @@ class genetic_algorithm:
             self.individuals.append(new_child_ind)
 
     def bitwise_crossover(self, parent_1, parent_2):
-        child_ind = individual(self.options, self.generation)
+        child_ind = individual.individual(self.options, self.generation, self.individual_count)
+        self.individual_count += 1
         # print("parent 1 pattern:", parent_1.material_matrix)
         # print("parent 2 pattern:", parent_2.material_matrix)
         # print("Child pattern before:", child_ind.material_matrix, child_ind.ind_count)
@@ -265,7 +267,7 @@ class genetic_algorithm:
         return child_ind
 
     def singlepoint_crossover(self, parent_1, parent_2):
-        child_ind = individual(self.options, self.generation)
+        child_ind = individual.individual(self.options, self.generation)
 
         temp_material_master_list = []
         for material_list_count, material_list in enumerate(child_ind.material_matrix):

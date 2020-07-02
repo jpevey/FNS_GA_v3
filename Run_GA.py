@@ -10,10 +10,10 @@ options['verify_fuel_mass_after_crossover'] = False
 options['enforce_fuel_count'] = False
 options['include_pattern'] = False
 options['number_of_generations'] = 2
-options['number_of_individuals'] = 3
+options['number_of_individuals'] = 5
 options['number_of_parents'] = 2
 options['minimum_fuel_elements'] = 1
-options['maximum_fuel_elements'] = 4
+options['maximum_fuel_elements'] = 3
 options['mutation_rate'] = 0.20  # for each individual, % chance that a material flips, 0.05 = 5%
 options[
     'mutation_type'] = 'bitwise'  # bitwise - each material has a chance to mutate to other material based on mutation_rate
