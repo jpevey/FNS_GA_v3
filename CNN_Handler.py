@@ -1,12 +1,3 @@
-import os
-import collections
-import math
-import random
-import copy
-import time
-random.seed(865)
-
-
 ### Imports from CNN notebook
 from __future__ import print_function
 import keras
@@ -26,6 +17,16 @@ from keras_radam import RAdam
 import pandas as pd
 import numpy as np
 import random
+import os
+import collections
+import math
+import random
+import copy
+import time
+random.seed(865)
+
+
+
 
 class CNN_handler:
     def __init__(self, model_string):

@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="test">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
+    <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CNN_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/CNN_Handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +34,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
-  <component name="RunManager" selected="Python.Run_GA">
+  <component name="RunManager" selected="Python.Genetic_Algorithm">
     <configuration name="Genetic_Algorithm" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FNS_GA_v3" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -82,8 +79,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Run_GA" />
         <item itemvalue="Python.Genetic_Algorithm" />
+        <item itemvalue="Python.Run_GA" />
       </list>
     </recent_temporary>
   </component>
@@ -117,34 +114,42 @@
       <option name="project" value="LOCAL" />
       <updated>1593658012575</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="adding mcnp support">
+      <created>1593663882939</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1593663882939</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="adding mcnp support" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding mcnp support" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="436" y="12" key="CommitChangelistDialog2" timestamp="1593661768993">
+    <state x="436" y="12" key="CommitChangelistDialog2" timestamp="1593663882218">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="436" y="12" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1593661768993" />
-    <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1593662024248">
+    <state x="436" y="12" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1593663882218" />
+    <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1593704201967">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1593662024248" />
-    <state width="1537" height="218" key="GridCell.Tab.0.center" timestamp="1593662024248">
+    <state width="1537" height="218" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1593704201967" />
+    <state width="1537" height="218" key="GridCell.Tab.0.center" timestamp="1593704201967">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1593662024248" />
-    <state width="1537" height="218" key="GridCell.Tab.0.left" timestamp="1593662024247">
+    <state width="1537" height="218" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1593704201967" />
+    <state width="1537" height="218" key="GridCell.Tab.0.left" timestamp="1593704201966">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1593662024247" />
-    <state width="1537" height="218" key="GridCell.Tab.0.right" timestamp="1593662024248">
+    <state width="1537" height="218" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1593704201966" />
+    <state width="1537" height="218" key="GridCell.Tab.0.right" timestamp="1593704201967">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1593662024248" />
+    <state width="1537" height="218" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1593704201967" />
     <state x="389" y="66" key="SettingsEditor" timestamp="1593657989968">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

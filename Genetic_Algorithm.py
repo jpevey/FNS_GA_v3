@@ -7,6 +7,7 @@ import time
 random.seed(865)
 
 import Individual_v1 as individual
+#import CNN_Handler
 
 class genetic_algorithm:
     def __init__(self, options_dict):
@@ -14,12 +15,29 @@ class genetic_algorithm:
         self.options = options_dict
         self.individuals = []
         self.generation = 0
-        self.individual_count = 0
-
         ### Creating initial population
         for ind in range(self.options['number_of_individuals']):
-            self.individuals.append(individual.individual(options_dict, self.generation, ind))
-            self.individual_count += 1
+            self.individuals.append(individual(options_dict, self.generation))
+
+        ### Loading CNN if needed
+        #if 'cnn' in self.options['solver']:
+        #    model_string = "CNN_3d_11x11_fm_cad_4x4_kern_v2.hdf5"
+        #    self.cnn_handler = CNN_Handler.CNN_handler(model_string)
+        #    self.cnn_input = []
+
+        if self.options['include_pattern']:
+            for ind_count, pattern_to_include in enumerate(self.options['pattern_to_include']):
+                for _ in self.individuals[ind_count].material_matrix:
+                    print(_)
+                self.individuals[ind_count].material_matrix = pattern_to_include
+                self.individuals[ind_count].make_material_string('%array%1')
+                for _ in self.individuals[ind_count].material_matrix:
+                    print(_)
+
+        if self.options['enforce_fuel_count']:
+            print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
+            for ind_count, ind in enumerate(self.individuals):
+                ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
 
         ### Creating output csv if needed
         if self.options['write_output_csv']:
@@ -48,10 +66,20 @@ class genetic_algorithm:
             self.crossover()
             print("mutate")
             self.mutate()
+
+            if self.options['enforce_fuel_count']:
+                print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
+                for ind_count, ind in enumerate(self.individuals):
+                    ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
+
             print("evaluate")
             self.evaluate()
             print("sort")
             self.individuals.sort(key=lambda x: x.keff, reverse=True)
+            ### Evaluating diversity of population
+            if self.options['choose_parent_based_on_bitwise_diversity']:
+                print("Evaluating diversity of parents")
+                self.evaluate_bitwise_diversity_of_parents()
 
             print("write output")
             if self.options['write_output_csv']:
@@ -143,29 +171,30 @@ class genetic_algorithm:
 
             for individual in self.individuals:
                 individual.get_scale_keff()
-        if 'cnn' in self.options['solver']:
-            print("solving for k with cnn")
-            self.create_cnn_input()
-            self.solve_for_keff_with_cnn()
+        #if 'cnn' in self.options['solver']:
+        #    print("solving for k with cnn")
+        #    self.create_cnn_input()
+        #    self.solve_for_keff_with_cnn()
 
-    def create_cnn_input(self):
-        data_array = self.cnn_handler.build_individuals_array(self.individuals, generation=self.generation)
+    #def create_cnn_input(self):
+    #    data_array = self.cnn_handler.build_individuals_array(self.individuals, generation=self.generation)
 
-        self.cnn_input = self.cnn_handler.build_input_data_reshaped(data_array,
-                                                                    X_val=11,
-                                                                    Y_val=11,
-                                                                    Z_val=1,
-                                                                    channels=2)
+    #    self.cnn_input = self.cnn_handler.build_input_data_reshaped(data_array,
+    #                                                                X_val=11,
+    #                                                                Y_val=11,
+    #                                                                Z_val=1,
+    #                                                                channels=2)
         # print("HERE!!! create_cnn_input")
 
-    def solve_for_keff_with_cnn(self):
-        self.cnn_predictions = self.cnn_handler.model.predict(self.cnn_input)
-        # print("PREDICTIONSSSSS", self.cnn_predictions, len(self.cnn_input))
-        for pred_count, prediction in enumerate(self.cnn_predictions):
-            # print("PREDICTION", prediction)
+    #def solve_for_keff_with_cnn(self):
+    #    self.cnn_predictions = self.cnn_handler.model.predict(self.cnn_input)
+    #    # print("PREDICTIONSSSSS", self.cnn_predictions, len(self.cnn_input))
+    #    for pred_count, prediction in enumerate(self.cnn_predictions):
+    #        # print("PREDICTION", prediction)
 
-            self.individuals[pred_count].keff = prediction[0]
+    #        self.individuals[pred_count].keff = prediction[0]
 
+    ### The crossover function creates total population - number of parents
     def crossover(self):
         number_of_children = self.options['number_of_individuals'] - \
                              self.options['number_of_parents']
@@ -176,6 +205,10 @@ class genetic_algorithm:
             parent_2 = random.randint(0, self.options['number_of_parents'] - 1)
             while parent_1 == parent_2:
                 parent_2 = random.randint(0, self.options['number_of_parents'] - 1)
+
+            if self.options['choose_parent_based_on_bitwise_diversity']:
+                # print("Choosing parent 2 based on diversity score")
+                parent_2 = self.choose_parent_based_on_bitwise_diversity(parent_1)
 
             parent_1 = self.individuals[parent_1]
             parent_2 = self.individuals[parent_2]
@@ -190,6 +223,16 @@ class genetic_algorithm:
                         new_child_ind = self.bitwise_crossover(parent_1, parent_2)
                         fuel_count = new_child_ind.count_material(1)
 
+            if self.options['crossover_type'] == 'singlepoint':
+                new_child_ind = self.singlepoint_crossover(parent_1, parent_2)
+                if self.options['verify_fuel_mass_after_crossover']:
+                    ### Checking if new child meets fuel # requirement
+                    fuel_count = new_child_ind.count_material(1)
+                    while ((fuel_count > self.options['maximum_fuel_elements']) or (
+                            fuel_count < self.options['minimum_fuel_elements'])):
+                        new_child_ind = self.singlepoint_crossover(parent_1, parent_2)
+                        fuel_count = new_child_ind.count_material(1)
+
             try:
                 new_child_ind.parent_string = parent_1.scale_input_filename + "," + parent_2.scale_input_filename
             except:
@@ -200,8 +243,7 @@ class genetic_algorithm:
             self.individuals.append(new_child_ind)
 
     def bitwise_crossover(self, parent_1, parent_2):
-        child_ind = individual.individual(self.options, self.generation, self.individual_count)
-        self.individual_count += 1
+        child_ind = individual(self.options, self.generation)
         # print("parent 1 pattern:", parent_1.material_matrix)
         # print("parent 2 pattern:", parent_2.material_matrix)
         # print("Child pattern before:", child_ind.material_matrix, child_ind.ind_count)
@@ -223,7 +265,7 @@ class genetic_algorithm:
         return child_ind
 
     def singlepoint_crossover(self, parent_1, parent_2):
-        child_ind = individual.individual(self.options, self.generation)
+        child_ind = individual(self.options, self.generation)
 
         temp_material_master_list = []
         for material_list_count, material_list in enumerate(child_ind.material_matrix):
