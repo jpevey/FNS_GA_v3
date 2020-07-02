@@ -147,31 +147,37 @@ class genetic_algorithm:
 
         return parent_2_index
 
-    def evaluate(self):
+    def evaluate(self, evaluation_type):
         scale_inputs = []
-        if 'scale' in self.options['solver']:
-            ### create scale inputs, add filenames to list
-            for individual in self.individuals:
-                if individual.evaluated == False:
-                    if self.options['geometry'] == 'cyl':
-                        individual.make_material_string('cyl_materials')
-                    elif self.options['geometry'] == 'grid':
-                        individual.make_material_string('%array%1')
-                    else:
-                        print("Geometry not handled in evaluate function")
-                        exit()
-                    scale_inputs.append(individual.setup_scale(self.generation))
-                    individual.evaluated = True
-                    if self.options['fake_keff_debug']:
-                        individual.keff = random.uniform(0.5, 1.5)
-            self.scale_inputs = scale_inputs
-            ### submitting all jobs and waiting on all jobs
-            if 'necluster' in self.options['solver']:
-                self.submit_jobs(self.scale_inputs)
-                self.wait_on_jobs()
+        if evaluation_type == 'representivitiy':
+            print("")
+        if evaluation_type == 'keff':
+            if 'scale' in self.options['solver']:
+                ### create scale inputs, add filenames to list
+                for individual in self.individuals:
+                    if individual.evaluated == False:
+                        if self.options['geometry'] == 'cyl':
+                            individual.make_material_string('cyl_materials')
+                        elif self.options['geometry'] == 'grid':
+                            individual.make_material_string('%array%1')
+                        else:
+                            print("Geometry not handled in evaluate function")
+                            exit()
+                        scale_inputs.append(individual.setup_scale(self.generation))
+                        individual.evaluated = True
+                        if self.options['fake_keff_debug']:
+                            individual.keff = random.uniform(0.5, 1.5)
+                self.scale_inputs = scale_inputs
+                ### submitting all jobs and waiting on all jobs
+                if 'necluster' in self.options['solver']:
+                    self.submit_jobs(self.scale_inputs)
+                    self.wait_on_jobs()
 
-            for individual in self.individuals:
-                individual.get_scale_keff()
+                for individual in self.individuals:
+                    individual.get_scale_keff()
+            else:
+                print("Not able to evaluate keff with mcnp yet")
+                ### todo: add mcnp keff capability
         #if 'cnn' in self.options['solver']:
         #    print("solving for k with cnn")
         #    self.create_cnn_input()

@@ -32,11 +32,11 @@ options['grid_y'] = 1
 # options['grid_z'] = 1 need to code 3rd dimension for fns
 options['total_materials'] = options['grid_x'] * options['grid_y']
 options['scale_template_file_string'] = '11x11_grid_array_template.inp'
-options['file_keyword'] = 'grid_11x11_diversity_'
+options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
 # options['solver'] = 'cnn'
 # options['geometry'] = 'cyl'
-options['geometry'] = 'grid'
+options['geometry'] = 'stacked_cylinders'
 options['template_keywords'] = collections.OrderedDict()
 options['keywords_list'] = ['mat_1', 'mat_2', 'mat_3', 'mat_4']
 for val in options['keywords_list']:
