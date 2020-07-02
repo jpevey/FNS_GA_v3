@@ -1,3 +1,12 @@
+import os
+import collections
+import math
+import random
+import copy
+import time
+random.seed(865)
+
+
 ### Imports from CNN notebook
 from __future__ import print_function
 import keras
@@ -13,9 +22,6 @@ from IPython.display import clear_output
 from keras.utils import to_categorical
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
-%matplotlib inline
-# Load the TensorBoard notebook extension.
-%load_ext tensorboard
 from keras_radam import RAdam
 import pandas as pd
 import numpy as np
