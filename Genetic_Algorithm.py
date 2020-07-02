@@ -1,0 +1,384 @@
+import os
+import collections
+import math
+import random
+import copy
+import time
+random.seed(865)
+
+import Individual_v1 as individual
+
+class genetic_algorithm:
+    def __init__(self, options_dict):
+        print("Initializing GA with:", options_dict)
+        self.options = options_dict
+        self.individuals = []
+        self.generation = 0
+
+        ### Creating initial population
+        for ind in range(self.options['number_of_individuals']):
+            self.individuals.append(individual(options_dict, self.generation))
+
+        ### Creating output csv if needed
+        if self.options['write_output_csv']:
+            output_csv = open(self.options['output_filename'] + '.csv', 'w')
+            for flag in self.options:
+                output_csv.write("{},{}\n".format(flag, self.options[flag]))
+            output_csv.close()
+
+        ### Evaluating initial population, gen 0
+        print("Evaluating initial population")
+        self.evaluate()
+        self.individuals.sort(key=lambda x: x.keff, reverse=True)
+
+        ### Evaluating diversity of population
+        if self.options['choose_parent_based_on_bitwise_diversity']:
+            print("Evaluating diversity of parents")
+            self.evaluate_bitwise_diversity_of_parents()
+
+        self.write_output()
+        self.generation += 1
+
+        ### Running GA algo
+        for generation in range(self.options['number_of_generations']):
+            print("Generation: ", self.generation)
+            print("crossover")
+            self.crossover()
+            print("mutate")
+            self.mutate()
+
+            print("evaluate")
+            self.evaluate()
+            print("sort")
+            self.individuals.sort(key=lambda x: x.keff, reverse=True)
+
+            print("write output")
+            if self.options['write_output_csv']:
+                self.write_output()
+
+            self.generation += 1
+
+    def evaluate_bitwise_diversity_of_parents(self):
+
+        temp_material_master_list = []
+        for individual_count, individual in enumerate(self.individuals):
+            if individual_count > self.options['number_of_parents'] - 1:
+                individual.total_diversity_score = "N/A"
+                continue
+
+            individual.bitwise_diversity_scores = []
+            ### cycling over parents evaluating the diversity, if a score of [total number of material locations] is given
+            ### if the individuals are exactly the same, 0 exactly opposite
+
+            for comparison_count, comparison_individual in enumerate(self.individuals):
+                if comparison_count == individual_count:
+                    continue
+                if comparison_count > self.options['number_of_parents'] - 1:
+                    continue
+                individual.bitwise_diversity_scores.append([comparison_count,
+                                                            self.evaluate_bitwise_diversity(individual,
+                                                                                            comparison_individual)])
+
+            ### Calculating total diversity score
+            # print("Calculating total diversity score")
+            total_diversity_score = 0
+            for d_s in individual.bitwise_diversity_scores:
+                # print(d_s[1])
+                total_diversity_score += d_s[1]
+
+            individual.total_diversity_score = total_diversity_score
+            # print(individual.total_diversity_score)
+
+    def evaluate_bitwise_diversity(self, individual, comparison_individual):
+        score = self.options['total_materials']
+        for material_list_count, material_list in enumerate(individual.material_matrix):
+            for material_count, material in enumerate(material_list):
+                individual_material = individual.material_matrix[material_list_count][material_count]
+                comparison_material = comparison_individual.material_matrix[material_list_count][material_count]
+
+                if individual_material == comparison_material:
+                    score -= 1
+        return score
+
+    def choose_parent_based_on_bitwise_diversity(self, parent_1_value):
+        diversity_scores = self.individuals[parent_1_value].bitwise_diversity_scores
+
+        ### Sorting diversity scores
+        diversity_scores.sort(key=lambda x: x[1], reverse=True)
+
+        ### Setting the parent_2 default value to the most similar case
+        parent_2_index = diversity_scores[self.options['number_of_parents'] - 2][0]
+
+        for d_s in diversity_scores:
+            random_value = random.uniform(0, 1)
+
+            if random_value < (d_s[1] / self.individuals[parent_1_value].total_diversity_score):
+                parent_2_index = d_s[0]
+
+        return parent_2_index
+
+    def evaluate(self):
+        scale_inputs = []
+        if 'scale' in self.options['solver']:
+            ### create scale inputs, add filenames to list
+            for individual in self.individuals:
+                if individual.evaluated == False:
+                    if self.options['geometry'] == 'cyl':
+                        individual.make_material_string('cyl_materials')
+                    elif self.options['geometry'] == 'grid':
+                        individual.make_material_string('%array%1')
+                    else:
+                        print("Geometry not handled in evaluate function")
+                        die_here()
+                    scale_inputs.append(individual.setup_scale(self.generation))
+                    individual.evaluated = True
+                    if self.options['fake_keff_debug']:
+                        individual.keff = random.uniform(0.5, 1.5)
+            self.scale_inputs = scale_inputs
+            ### submitting all jobs and waiting on all jobs
+            if 'necluster' in self.options['solver']:
+                self.submit_jobs(self.scale_inputs)
+                self.wait_on_jobs()
+
+            for individual in self.individuals:
+                individual.get_scale_keff()
+        if 'cnn' in self.options['solver']:
+            print("solving for k with cnn")
+            self.create_cnn_input()
+            self.solve_for_keff_with_cnn()
+
+    def create_cnn_input(self):
+        data_array = self.cnn_handler.build_individuals_array(self.individuals, generation=self.generation)
+
+        self.cnn_input = self.cnn_handler.build_input_data_reshaped(data_array,
+                                                                    X_val=11,
+                                                                    Y_val=11,
+                                                                    Z_val=1,
+                                                                    channels=2)
+        # print("HERE!!! create_cnn_input")
+
+    def solve_for_keff_with_cnn(self):
+        self.cnn_predictions = self.cnn_handler.model.predict(self.cnn_input)
+        # print("PREDICTIONSSSSS", self.cnn_predictions, len(self.cnn_input))
+        for pred_count, prediction in enumerate(self.cnn_predictions):
+            # print("PREDICTION", prediction)
+
+            self.individuals[pred_count].keff = prediction[0]
+
+    ### The crossover function creates total population - number of parents
+    def crossover(self):
+        number_of_children = self.options['number_of_individuals'] - \
+                             self.options['number_of_parents']
+
+        for new_child_value in range(number_of_children):
+            ### Getting parent values
+            parent_1 = random.randint(0, self.options['number_of_parents'] - 1)
+            parent_2 = random.randint(0, self.options['number_of_parents'] - 1)
+            while parent_1 == parent_2:
+                parent_2 = random.randint(0, self.options['number_of_parents'] - 1)
+
+            parent_1 = self.individuals[parent_1]
+            parent_2 = self.individuals[parent_2]
+            if self.options['crossover_type'] == 'bitwise':
+                new_child_ind = self.bitwise_crossover(parent_1, parent_2)
+
+                ### Checking if new child meets fuel # requirement
+                if self.options['verify_fuel_mass_after_crossover']:
+                    fuel_count = new_child_ind.count_material(1)
+                    while ((fuel_count > self.options['maximum_fuel_elements']) or (
+                            fuel_count < self.options['minimum_fuel_elements'])):
+                        new_child_ind = self.bitwise_crossover(parent_1, parent_2)
+                        fuel_count = new_child_ind.count_material(1)
+
+            try:
+                new_child_ind.parent_string = parent_1.scale_input_filename + "," + parent_2.scale_input_filename
+            except:
+                new_child_ind.parent_string = str(parent_1.ind_count) + "," + str(parent_2.ind_count)
+
+            new_child_ind.born_from_crossover = True
+
+            self.individuals.append(new_child_ind)
+
+    def bitwise_crossover(self, parent_1, parent_2):
+        child_ind = individual(self.options, self.generation)
+        # print("parent 1 pattern:", parent_1.material_matrix)
+        # print("parent 2 pattern:", parent_2.material_matrix)
+        # print("Child pattern before:", child_ind.material_matrix, child_ind.ind_count)
+        temp_material_master_list = []
+        for material_list_count, material_list in enumerate(child_ind.material_matrix):
+            temp_material_list = []
+            for material_count, material in enumerate(material_list):
+                selection = random.randint(0, 1)
+
+                material = parent_1.material_matrix[material_list_count][material_count]
+
+                if selection == 1:
+                    material = parent_2.material_matrix[material_list_count][material_count]
+
+                temp_material_list.append(material)
+            temp_material_master_list.append(temp_material_list)
+        child_ind.material_matrix = temp_material_master_list
+        # print("Child pattern after:", child_ind.material_matrix)
+        return child_ind
+
+    def singlepoint_crossover(self, parent_1, parent_2):
+        child_ind = individual(self.options, self.generation)
+
+        temp_material_master_list = []
+        for material_list_count, material_list in enumerate(child_ind.material_matrix):
+            temp_material_list = []
+
+            ml_length = len(material_list) - 1
+
+            singlepoint_value = random.randint(1, ml_length)
+
+            temp_material_list = parent_1.material_matrix[material_list_count][0:singlepoint_value] + \
+                                 parent_2.material_matrix[material_list_count][singlepoint_value - 1:ml_length]
+
+            temp_material_master_list.append(temp_material_list)
+        child_ind.material_matrix = temp_material_master_list
+
+        return child_ind
+
+    def mutate(self):
+        ### Currently only works on a material-basis
+        if self.options['mutation_type'] == 'bitwise':
+            for ind_count, individual in enumerate(self.individuals):
+                ### Will not mutate parents/elite population
+                if ind_count < self.options['number_of_parents']:
+                    continue
+
+                original_material_matrix = copy.deepcopy(individual.material_matrix)
+                individual.material_matrix = self.single_bit_mutation(original_material_matrix)
+
+                if self.options['verify_fuel_mass_after_mutation']:
+                    ### Checking if new child meets fuel # requirement
+                    fuel_count = individual.count_material(1)
+                    # try_count = 0
+                    while ((fuel_count > self.options['maximum_fuel_elements']) or (
+                            fuel_count < self.options['minimum_fuel_elements'])):
+                        individual.material_matrix = self.single_bit_mutation(original_material_matrix)
+                        fuel_count = individual.count_material(1)
+                        # print("mutation fuel count:", fuel_count)
+                        # try_count  += 1
+                    # print("fixed mutation in:", try_count, "tries")
+
+    def single_bit_mutation(self, material_matrix):
+        new_material_matrix = []
+        for material_list in material_matrix:
+            material_matrix_sublist = []
+            for material in material_list:
+                ### Attempting mutation
+                if random.uniform(0, 1.0) < self.options['mutation_rate']:
+                    new_index = random.randint(0, len(self.options['material_types']) - 1)
+                    while material == self.options['material_types'][new_index]:
+                        new_index = random.randint(0, len(self.options['material_types']) - 1)
+                    # print("new material: ", self.options['material_types'][new_index], "old", material)
+                    material = self.options['material_types'][new_index]
+                material_matrix_sublist.append(material)
+            new_material_matrix.append(material_matrix_sublist)
+        return new_material_matrix
+
+    def submit_jobs(self, job_list):
+        for job in job_list:
+            print("Submitting job:", job)
+            os.system('qsub ' + job)
+
+    def wait_on_jobs(self):
+        waiting_on_jobs = True
+        jobs_completed = 0
+        temp_file_list = copy.deepcopy(self.scale_inputs)
+        while waiting_on_jobs:
+            for file in os.listdir():
+                if "gen_" + str(self.generation) in file:
+                    if "_done.dat" in file:
+                        file_temp = file.split("_done.dat")
+                        script_str = file_temp[0] + ".sh"
+                        if script_str in temp_file_list:
+                            temp_file_list.remove(file_temp[0] + ".sh")
+                            jobs_completed += 1
+            if jobs_completed == len(self.scale_inputs):
+                print("All jobs are complete, continuing")
+                return
+
+            print("Jobs Complete: ", jobs_completed, "Jobs pending:", len(self.scale_inputs) - jobs_completed)
+            for file in temp_file_list:
+                print(file)
+            if self.options['skip_waiting_on_jobs_debug']:
+                print("""options['skip_waiting_on_jobs_debug'] is True, continuing""")
+                return
+            print("Waiting 15 seconds.")
+            time.sleep(15)
+
+    def enforce_fuel_count(self):
+        for individual in self.individuals:
+            fuel_count = individual.count_material(1)
+            if fuel_count != self.options['enforced_fuel_count_value']:
+                individual.fix_material_count(1, self.options['enforced_fuel_count_value'])
+
+    def write_output(self):
+        output_file = open(self.options['output_filename'] + '.csv', 'a')
+
+        ###Building string to write
+        number_of_children_needed = self.options['number_of_individuals'] - self.options['number_of_parents']
+        number_of_inds_from_current_generation = 0
+        for ind_count, individual in enumerate(self.individuals):
+
+            # print("Writing ind", ind_count, self.options['number_of_parents']  - 1)
+
+            if ind_count <= self.options['number_of_parents'] - 1:
+                write_string = self.write_options_funct(output_file, individual)
+                # print("WRITING PARENTS!", self.generation, ind_count, write_string)
+                output_file.write(write_string + "\n")
+
+                if individual.generation == self.generation:
+                    number_of_inds_from_current_generation += 1
+
+                continue
+            if individual.generation == self.generation:
+
+                write_string = self.write_options_funct(output_file, individual)
+                # print("writing out child:", self.generation, ind_count, write_string)
+                output_file.write(write_string + "\n")
+                if individual.generation == self.generation:
+                    number_of_inds_from_current_generation += 1
+                continue
+
+            if ind_count < self.options['number_of_individuals'] - 1:
+                if number_of_children_needed > number_of_inds_from_current_generation:
+                    continue
+                write_string = self.write_options_funct(output_file, individual)
+                # print("writing out filler:", self.generation, ind_count, write_string)
+                output_file.write(write_string + "\n")
+                continue
+        output_file.close()
+
+    def write_options_funct(self, output_file, individual):
+        write_string = ""
+        for write_option in self.options['output_writeout_values']:
+            if write_option == 'generation':
+                write_string += str(self.generation) + ","
+            if write_option == 'individual_count':
+                write_string += str(individual.ind_count) + ","
+            if write_option == 'keff':
+                write_string += str(individual.keff) + ","
+            if write_option == 'materials':
+                write_string += str(individual.make_material_string_csv())
+            if write_option == 'input_name':
+                try:
+                    write_string += str(individual.scale_input_filename) + ','
+                except:
+                    write_string += "N/A,"
+            if write_option == 'number_of_fuel':
+                write_string += str(individual.count_material(1)) + ','
+            if write_option == 'write_out_parents':
+                write_string += str(individual.parent_string) + ','
+            if write_option == 'write_out_average_diversity_score':
+                if self.options['choose_parent_based_on_bitwise_diversity'] == True:
+                    try:
+                        average_tds = individual.total_diversity_score / (self.options['number_of_parents'] - 1)
+                        write_string += str(average_tds) + ','
+                    except:
+                        write_string += "N/A,"
+
+        return write_string
