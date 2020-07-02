@@ -1,16 +1,11 @@
-import os
 import collections
-import math
 import random
-import copy
-import time
+
 random.seed(865)
 
 
 class individual:
-    def __init__(self, options, generation):
-        global individual_count
-        individual_count += 1
+    def __init__(self, options, generation, individual_count):
 
         self.evaluated = False
         self.keyword_strings = collections.OrderedDict()

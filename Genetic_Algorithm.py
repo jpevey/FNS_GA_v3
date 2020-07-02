@@ -14,10 +14,12 @@ class genetic_algorithm:
         self.options = options_dict
         self.individuals = []
         self.generation = 0
+        self.individual_count = 0
 
         ### Creating initial population
         for ind in range(self.options['number_of_individuals']):
-            self.individuals.append(individual(options_dict, self.generation))
+            self.individuals.append(individual.individual(options_dict, self.generation, ind))
+            self.individual_count += 1
 
         ### Creating output csv if needed
         if self.options['write_output_csv']:
@@ -46,7 +48,6 @@ class genetic_algorithm:
             self.crossover()
             print("mutate")
             self.mutate()
-
             print("evaluate")
             self.evaluate()
             print("sort")
@@ -129,7 +130,7 @@ class genetic_algorithm:
                         individual.make_material_string('%array%1')
                     else:
                         print("Geometry not handled in evaluate function")
-                        die_here()
+                        exit()
                     scale_inputs.append(individual.setup_scale(self.generation))
                     individual.evaluated = True
                     if self.options['fake_keff_debug']:
@@ -165,7 +166,6 @@ class genetic_algorithm:
 
             self.individuals[pred_count].keff = prediction[0]
 
-    ### The crossover function creates total population - number of parents
     def crossover(self):
         number_of_children = self.options['number_of_individuals'] - \
                              self.options['number_of_parents']
@@ -200,7 +200,8 @@ class genetic_algorithm:
             self.individuals.append(new_child_ind)
 
     def bitwise_crossover(self, parent_1, parent_2):
-        child_ind = individual(self.options, self.generation)
+        child_ind = individual.individual(self.options, self.generation, self.individual_count)
+        self.individual_count += 1
         # print("parent 1 pattern:", parent_1.material_matrix)
         # print("parent 2 pattern:", parent_2.material_matrix)
         # print("Child pattern before:", child_ind.material_matrix, child_ind.ind_count)
@@ -222,7 +223,7 @@ class genetic_algorithm:
         return child_ind
 
     def singlepoint_crossover(self, parent_1, parent_2):
-        child_ind = individual(self.options, self.generation)
+        child_ind = individual.individual(self.options, self.generation)
 
         temp_material_master_list = []
         for material_list_count, material_list in enumerate(child_ind.material_matrix):
