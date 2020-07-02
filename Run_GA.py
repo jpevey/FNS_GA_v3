@@ -3,7 +3,7 @@ import Genetic_Algorithm
 
 options = collections.OrderedDict()
 options['skip_waiting_on_jobs_debug'] = True
-options['fake_keff_debug'] = True
+options['fake_fitness_debug'] = True
 options['skip_writing_files'] = False
 options['verify_fuel_mass_after_mutation'] = False
 options['verify_fuel_mass_after_crossover'] = False
@@ -23,7 +23,7 @@ options['material_types'] = [1, 2, 3, 4]
 # For example, given 3 parents the first is choosen at random (default)
 # Then, starting with the most dissimilar parent, a chance of choosing each parent based on
 # (diversity score / sum of all diversity scores)
-options['choose_parent_based_on_bitwise_diversity'] = False
+options['choose_parent_based_on_bitwise_diversity'] = True
 options['crossover_type'] = 'bitwise'  # bitwise - each material bit has a chance to come from parent 1 or parent 2
 # options['crossover_type'] = 'singlepoint' # bitwise - each material bit has a chance to come from parent 1 or parent 2
 options['enforced_fuel_count_value'] = 0
@@ -32,8 +32,11 @@ options['grid_y'] = 1
 # options['grid_z'] = 1 need to code 3rd dimension for fns
 options['total_materials'] = options['grid_x'] * options['grid_y']
 options['scale_template_file_string'] = '11x11_grid_array_template.inp'
+options['mcnp_template_file_string'] = 'FluxRep_toy_jlp_template_incorrect_maybe.inp'
 options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
+# solver_location: 'local' or 'necluster'
+options['solver_location'] = 'local'
 # options['solver'] = 'cnn'
 # options['geometry'] = 'cyl'
 options['geometry'] = 'stacked_cylinders'
@@ -44,7 +47,12 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = 'output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = 'representativity'
+options['fitness'] = 'representivitiy'
+options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
+options['default_mcnp_mat_count_and_density'][1] = '1 -18.95'
+options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'
+options['default_mcnp_mat_count_and_density'][3] = '3 -18.94'
+options['default_mcnp_mat_count_and_density'][4] = '4 -2.1596'
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \

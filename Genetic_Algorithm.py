@@ -7,6 +7,7 @@ import time
 random.seed(865)
 
 import Individual_v1 as individual
+import MCNP_File_Handler
 #import CNN_Handler
 
 class genetic_algorithm:
@@ -49,8 +50,8 @@ class genetic_algorithm:
 
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
-        self.evaluate()
-        self.individuals.sort(key=lambda x: x.keff, reverse=True)
+        self.evaluate(self.options['fitness'], self.individuals)
+        self.individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
@@ -74,7 +75,7 @@ class genetic_algorithm:
                     ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
 
             print("evaluate")
-            self.evaluate()
+            self.evaluate(self.options['fitness'])
             print("sort")
             self.individuals.sort(key=lambda x: x.keff, reverse=True)
             ### Evaluating diversity of population
@@ -147,10 +148,23 @@ class genetic_algorithm:
 
         return parent_2_index
 
-    def evaluate(self, evaluation_type):
+    def evaluate(self, evaluation_type, list_of_individuals):
         scale_inputs = []
         if evaluation_type == 'representivitiy':
-            print("")
+            print("Solving for representivity")
+            if 'mcnp' in self.options['solver']:
+                self.mcnp_inputs = []
+                mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
+                for individual in list_of_individuals:
+                    ### Building MCNP input file
+                    print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
+                    mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
+                                                       dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
+                                                       input_file_str = individual.input_file_string)
+                    mcnp_file_handler.run_mcnp_input(individual.input_file_string)
+                    self.mcnp_inputs.append(individual.input_file_string)
+                self.wait_on_jobs('mcnp')
+                print("")
         if evaluation_type == 'keff':
             if 'scale' in self.options['solver']:
                 ### create scale inputs, add filenames to list
@@ -165,13 +179,17 @@ class genetic_algorithm:
                             exit()
                         scale_inputs.append(individual.setup_scale(self.generation))
                         individual.evaluated = True
-                        if self.options['fake_keff_debug']:
+                        if self.options['fake_fitness_debug']:
                             individual.keff = random.uniform(0.5, 1.5)
                 self.scale_inputs = scale_inputs
                 ### submitting all jobs and waiting on all jobs
-                if 'necluster' in self.options['solver']:
+                if self.options['solver_location']  == 'necluster':
                     self.submit_jobs(self.scale_inputs)
-                    self.wait_on_jobs()
+                    self.wait_on_jobs('scale')
+
+                if self.options['solver_location'] == 'local':
+                    print("Cant run scale locally... yet... fix this")
+                    exit()
 
                 for individual in self.individuals:
                     individual.get_scale_keff()
@@ -335,10 +353,11 @@ class genetic_algorithm:
             print("Submitting job:", job)
             os.system('qsub ' + job)
 
-    def wait_on_jobs(self):
+    def wait_on_jobs(self, run_type):
         waiting_on_jobs = True
         jobs_completed = 0
-        temp_file_list = copy.deepcopy(self.scale_inputs)
+        jobs_to_be_waited_on = getattr(self, run_type + "_inputs")
+        temp_file_list = copy.deepcopy(jobs_to_be_waited_on)
         while waiting_on_jobs:
             for file in os.listdir():
                 if "gen_" + str(self.generation) in file:
@@ -348,11 +367,11 @@ class genetic_algorithm:
                         if script_str in temp_file_list:
                             temp_file_list.remove(file_temp[0] + ".sh")
                             jobs_completed += 1
-            if jobs_completed == len(self.scale_inputs):
+            if jobs_completed == len(jobs_to_be_waited_on):
                 print("All jobs are complete, continuing")
                 return
 
-            print("Jobs Complete: ", jobs_completed, "Jobs pending:", len(self.scale_inputs) - jobs_completed)
+            print("Jobs Complete: ", jobs_completed, "Jobs pending:", len(jobs_to_be_waited_on) - jobs_completed)
             for file in temp_file_list:
                 print(file)
             if self.options['skip_waiting_on_jobs_debug']:

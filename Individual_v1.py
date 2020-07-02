@@ -16,19 +16,20 @@ class individual:
         self.grid_y = options['grid_y']
         self.options = options
         self.ind_count = individual_count
+        self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count)
 
         self.create_random_pattern()
         self.parent_string = "random_initialized,"
         self.born_from_crossover = False
 
-        print("ind_count, matrix", self.ind_count, self.material_matrix)
+        self.default_materials = collections.OrderedDict()
     def create_random_pattern(self):
 
         self.pattern = collections.OrderedDict()
         number_of_fuel = random.randint(self.options['minimum_fuel_elements'], self.options['maximum_fuel_elements'])
         self.fuel_locations = []
         total_number_of_locations = self.grid_y * self.grid_x
-        print("NUMBER OF FUEL: " , number_of_fuel, self.ind_count)
+        #print("NUMBER OF FUEL: " , number_of_fuel, self.ind_count)
         ### Assigning fuel locations
         for _ in range(number_of_fuel):
             fuel_location = random.randint(1, total_number_of_locations)
@@ -36,7 +37,7 @@ class individual:
                 fuel_location = random.randint(1, total_number_of_locations )
             self.fuel_locations.append(fuel_location)
 
-        print("fuel locations:", self.fuel_locations)
+        #print("fuel locations:", self.fuel_locations)
 
         self.create_material_matrix()
 
@@ -56,6 +57,13 @@ class individual:
             material_matrix.append(minor_material)
         self.material_matrix = material_matrix
 
+    def create_discrete_material_mcnp_dictionary(self, keywords_list):
+        material_dictionary = collections.OrderedDict()
+        for count, item in enumerate(keywords_list):
+            print('self.material_matrix[count]', self.material_matrix[count][0], self.material_matrix[count][0])
+            material_dictionary[item] = self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]]
+        return material_dictionary
+
     def setup_scale(self, generation):
         if self.options['skip_writing_files'] == True:
             return
@@ -66,8 +74,8 @@ class individual:
     def create_scale_input(self, generation):
 
         ### Creating file
-        scale_input_filename = self.options['file_keyword'] + str(self.ind_count) + "_gen_" + str(generation) + ".inp"
-        output_file = open(scale_input_filename, 'w')
+        scale_input_filename = self.input_file_string
+        output_file = open(self.input_file_string, 'w')
         self.scale_input_filename = scale_input_filename
 
         ### Printing debug

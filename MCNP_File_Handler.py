@@ -48,14 +48,15 @@ class mcnp_file_handler():
         print("Let's play with some MCNP files!")
         self.mcnp_script_template = mcnp_script_templates[mcnp_version]
 
-    def write_mcnp_input(self, template_file, dictionary_of_replacements, unique_flag = "mcnp_input_"):
+    def write_mcnp_input(self, template_file, dictionary_of_replacements, input_file_str):
         print("Building MCNP model from template")
 
         ### Opening template file
         template_file = open(template_file, 'r')
 
         ### Opening output file
-        output_file_string = unique_flag + ".inp"
+        output_file_string = input_file_str + ".inp"
+
         output_file = open(output_file_string, 'w')
 
         ### Moving over the template file, inserting str's based on the dictionary
@@ -100,9 +101,14 @@ class mcnp_file_handler():
             os.wait(15)
 
     def get_flux(self, input_name):
-        ### todo
+        ### todo: write function which pulls flux tally out of mcnp output and returns it in a format required for calculate_representivity
+        ###
         pass
 
     def calculate_representivity(self, flux):
         ### todo
         pass
+
+    def run_mcnp_input(self, input_file):
+        os.system('qsub ' + input_file + ".sh")
+        print("Submitted:" , input_file + ".sh")
