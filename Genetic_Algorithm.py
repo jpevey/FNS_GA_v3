@@ -65,9 +65,9 @@ class genetic_algorithm:
         for generation in range(self.options['number_of_generations']):
             print("Generation: ", self.generation)
             print("crossover")
-            self.crossover()
+            list_of_children = self.crossover()
             print("mutate")
-            self.mutate()
+            list_of_mutated_children = self.mutate(list_of_children)
 
             if self.options['enforce_fuel_count']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
@@ -75,7 +75,7 @@ class genetic_algorithm:
                     ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
 
             print("evaluate")
-            self.evaluate(self.options['fitness'])
+            self.evaluate(self.options['fitness'], self.individuals)
             print("sort")
             self.individuals.sort(key=lambda x: x.keff, reverse=True)
             ### Evaluating diversity of population
@@ -239,7 +239,7 @@ class genetic_algorithm:
     def crossover(self):
         number_of_children = self.options['number_of_individuals'] - \
                              self.options['number_of_parents']
-
+        list_of_children = []
         for new_child_value in range(number_of_children):
             ### Getting parent values
             parent_1 = random.randint(0, self.options['number_of_parents'] - 1)
@@ -281,7 +281,9 @@ class genetic_algorithm:
 
             new_child_ind.born_from_crossover = True
 
-            self.individuals.append(new_child_ind)
+            list_of_children.append(new_child_ind)
+
+        return list_of_children
 
     def bitwise_crossover(self, parent_1, parent_2):
         child_ind = individual.individual(self.options, self.generation, self.individual_count)
@@ -325,10 +327,10 @@ class genetic_algorithm:
 
         return child_ind
 
-    def mutate(self):
+    def mutate(self, list_of_individuals):
         ### Currently only works on a material-basis
         if self.options['mutation_type'] == 'bitwise':
-            for ind_count, individual in enumerate(self.individuals):
+            for ind_count, individual in enumerate(list_of_individuals):
                 ### Will not mutate parents/elite population
                 if ind_count < self.options['number_of_parents']:
                     continue
@@ -347,6 +349,8 @@ class genetic_algorithm:
                         # print("mutation fuel count:", fuel_count)
                         # try_count  += 1
                     # print("fixed mutation in:", try_count, "tries")
+
+        return list_of_individuals
 
     def single_bit_mutation(self, material_matrix):
         new_material_matrix = []
