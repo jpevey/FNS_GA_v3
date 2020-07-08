@@ -14,12 +14,12 @@ class genetic_algorithm:
     def __init__(self, options_dict):
         print("Initializing GA with:", options_dict)
         self.options = options_dict
-        self.individuals = []
+        self.all_individuals = []
         self.generation = 0
         self.individual_count = 0
         ### Creating initial population
         for ind in range(self.options['number_of_individuals']):
-            self.individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
+            self.all_individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
             self.individual_count += 1
         ### Loading CNN if needed
         #if 'cnn' in self.options['solver']:
@@ -50,8 +50,8 @@ class genetic_algorithm:
 
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
-        self.evaluate(self.options['fitness'], self.individuals)
-        self.individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
+        self.all_individuals = self.evaluate(self.options['fitness'], self.all_individuals)
+        self.all_individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
@@ -150,8 +150,8 @@ class genetic_algorithm:
 
     def evaluate(self, evaluation_type, list_of_individuals):
         scale_inputs = []
-        if evaluation_type == 'representivitiy':
-            print("Solving for representivity")
+        if evaluation_type == 'representativity':
+            print("Solving for representativity")
             if 'mcnp' in self.options['solver']:
                 self.mcnp_inputs = []
                 mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
@@ -164,9 +164,14 @@ class genetic_algorithm:
                     mcnp_file_handler.build_mcnp_running_script(individual.input_file_string)
                     mcnp_file_handler.run_mcnp_input(individual.input_file_string)
                     self.mcnp_inputs.append(individual.input_file_string)
+
+
                 self.wait_on_jobs('mcnp')
 
-
+                for individual in list_of_individuals:
+                    if self.options['fake_fitness_debug'] == True:
+                        individual.representativity = random.uniform(0, 1.0)
+                    print("individual.representativity", individual.representativity)
 
         if evaluation_type == 'keff':
             if 'mcnp' in self.options['solver']:
@@ -217,6 +222,7 @@ class genetic_algorithm:
         #    self.create_cnn_input()
         #    self.solve_for_keff_with_cnn()
 
+        return list_of_individuals
     #def create_cnn_input(self):
     #    data_array = self.cnn_handler.build_individuals_array(self.individuals, generation=self.generation)
 

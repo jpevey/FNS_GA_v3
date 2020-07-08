@@ -48,7 +48,7 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = 'output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = 'keff'
+options['fitness'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
 options['default_mcnp_mat_count_and_density'][1] = '1 -18.95'
 options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'
