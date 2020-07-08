@@ -1,5 +1,6 @@
 import collections
 import Genetic_Algorithm
+import Individual_v1
 
 options = collections.OrderedDict()
 options['skip_waiting_on_jobs_debug'] = True
@@ -39,7 +40,7 @@ options['solver'] = 'mcnp'
 options['solver_location'] = 'local'
 # options['solver'] = 'cnn'
 # options['geometry'] = 'cyl'
-options['geometry'] = 'stacked_cylinders'
+options['geometry'] = 'grid'
 options['template_keywords'] = collections.OrderedDict()
 options['keywords_list'] = ['mat_1', 'mat_2', 'mat_3', 'mat_4']
 for val in options['keywords_list']:
@@ -145,3 +146,4 @@ options['cyl_scale_template'] = [
 
 if __name__ == '__main__':
     ga = Genetic_Algorithm.genetic_algorithm(options)
+    pass

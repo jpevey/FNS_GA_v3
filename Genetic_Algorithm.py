@@ -32,7 +32,7 @@ class genetic_algorithm:
                 for _ in self.individuals[ind_count].material_matrix:
                     print(_)
                 self.individuals[ind_count].material_matrix = pattern_to_include
-                self.individuals[ind_count].make_material_string('%array%1')
+                self.individuals[ind_count].make_material_string_scale('%array%1')
                 for _ in self.individuals[ind_count].material_matrix:
                     print(_)
 
@@ -161,24 +161,31 @@ class genetic_algorithm:
                     mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
                                                        dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
                                                        input_file_str = individual.input_file_string)
+                    mcnp_file_handler.build_mcnp_running_script(individual.input_file_string)
                     mcnp_file_handler.run_mcnp_input(individual.input_file_string)
                     self.mcnp_inputs.append(individual.input_file_string)
                 self.wait_on_jobs('mcnp')
-                print("")
+
         if evaluation_type == 'keff':
+            if 'mcnp' in self.options['solver']:
+                ### create scale inputs, add filenames to list
+                for individual in self.individuals:
+                    if individual.evaluated_keff == False:
+                        for keyword in self.options['keywords_list']:
+                            individual.make_material_string_mcnp(keyword)
             if 'scale' in self.options['solver']:
                 ### create scale inputs, add filenames to list
                 for individual in self.individuals:
-                    if individual.evaluated == False:
+                    if individual.evaluated_keff == False:
                         if self.options['geometry'] == 'cyl':
-                            individual.make_material_string('cyl_materials')
+                            individual.make_material_string_scale('cyl_materials')
                         elif self.options['geometry'] == 'grid':
-                            individual.make_material_string('%array%1')
+                            individual.make_material_string_scale('%array%1')
                         else:
                             print("Geometry not handled in evaluate function")
                             exit()
                         scale_inputs.append(individual.setup_scale(self.generation))
-                        individual.evaluated = True
+                        individual.evaluated_keff = True
                         if self.options['fake_fitness_debug']:
                             individual.keff = random.uniform(0.5, 1.5)
                 self.scale_inputs = scale_inputs

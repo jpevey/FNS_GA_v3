@@ -6,7 +6,7 @@ random.seed(865)
 
 class individual:
     def __init__(self, options, generation, individual_count):
-
+        print("Created Individual", individual_count)
         self.evaluated = False
         self.keyword_strings = collections.OrderedDict()
         self.keff = 0.0
@@ -17,14 +17,14 @@ class individual:
         self.options = options
         self.ind_count = individual_count
         self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count)
-
         self.create_random_pattern()
         self.parent_string = "random_initialized,"
         self.born_from_crossover = False
 
         self.default_materials = collections.OrderedDict()
-    def create_random_pattern(self):
 
+    def create_random_pattern(self):
+        print("Creating random pattern for ind:", self.ind_count)
         self.pattern = collections.OrderedDict()
         number_of_fuel = random.randint(self.options['minimum_fuel_elements'], self.options['maximum_fuel_elements'])
         self.fuel_locations = []
@@ -56,11 +56,15 @@ class individual:
                 minor_material.append(material)
             material_matrix.append(minor_material)
         self.material_matrix = material_matrix
+        print("Material Matrix:", self.material_matrix)
 
-    def create_discrete_material_mcnp_dictionary(self, keywords_list):
+    def create_discrete_material_mcnp_dictionary(self, keywords_list = []):
+        if keywords_list == []:
+            keywords_list = self.options['keywords_list']
+
         material_dictionary = collections.OrderedDict()
         for count, item in enumerate(keywords_list):
-            print('self.material_matrix[count]', self.material_matrix[count][0], self.material_matrix[count][0])
+            print('self.material_matrix[count]', self.material_matrix[count][0], self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]])
             material_dictionary[item] = self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]]
         return material_dictionary
 
@@ -117,7 +121,7 @@ class individual:
         except:
             print("Couldn't get keff...")
 
-    def make_material_string(self, keyword):
+    def make_material_string_scale(self, keyword):
         print("CREATING MATERIAL STRING FOR IND::", self.ind_count)
         if self.options['geometry'] == 'cyl':
             ### Making a string for the input file
@@ -143,7 +147,6 @@ class individual:
             material_string = ""
             print(self.material_matrix)
             for row_materials in self.material_matrix:
-
                 for material in row_materials:
                     material_string = material_string + str(material) + " "
                 material_string += "\n"
@@ -232,3 +235,5 @@ class individual:
         for list_count, _ in enumerate(self.material_matrix):
             for material_count, material in enumerate(_):
                 index_value += 1
+
+
