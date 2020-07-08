@@ -166,13 +166,22 @@ class genetic_algorithm:
                     self.mcnp_inputs.append(individual.input_file_string)
                 self.wait_on_jobs('mcnp')
 
+
+
         if evaluation_type == 'keff':
             if 'mcnp' in self.options['solver']:
-                ### create scale inputs, add filenames to list
-                for individual in self.individuals:
-                    if individual.evaluated_keff == False:
-                        for keyword in self.options['keywords_list']:
-                            individual.make_material_string_mcnp(keyword)
+                self.mcnp_inputs = []
+                mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
+                for individual in list_of_individuals:
+                    ### Building MCNP input file
+                    print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
+                    mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
+                                                       dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
+                                                       input_file_str = individual.input_file_string)
+                    mcnp_file_handler.build_mcnp_running_script(individual.input_file_string)
+                    mcnp_file_handler.run_mcnp_input(individual.input_file_string)
+                    self.mcnp_inputs.append(individual.input_file_string)
+                self.wait_on_jobs('mcnp')
             if 'scale' in self.options['solver']:
                 ### create scale inputs, add filenames to list
                 for individual in self.individuals:

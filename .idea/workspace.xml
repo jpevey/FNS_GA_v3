@@ -4,7 +4,6 @@
     <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
     </list>
@@ -208,7 +207,14 @@
       <option name="project" value="LOCAL" />
       <updated>1594226262860</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="debugging mcnp input and .sh creation and submittal">
+      <created>1594231983676</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1594231983676</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -217,33 +223,34 @@
     <MESSAGE value="added back some options to G_A.py" />
     <MESSAGE value="fixing how fuel is added to individuals" />
     <MESSAGE value="fixing syntax in get_flux, propagate_uncertainty and calculate_representivity" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixing syntax in get_flux, propagate_uncertainty and calculate_representivity" />
+    <MESSAGE value="debugging mcnp input and .sh creation and submittal" />
+    <option name="LAST_COMMIT_MESSAGE" value="debugging mcnp input and .sh creation and submittal" />
   </component>
   <component name="WindowStateProjectService">
     <state x="503" y="67" key="#Run_GA" timestamp="1593705666402">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="436" y="12" key="CommitChangelistDialog2" timestamp="1594226262057">
+    <state x="436" y="12" key="CommitChangelistDialog2" timestamp="1594231982946">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="436" y="12" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594226262057" />
-    <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1594231928934">
+    <state x="436" y="12" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594231982946" />
+    <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1594232062217">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594231928934" />
-    <state width="1537" height="218" key="GridCell.Tab.0.center" timestamp="1594231928934">
+    <state width="1537" height="218" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594232062217" />
+    <state width="1537" height="218" key="GridCell.Tab.0.center" timestamp="1594232062216">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1594231928934" />
-    <state width="1537" height="218" key="GridCell.Tab.0.left" timestamp="1594231928934">
+    <state width="1537" height="218" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1594232062216" />
+    <state width="1537" height="218" key="GridCell.Tab.0.left" timestamp="1594232062216">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1594231928934" />
-    <state width="1537" height="218" key="GridCell.Tab.0.right" timestamp="1594231928934">
+    <state width="1537" height="218" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1594232062216" />
+    <state width="1537" height="218" key="GridCell.Tab.0.right" timestamp="1594232062217">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1594231928934" />
+    <state width="1537" height="218" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1594232062217" />
     <state width="1537" height="270" key="GridCell.Tab.1.bottom" timestamp="1593718682927">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

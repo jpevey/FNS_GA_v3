@@ -37,7 +37,7 @@ options['mcnp_template_file_string'] = 'cyl_template.inp'
 options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
-options['solver_location'] = 'local'
+options['solver_location'] = 'necluster'
 # options['solver'] = 'cnn'
 # options['geometry'] = 'cyl'
 options['geometry'] = 'grid'
@@ -48,7 +48,7 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = 'output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = 'representivitiy'
+options['fitness'] = 'keff'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
 options['default_mcnp_mat_count_and_density'][1] = '1 -18.95'
 options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'

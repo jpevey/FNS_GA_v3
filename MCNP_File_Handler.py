@@ -72,6 +72,9 @@ class mcnp_file_handler():
         output_file.close()
 
     def build_mcnp_running_script(self, input_file_name):
+        if input_file_name.endswith('.inp') == False:
+            input_file_name = input_file_name + ".inp"
+
         write_string = self.mcnp_script_template.replace("%%%INPUT%%%", input_file_name)
         script_file = open(input_file_name + ".sh", 'w')
         script_file.write(write_string)
