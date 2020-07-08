@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +17,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1e6zSH3X5bJBAGr9MsP7aOY1CQB" />
@@ -36,7 +37,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
-  <component name="RunManager" selected="Python.Run_GA">
+  <component name="RunManager" selected="Python.MCNP_File_Handler">
     <configuration name="Genetic_Algorithm" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="FNS_GA_v3" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -127,6 +128,7 @@
         <item itemvalue="Python.MCNP_File_Handler" />
         <item itemvalue="Python.Individual_v1" />
         <item itemvalue="Python.Genetic_Algorithm" />
+        <item itemvalue="Python.Run_GA" />
       </list>
     </recent_temporary>
   </component>

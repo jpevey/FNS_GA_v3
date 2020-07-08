@@ -4,6 +4,8 @@ import copy
 import numpy as np
 import xlrd
 
+np.set_printoptions(precision=None, suppress=None)
+
 ### Setting default values
 
 # string: Select either 6.1 or 6.2
@@ -111,7 +113,7 @@ class mcnp_file_handler():
 
             if file.endswith(".inpo") == False:
                 continue
-        
+
             inputfile = open(file, 'r')
             #bins = []
             current_vals= []
@@ -121,7 +123,7 @@ class mcnp_file_handler():
                 if line == '      energy   \n':
                     p = 0
                     for n in range(i+1, i+255):
-                          lines = inputfile.readline(n)
+                        lines = inputfile.readline(n)
                         split_l = lines.split(' ')
                         length = len(split_l)
                         #bins.append((split_l[length-5]))
@@ -132,16 +134,16 @@ class mcnp_file_handler():
                             total.append(split_l[len(split_l)-2])
                             total_unc.append(split_l[len(split_l)-1])
                         p = p + 1
-                       
+
                     current_vals.pop(253) #extracting last value ('total flux')
                     current_unc.pop(253)
             #bins.pop(239)
                 i = i + 1
         return current_vals, current_unc
-                        
+
         
 
-    np.set_printoptions(precision=None, suppress=None)
+
 
     def propagate_uncertainty(self, derivative, uncertainty):
         #print(derivative)
@@ -162,7 +164,7 @@ class mcnp_file_handler():
         bins = []
         nums = []
         sfrflux = []
-        strflux_unc = [
+        sfrflux_unc = []
         i=0
         for rowx in range(sheet.nrows):
             if i == 0:
@@ -218,11 +220,11 @@ class mcnp_file_handler():
         derivative0 = np.concatenate([dR_dflux1, dR_dflux2])
         derivative  = np.reshape(derivative0,(1,504))
 
-        R_unc = propagate_uncertainty(derivative,uncertainty)   
+        R_unc = self.propagate_uncertainty(derivative,uncertainty)
         #print(R)
         R[np.isnan(R)] = 0
         R_unc[np.isnan(R_unc)] = 0
-    return R, R_unc
+        return R, R_unc
         
         
     def run_mcnp_input(self, input_file):
