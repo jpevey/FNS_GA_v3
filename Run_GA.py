@@ -32,7 +32,7 @@ options['grid_y'] = 1
 # options['grid_z'] = 1 need to code 3rd dimension for fns
 options['total_materials'] = options['grid_x'] * options['grid_y']
 options['scale_template_file_string'] = '11x11_grid_array_template.inp'
-options['mcnp_template_file_string'] = 'FluxRep_toy_jlp_template_incorrect_maybe.inp'
+options['mcnp_template_file_string'] = 'cyl_template.inp'
 options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
