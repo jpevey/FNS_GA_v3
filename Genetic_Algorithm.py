@@ -85,6 +85,9 @@ class genetic_algorithm:
             print("CHILDREN:::")
             for ind_count, ind_ in enumerate(list_of_mutated_children):
                 print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
+
+            ### Checking if any of the children have already been created/evaluated
+
             ### combining now evaluated children with previous list of individuals
             self.individuals = self.individuals + list_of_mutated_children
             print("sorting")

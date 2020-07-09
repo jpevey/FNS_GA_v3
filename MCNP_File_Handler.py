@@ -204,10 +204,8 @@ class mcnp_file_handler():
         ddenomenator4_flux2 = np.dot(variable0, ddenomenator3_dflux2)
         # print(numerator, denomenator4, R)
         R = numerator / denomenator4
-        dR_dflux1 = np.dot(1 / (denomenator4), dnumerator_dflux1) - np.dot(numerator / denomenator4 ** 2,
-                                                                           ddenomenator4_flux1)
-        dR_dflux2 = np.dot(1 / (denomenator4), dnumerator_dflux2) - np.dot(numerator / denomenator4 ** 2,
-                                                                           ddenomenator4_flux2)
+        dR_dflux1 = np.dot(1 / (denomenator4), dnumerator_dflux1) - np.dot(numerator / denomenator4 ** 2, ddenomenator4_flux1)
+        dR_dflux2 = np.dot(1 / (denomenator4), dnumerator_dflux2) - np.dot(numerator / denomenator4 ** 2, ddenomenator4_flux2)
 
         uncertainty0 = np.concatenate([flux1_unc, flux2_unc])
         uncertainty = np.reshape(uncertainty0, (1, 504))
