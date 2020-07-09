@@ -194,6 +194,10 @@ class genetic_algorithm:
                 for individual in list_of_individuals:
                     if self.options['fake_fitness_debug'] == True:
                         individual.representativity = random.uniform(0, 1.0)
+
+                    current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string)
+                    individual.representativity = mcnp_file_handler.calculate_representivity(current_vals, current_unc)
+
                     print("individual.representativity", individual.representativity)
 
 
