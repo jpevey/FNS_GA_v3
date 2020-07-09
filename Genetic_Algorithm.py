@@ -17,9 +17,7 @@ class genetic_algorithm:
         ### List of current generation individuals
         self.individuals = []
 
-        if self.options['guarantee_unique_children'] == True:
-            self.all_individuals = []
-            self.all_individuals = self.all_individuals + self.individuals
+
 
         self.generation = 0
         self.individual_count = 0
@@ -27,6 +25,10 @@ class genetic_algorithm:
         for ind in range(self.options['number_of_individuals']):
             self.individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
             self.individual_count += 1
+
+        if self.options['remake_duplicate_children'] == True:
+            self.all_individuals = copy.deepcopy(self.individuals)
+            print("All individuals:", self.all_individuals)
         ### Loading CNN if needed
         #if 'cnn' in self.options['solver']:
         #    model_string = "CNN_3d_11x11_fm_cad_4x4_kern_v2.hdf5"
@@ -115,11 +117,21 @@ class genetic_algorithm:
             self.generation += 1
 
     def remake_duplicate_children(self, list_of_children, comparison_list):
-       for child in list_of_children:
-           for comparison_ind in comparison_list:
-               if child.material_matrix == comparison_ind.material_matrix:
-                    child.create_random_pattern()
 
+        for child in list_of_children:
+            print("Checking child:", child.material_matrix, comparison_list)
+            for comparison_ind in comparison_list:
+                print("comparison", comparison_ind.material_matrix)
+                comparison_score = 0
+                for child_mat, comp_mat in zip(child.material_matrix, comparison_ind.material_matrix):
+                    if child_mat == comp_mat:
+                        comparison_score += 1
+                    if comparison_score == 4:
+                        print("Duplicate child found!!!")
+                        child.create_random_pattern()
+                #print(child.material_matrix, comparison_ind.material_matrix)
+                #if child.material_matrix == comparison_ind.material_matrix:
+                #    child.create_random_pattern()
         return list_of_children
 
 
@@ -213,9 +225,9 @@ class genetic_algorithm:
                 for individual in list_of_individuals:
                     if self.options['fake_fitness_debug'] == True:
                         individual.representativity = random.uniform(0, 1.0)
-
-                    current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                    individual.representativity = mcnp_file_handler.calculate_representivity(current_vals, current_unc)
+                    else:
+                        current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string + "o")
+                        individual.representativity = mcnp_file_handler.calculate_representivity(current_vals, current_unc)
 
                     print("individual.representativity", individual.representativity)
 

@@ -8,8 +8,9 @@ include_pattern,False
 number_of_generations,2
 number_of_individuals,5
 number_of_parents,2
-minimum_fuel_elements,1
+minimum_fuel_elements,0
 maximum_fuel_elements,3
+remake_duplicate_children,True
 mutation_rate,0.2
 mutation_type,bitwise
 material_types,[1, 2, 3, 4]
@@ -54,18 +55,18 @@ scale_script_template,
 pattern_to_include,[[[1, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1], [2, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1], [1, 1, 1, 2, 1, 2, 1, 1, 2, 2, 2], [1, 2, 2, 1, 1, 1, 2, 1, 1, 2, 1], [2, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1], [1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2], [2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2], [2, 1, 2, 1, 2, 1, 1, 2, 2, 1, 2], [2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2], [2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]]
 read_parents_from_file,False
 cyl_scale_template,['cylinder material 1 10.83396326 2.54 0.0', 'cylinder material 1 15.32153778 2.54 0.0', 'cylinder material 1 18.76497482 2.54 0.0', 'cylinder material 1 21.66792653 2.54 0.0', 'cylinder material 1 24.22547832 2.54 0.0', 'cylinder material 1 26.53768189 2.54 0.0', 'cylinder material 1 28.66397251 2.54 0.0', 'cylinder material 1 30.64307556 2.54 0.0', 'cylinder material 1 32.50188979 2.54 0.0', 'cylinder material 1 34.26 2.54 0.0', 'cylinder material 1 35.93219114 2.54 0.0', 'cylinder material 1 37.52994964 2.54 0.0', 'cylinder material 1 39.06241006 2.54 0.0', 'cylinder material 1 40.53697867 2.54 0.0', 'cylinder material 1 41.95975929 2.54 0.0', 'cylinder material 1 43.33585305 2.54 0.0', 'cylinder material 1 44.66957488 2.54 0.0', 'cylinder material 1 45.96461335 2.54 0.0', 'cylinder material 1 47.22415102 2.54 0.0', 'cylinder material 1 48.45095663 2.54 0.0']
-0,1,N/A,0.9377231709729135,3,random_initialized,,3.0,2,1,1,1,
-0,0,N/A,0.8388421336417516,2,random_initialized,,3.0,1,2,3,1,
-0,3,N/A,0.37336703510746994,3,random_initialized,,N/A,2,1,1,1,
-0,2,N/A,0.3124462117753217,1,random_initialized,,N/A,4,1,4,3,
-0,4,N/A,0.10525706797497858,3,random_initialized,,N/A,1,2,1,1,
-1,1,N/A,0.9377231709729135,3,random_initialized,,3.0,2,1,1,1,
-1,0,N/A,0.8388421336417516,2,random_initialized,,3.0,1,2,3,1,
-1,5,N/A,0.6926592174806234,3,1,0,N/A,1,2,1,1,
-1,7,N/A,0.6892498583314199,2,1,0,N/A,1,2,3,1,
-1,6,N/A,0.4758998018217593,4,1,0,N/A,1,1,1,1,
-2,1,N/A,0.9377231709729135,3,random_initialized,,3.0,2,1,1,1,
-2,0,N/A,0.8388421336417516,2,random_initialized,,3.0,1,2,3,1,
-2,5,N/A,0.6926592174806234,3,1,0,N/A,1,2,1,1,
-2,7,N/A,0.6892498583314199,2,1,0,N/A,1,2,3,1,
-2,6,N/A,0.4758998018217593,4,1,0,N/A,1,1,1,1,
+0,4,N/A,0.9377231709729135,0,random_initialized,,4.0,4,4,3,4,
+0,3,N/A,0.8388421336417516,2,random_initialized,,4.0,2,1,1,2,
+0,1,N/A,0.5659059287445143,1,random_initialized,,N/A,2,3,1,4,
+0,0,N/A,0.07546193461890693,3,random_initialized,,N/A,1,4,1,1,
+0,2,N/A,0.06184005967204942,1,random_initialized,,N/A,4,1,4,3,
+1,4,N/A,0.9377231709729135,0,random_initialized,,4.0,4,4,3,4,
+1,3,N/A,0.8388421336417516,2,random_initialized,,4.0,2,1,1,2,
+1,5,N/A,0.7344358240474983,2,3,4,N/A,4,1,1,2,
+1,1,N/A,0.5659059287445143,1,random_initialized,,N/A,2,3,1,4,
+1,6,N/A,0.5358660575929557,2,4,3,N/A,4,1,1,4,
+2,4,N/A,0.9377231709729135,0,random_initialized,,4.0,4,4,3,4,
+2,3,N/A,0.8388421336417516,2,random_initialized,,4.0,2,1,1,2,
+2,5,N/A,0.7344358240474983,2,3,4,N/A,4,1,1,2,
+2,9,N/A,0.6856247667559482,2,4,3,N/A,1,1,3,3,
+2,10,N/A,0.5817035503610637,0,4,3,N/A,4,4,4,3,
