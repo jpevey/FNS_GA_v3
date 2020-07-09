@@ -221,10 +221,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="436" y="12" key="CommitChangelistDialog2" timestamp="1594307078754">
+    <state x="436" y="12" key="CommitChangelistDialog2" timestamp="1594307452492">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="436" y="12" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594307078754" />
+    <state x="436" y="12" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594307452492" />
     <state width="767" height="218" key="GridCell.Tab.0.bottom" timestamp="1594306819802">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -261,5 +261,9 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="389" y="66" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1593657989968" />
+    <state x="361" y="149" key="Vcs.Push.Dialog.v2" timestamp="1594307554036">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="361" y="149" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1594307554036" />
   </component>
 </project>
