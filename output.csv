@@ -1,0 +1,71 @@
+skip_waiting_on_jobs_debug,True
+fake_fitness_debug,True
+skip_writing_files,False
+verify_fuel_mass_after_mutation,False
+verify_fuel_mass_after_crossover,False
+enforce_fuel_count,False
+include_pattern,False
+number_of_generations,2
+number_of_individuals,5
+number_of_parents,2
+minimum_fuel_elements,1
+maximum_fuel_elements,3
+mutation_rate,0.2
+mutation_type,bitwise
+material_types,[1, 2, 3, 4]
+choose_parent_based_on_bitwise_diversity,True
+crossover_type,bitwise
+enforced_fuel_count_value,0
+grid_x,4
+grid_y,1
+total_materials,4
+scale_template_file_string,11x11_grid_array_template.inp
+mcnp_template_file_string,simplecyl.inp
+file_keyword,stacked_cylinders_test_
+solver,mcnp
+store_all_individuals,False
+solver_location,necluster
+geometry,grid
+template_keywords,OrderedDict([('mat_1', ''), ('mat_2', ''), ('mat_3', ''), ('mat_4', '')])
+keywords_list,['mat_1', 'mat_2', 'mat_3', 'mat_4']
+write_output_csv,True
+output_filename,output
+fitness,representativity
+default_mcnp_mat_count_and_density,OrderedDict([(1, '1 -18.95'), (2, '2 -0.93'), (3, '3 -18.94'), (4, '4 -2.1596')])
+output_writeout_values,['generation', 'individual_count', 'input_name', 'representativity', 'number_of_fuel', 'write_out_parents', 'write_out_average_diversity_score', 'materials']
+scale_script_template,
+    #!/bin/bash
+    #PBS -q fill
+    #PBS -V
+    #PBS -l nodes=1:ppn=8
+    
+    module unload mpi
+    module load openmpi/1.8.8-gnu
+    module load scale/dev
+    cat ${PBS_NODEFILE}
+    #NP=$(grep -c node ${PBS_NODEFILE})
+    
+    cd $PBS_O_WORKDIR
+    
+    #echo $NP
+    scalerte -m -N 8 -M ${PBS_NODEFILE} -T /home/tmp_scale/$USER/scale.$$ %%%input%%%
+    grep -a "final result" %%%input%%%.out > %%%input%%%_done.dat
+    
+pattern_to_include,[[[1, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1], [2, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1], [1, 1, 1, 2, 1, 2, 1, 1, 2, 2, 2], [1, 2, 2, 1, 1, 1, 2, 1, 1, 2, 1], [2, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1], [1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2], [2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1], [1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2], [2, 1, 2, 1, 2, 1, 1, 2, 2, 1, 2], [2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2], [2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]]
+read_parents_from_file,False
+cyl_scale_template,['cylinder material 1 10.83396326 2.54 0.0', 'cylinder material 1 15.32153778 2.54 0.0', 'cylinder material 1 18.76497482 2.54 0.0', 'cylinder material 1 21.66792653 2.54 0.0', 'cylinder material 1 24.22547832 2.54 0.0', 'cylinder material 1 26.53768189 2.54 0.0', 'cylinder material 1 28.66397251 2.54 0.0', 'cylinder material 1 30.64307556 2.54 0.0', 'cylinder material 1 32.50188979 2.54 0.0', 'cylinder material 1 34.26 2.54 0.0', 'cylinder material 1 35.93219114 2.54 0.0', 'cylinder material 1 37.52994964 2.54 0.0', 'cylinder material 1 39.06241006 2.54 0.0', 'cylinder material 1 40.53697867 2.54 0.0', 'cylinder material 1 41.95975929 2.54 0.0', 'cylinder material 1 43.33585305 2.54 0.0', 'cylinder material 1 44.66957488 2.54 0.0', 'cylinder material 1 45.96461335 2.54 0.0', 'cylinder material 1 47.22415102 2.54 0.0', 'cylinder material 1 48.45095663 2.54 0.0']
+0,1,N/A,0.9377231709729135,3,random_initialized,,3.0,2,1,1,1,
+0,0,N/A,0.8388421336417516,2,random_initialized,,3.0,1,2,3,1,
+0,3,N/A,0.37336703510746994,3,random_initialized,,N/A,2,1,1,1,
+0,2,N/A,0.3124462117753217,1,random_initialized,,N/A,4,1,4,3,
+0,4,N/A,0.10525706797497858,3,random_initialized,,N/A,1,2,1,1,
+1,1,N/A,0.9377231709729135,3,random_initialized,,3.0,2,1,1,1,
+1,0,N/A,0.8388421336417516,2,random_initialized,,3.0,1,2,3,1,
+1,5,N/A,0.6926592174806234,3,1,0,N/A,1,2,1,1,
+1,7,N/A,0.6892498583314199,2,1,0,N/A,1,2,3,1,
+1,6,N/A,0.4758998018217593,4,1,0,N/A,1,1,1,1,
+2,1,N/A,0.9377231709729135,3,random_initialized,,3.0,2,1,1,1,
+2,0,N/A,0.8388421336417516,2,random_initialized,,3.0,1,2,3,1,
+2,5,N/A,0.6926592174806234,3,1,0,N/A,1,2,1,1,
+2,7,N/A,0.6892498583314199,2,1,0,N/A,1,2,3,1,
+2,6,N/A,0.4758998018217593,4,1,0,N/A,1,1,1,1,

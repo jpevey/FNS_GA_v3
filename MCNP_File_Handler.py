@@ -59,7 +59,7 @@ class mcnp_file_handler():
         template_file = open(template_file, 'r')
 
         ### Opening output file
-        output_file_string = input_file_str + ".inp"
+        output_file_string = input_file_str
 
         output_file = open(output_file_string, 'w')
 
