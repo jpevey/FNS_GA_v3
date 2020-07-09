@@ -408,14 +408,15 @@ class genetic_algorithm:
         jobs_completed = 0
         jobs_to_be_waited_on = getattr(self, run_type + "_inputs")
         temp_file_list = copy.deepcopy(jobs_to_be_waited_on)
+        print("Jobs waiting on: ", jobs_to_be_waited_on)
         while waiting_on_jobs:
             for file in os.listdir():
                 if "gen_" + str(self.generation) in file:
                     if "_done.dat" in file:
                         file_temp = file.split("_done.dat")
-                        script_str = file_temp[0] + ".sh"
+                        script_str = file_temp[0]
                         if script_str in temp_file_list:
-                            temp_file_list.remove(file_temp[0] + ".sh")
+                            temp_file_list.remove(file_temp[0])
                             jobs_completed += 1
             if jobs_completed == len(jobs_to_be_waited_on):
                 print("All jobs are complete, continuing")

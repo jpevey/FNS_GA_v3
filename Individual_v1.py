@@ -16,7 +16,7 @@ class individual:
         self.grid_y = options['grid_y']
         self.options = options
         self.ind_count = individual_count
-        self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count)
+        self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
         self.create_random_pattern()
         self.parent_string = "random_initialized,"
         self.born_from_crossover = False

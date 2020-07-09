@@ -221,5 +221,7 @@ class mcnp_file_handler():
         return R, R_unc
 
     def run_mcnp_input(self, input_file):
+        if input_file.endswith('.inp') == False:
+            input_file += ".inp"
         os.system('qsub ' + input_file + ".sh")
         print("Submitted:" , input_file + ".sh")
