@@ -17,9 +17,9 @@ class genetic_algorithm:
         ### List of current generation individuals
         self.individuals = []
 
-        if self.options['store_all_individuals'] == True:
+        if self.options['guarantee_unique_children'] == True:
             self.all_individuals = []
-            self.all_individuals.append(self.individuals)
+            self.all_individuals = self.all_individuals + self.individuals
 
         self.generation = 0
         self.individual_count = 0
@@ -75,6 +75,9 @@ class genetic_algorithm:
             print("mutating")
             list_of_mutated_children = self.mutate(list_of_children)
 
+            if self.options['guarantee_unique_children'] == True:
+                list_of_mutated_children = self.guarantee_unique_individuals(list_of_mutated_children, self.all_individuals)
+
             if self.options['enforce_fuel_count']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
                 for ind_count, ind in enumerate(list_of_mutated_children):
@@ -110,6 +113,17 @@ class genetic_algorithm:
                 self.write_output_v2()
 
             self.generation += 1
+
+    def guarantee_unique_individuals(self, list_of_children, comparison_list):
+       for child in list_of_children:
+           for comparison_ind in comparison_list:
+               if child.material_matrix == comparison_ind.material_matrix:
+                    child.create_random_pattern()
+
+        return list_of_children
+
+
+
 
     def evaluate_bitwise_diversity_of_parents(self):
 

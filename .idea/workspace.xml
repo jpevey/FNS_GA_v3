@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="integrating Cameron's flux/represent/uncert functions">
+    <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SFR_Flux_Data.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/SFR_Flux_Data.xlsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -284,7 +282,14 @@
       <option name="project" value="LOCAL" />
       <updated>1594328033919</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="integrating Cameron's flux/represent/uncert functions">
+      <created>1594330870185</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1594330870185</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -304,10 +309,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1594330844163">
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1594330869487">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594330844163" />
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594330869487" />
     <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1594324950505">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
