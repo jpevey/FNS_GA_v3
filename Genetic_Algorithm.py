@@ -121,14 +121,16 @@ class genetic_algorithm:
         for child in list_of_children:
             print("Checking child:", child.material_matrix, comparison_list)
             for comparison_ind in comparison_list:
-                print("comparison", comparison_ind.material_matrix)
+                print("comparison", child.material_matrix, comparison_ind.material_matrix)
                 comparison_score = 0
                 for child_mat, comp_mat in zip(child.material_matrix, comparison_ind.material_matrix):
                     if child_mat == comp_mat:
                         comparison_score += 1
                     if comparison_score == 4:
                         print("Duplicate child found!!!")
+                        print(child.material_matrix)
                         child.create_random_pattern()
+                        print(child.material_matrix)
                 #print(child.material_matrix, comparison_ind.material_matrix)
                 #if child.material_matrix == comparison_ind.material_matrix:
                 #    child.create_random_pattern()
@@ -357,7 +359,7 @@ class genetic_algorithm:
         # print("parent 2 pattern:", parent_2.material_matrix)
         # print("Child pattern before:", child_ind.material_matrix, child_ind.ind_count)
         temp_material_master_list = []
-        for material_list_count, material_list in enumerate(child_ind.material_matrix):
+        for material_list_count, material_list in enumerate(parent_1.material_matrix):
             temp_material_list = []
             for material_count, material in enumerate(material_list):
                 selection = random.randint(0, 1)
