@@ -14,12 +14,18 @@ class genetic_algorithm:
     def __init__(self, options_dict):
         print("Initializing GA with:", options_dict)
         self.options = options_dict
-        self.all_individuals = []
+        ### List of current generation individuals
+        self.individuals = []
+
+        if self.options['store_all_individuals'] == True:
+            self.all_individuals = []
+            self.all_individuals.append(self.individuals)
+
         self.generation = 0
         self.individual_count = 0
         ### Creating initial population
         for ind in range(self.options['number_of_individuals']):
-            self.all_individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
+            self.individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
             self.individual_count += 1
         ### Loading CNN if needed
         #if 'cnn' in self.options['solver']:
@@ -50,15 +56,15 @@ class genetic_algorithm:
 
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
-        self.all_individuals = self.evaluate(self.options['fitness'], self.all_individuals)
-        self.all_individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
+        self.evaluate(self.options['fitness'])
+        self.individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
             print("Evaluating diversity of parents")
             self.evaluate_bitwise_diversity_of_parents()
 
-        self.write_output()
+        self.write_output_v2()
         self.generation += 1
 
         ### Running GA algo
@@ -66,26 +72,39 @@ class genetic_algorithm:
             print("Generation: ", self.generation)
             print("crossover")
             list_of_children = self.crossover()
-            print("mutate")
+            print("mutating")
             list_of_mutated_children = self.mutate(list_of_children)
 
             if self.options['enforce_fuel_count']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
-                for ind_count, ind in enumerate(self.individuals):
+                for ind_count, ind in enumerate(list_of_mutated_children):
                     ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
 
-            print("evaluate")
-            self.evaluate(self.options['fitness'], self.individuals)
-            print("sort")
-            self.individuals.sort(key=lambda x: x.keff, reverse=True)
+            print("evaluating children")
+            self.evaluate(self.options['fitness'], list_of_mutated_children)
+            print("CHILDREN:::")
+            for ind_count, ind_ in enumerate(list_of_mutated_children):
+                print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
+            ### combining now evaluated children with previous list of individuals
+            self.individuals = self.individuals + list_of_mutated_children
+            print("sorting")
+            self.individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
+
+            ### Pairing down individuals to be specified number
+            self.individuals = self.individuals[:self.options['number_of_individuals']]
+
+
             ### Evaluating diversity of population
             if self.options['choose_parent_based_on_bitwise_diversity']:
                 print("Evaluating diversity of parents")
                 self.evaluate_bitwise_diversity_of_parents()
 
+            for ind_count, ind_ in enumerate(self.individuals):
+                print(ind_count, ind_.ind_count, ind_.generation)
+
             print("write output")
             if self.options['write_output_csv']:
-                self.write_output()
+                self.write_output_v2()
 
             self.generation += 1
 
@@ -148,7 +167,9 @@ class genetic_algorithm:
 
         return parent_2_index
 
-    def evaluate(self, evaluation_type, list_of_individuals):
+    def evaluate(self, evaluation_type, list_of_individuals = "Default"):
+        if list_of_individuals == "Default":
+            list_of_individuals = self.individuals
         scale_inputs = []
         if evaluation_type == 'representativity':
             print("Solving for representativity")
@@ -165,13 +186,14 @@ class genetic_algorithm:
                     mcnp_file_handler.run_mcnp_input(individual.input_file_string)
                     self.mcnp_inputs.append(individual.input_file_string)
 
-
                 self.wait_on_jobs('mcnp')
 
                 for individual in list_of_individuals:
                     if self.options['fake_fitness_debug'] == True:
                         individual.representativity = random.uniform(0, 1.0)
                     print("individual.representativity", individual.representativity)
+
+
 
         if evaluation_type == 'keff':
             if 'mcnp' in self.options['solver']:
@@ -221,7 +243,6 @@ class genetic_algorithm:
         #    print("solving for k with cnn")
         #    self.create_cnn_input()
         #    self.solve_for_keff_with_cnn()
-
         return list_of_individuals
     #def create_cnn_input(self):
     #    data_array = self.cnn_handler.build_individuals_array(self.individuals, generation=self.generation)
@@ -449,6 +470,17 @@ class genetic_algorithm:
                 continue
         output_file.close()
 
+    def write_output_v2(self):
+        output_file = open(self.options['output_filename'] + '.csv', 'a')
+
+        ###Building string to write
+        for ind_count, individual in enumerate(self.individuals):
+            write_string = self.write_options_funct(output_file, individual)
+            # print("writing out child:", self.generation, ind_count, write_string)
+            output_file.write(write_string + "\n")
+
+        output_file.close()
+
     def write_options_funct(self, output_file, individual):
         write_string = ""
         for write_option in self.options['output_writeout_values']:
@@ -458,6 +490,8 @@ class genetic_algorithm:
                 write_string += str(individual.ind_count) + ","
             if write_option == 'keff':
                 write_string += str(individual.keff) + ","
+            if write_option == 'representativity':
+                write_string += str(individual.representativity) + ","
             if write_option == 'materials':
                 write_string += str(individual.make_material_string_csv())
             if write_option == 'input_name':

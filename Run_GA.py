@@ -37,6 +37,7 @@ options['mcnp_template_file_string'] = 'cyl_template.inp'
 options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
+options['store_all_individuals'] = False
 options['solver_location'] = 'necluster'
 # options['solver'] = 'cnn'
 # options['geometry'] = 'cyl'
@@ -54,7 +55,7 @@ options['default_mcnp_mat_count_and_density'][1] = '1 -18.95'
 options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'
 options['default_mcnp_mat_count_and_density'][3] = '3 -18.94'
 options['default_mcnp_mat_count_and_density'][4] = '4 -2.1596'
-options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'number_of_fuel',
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'representativity', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
 # """#!/bin/bash
