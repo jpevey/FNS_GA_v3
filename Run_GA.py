@@ -48,7 +48,7 @@ options['keywords_list'] = ['mat_1', 'mat_2', 'mat_3', 'mat_4']
 for val in options['keywords_list']:
     options['template_keywords'][val] = ""
 options['write_output_csv'] = True
-options['output_filename'] = 'output'
+options['output_filename'] = '_output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
 options['fitness'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
