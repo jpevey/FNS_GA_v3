@@ -79,6 +79,7 @@ class genetic_algorithm:
 
             if self.options['remake_duplicate_children'] == True:
                 list_of_mutated_children = self.remake_duplicate_children(list_of_mutated_children, self.all_individuals)
+                self.all_individuals += list_of_mutated_children
 
             if self.options['enforce_fuel_count']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
@@ -115,6 +116,9 @@ class genetic_algorithm:
                 self.write_output_v2()
 
             self.generation += 1
+
+            if self.options['remake_duplicate_children'] == True:
+                self.all_individuals += list_of_mutated_children
 
     def remake_duplicate_children(self, list_of_children, comparison_list):
 
