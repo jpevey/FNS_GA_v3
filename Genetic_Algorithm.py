@@ -164,7 +164,12 @@ class genetic_algorithm:
                     mcnp_file_handler.run_mcnp_input(individual.input_file_string)
                     self.mcnp_inputs.append(individual.input_file_string)
                 self.wait_on_jobs('mcnp')
-                print("")
+
+                for individual in list_of_individuals:
+                    flux_, flux_unc = mcnp_file_handler.get_flux(individual.input_file_string)
+                    rep, rep_unc = mcnp_file_handler.calculate_representivity(flux_, flux_unc)
+                    individual.representativity = rep
+
         if evaluation_type == 'keff':
             if 'scale' in self.options['solver']:
                 ### create scale inputs, add filenames to list
