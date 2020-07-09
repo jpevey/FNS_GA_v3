@@ -109,14 +109,13 @@ class mcnp_file_handler():
 
     def get_flux(self, input_name):
         ### todo: write function which pulls flux tally out of mcnp output and returns it in a format required for calculate_representivity
-
         inputfile = open(input_name, 'r')
 
         current_vals = []
         current_unc = []
         i = 0
         for line in inputfile:
-            if line == '      energy   \n':
+            if line.strip() == 'energy':
                 p = 0
                 for n in range(i, i + 253):
                     lines = inputfile.readline(n)
@@ -218,7 +217,7 @@ class mcnp_file_handler():
         R[np.isnan(R)] = 0
         R_unc[np.isnan(R_unc)] = 0
         print(R, R_unc)
-        return R, R_unc
+        return R[0][0]
 
     def run_mcnp_input(self, input_file):
         if input_file.endswith('.inp') == False:

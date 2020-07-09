@@ -165,8 +165,13 @@ class genetic_algorithm:
         for d_s in diversity_scores:
             random_value = random.uniform(0, 1)
 
-            if random_value < (d_s[1] / self.individuals[parent_1_value].total_diversity_score):
+            try:
+                if random_value < (d_s[1] / self.individuals[parent_1_value].total_diversity_score):
+                    parent_2_index = d_s[0]
+            except:
                 parent_2_index = d_s[0]
+                return parent_2_index
+
 
         return parent_2_index
 
@@ -195,7 +200,7 @@ class genetic_algorithm:
                     if self.options['fake_fitness_debug'] == True:
                         individual.representativity = random.uniform(0, 1.0)
 
-                    current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string)
+                    current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string + "o")
                     individual.representativity = mcnp_file_handler.calculate_representivity(current_vals, current_unc)
 
                     print("individual.representativity", individual.representativity)
