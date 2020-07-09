@@ -13,8 +13,9 @@ options['include_pattern'] = False
 options['number_of_generations'] = 2
 options['number_of_individuals'] = 5
 options['number_of_parents'] = 2
-options['minimum_fuel_elements'] = 1
+options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
+options['remake_duplicate_children'] = True
 options['mutation_rate'] = 0.20  # for each individual, % chance that a material flips, 0.05 = 5%
 options[
     'mutation_type'] = 'bitwise'  # bitwise - each material has a chance to mutate to other material based on mutation_rate

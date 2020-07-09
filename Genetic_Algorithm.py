@@ -75,8 +75,8 @@ class genetic_algorithm:
             print("mutating")
             list_of_mutated_children = self.mutate(list_of_children)
 
-            if self.options['guarantee_unique_children'] == True:
-                list_of_mutated_children = self.guarantee_unique_individuals(list_of_mutated_children, self.all_individuals)
+            if self.options['remake_duplicate_children'] == True:
+                list_of_mutated_children = self.remake_duplicate_children(list_of_mutated_children, self.all_individuals)
 
             if self.options['enforce_fuel_count']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
@@ -114,7 +114,7 @@ class genetic_algorithm:
 
             self.generation += 1
 
-    def guarantee_unique_individuals(self, list_of_children, comparison_list):
+    def remake_duplicate_children(self, list_of_children, comparison_list):
        for child in list_of_children:
            for comparison_ind in comparison_list:
                if child.material_matrix == comparison_ind.material_matrix:
