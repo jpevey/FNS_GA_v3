@@ -36,6 +36,7 @@ class genetic_algorithm:
         #    self.cnn_input = []
 
         if self.options['include_pattern']:
+            print("Including a pattern in initial population!")
             for ind_count, pattern_to_include in enumerate(self.options['pattern_to_include']):
                 for _ in self.individuals[ind_count].material_matrix:
                     print(_)
@@ -541,7 +542,7 @@ class genetic_algorithm:
                 write_string += str(individual.make_material_string_csv())
             if write_option == 'input_name':
                 try:
-                    write_string += str(individual.scale_input_filename) + ','
+                    write_string += str(individual.input_file_string) + ','
                 except:
                     write_string += "N/A,"
             if write_option == 'number_of_fuel':
