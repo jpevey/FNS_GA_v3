@@ -147,7 +147,7 @@ class mcnp_file_handler():
 
         return propagated_unc
 
-    def calculate_representivity(self, flux, flux_unc):
+    def calculate_representativity(self, flux, flux_unc):
         ### show how well output is representative of sfr flux data
 
         ### SFR flux data

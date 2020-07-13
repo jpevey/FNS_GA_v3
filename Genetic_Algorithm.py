@@ -233,7 +233,7 @@ class genetic_algorithm:
                         individual.representativity = random.uniform(0, 1.0)
                     else:
                         current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                        individual.representativity = mcnp_file_handler.calculate_representivity(current_vals, current_unc)
+                        individual.representativity = mcnp_file_handler.calculate_representativity(current_vals, current_unc)
 
                     print("individual.representativity", individual.representativity)
 
