@@ -151,7 +151,9 @@ options['cyl_scale_template'] = [
     'cylinder material 1 48.45095663 2.54 0.0'
 ]
 
-
+options['check_eigenvalue'] = True
+options['check_eigenvalue_function'] = 'enforced_maximum_eigenvalue'
+options['enforced_maximum_eigenvalue'] = 0.98
 if __name__ == '__main__':
     ga = Genetic_Algorithm.genetic_algorithm(options)
 

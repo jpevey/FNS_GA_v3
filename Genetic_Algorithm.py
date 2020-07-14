@@ -57,6 +57,11 @@ class genetic_algorithm:
                 output_csv.write("{},{}\n".format(flag, self.options[flag]))
             output_csv.close()
 
+
+        ### Running eigenvalue calcs if needed
+        if self.options['enforced_maximum_eigenvalue'] == True:
+            getattr(self, self.options['check_eigenvalue_function'])()
+
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
         self.evaluate(self.options['fitness'])
@@ -475,6 +480,22 @@ class genetic_algorithm:
             fuel_count = individual.count_material(1)
             if fuel_count != self.options['enforced_fuel_count_value']:
                 individual.fix_material_count(1, self.options['enforced_fuel_count_value'])
+
+    def check_eigenvalue_function(self, list_of_individuals):
+        print("Enforcing eigenvalue on population, individuals with a keff >",
+              self.options['enforced_maximum_eigenvalue'], 'will not have a source calculation run')
+
+        for ind in list_of_individuals:
+            ind.evaluate_eigenvalue()
+            ind.get_eigenvalue('mcnp')
+
+            if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
+                print("keff, ", ind.keff, "too high. Skipping source calculation")
+
+            else:
+                ind.acceptable_eigenvalue = True
+
+        return list_of_individuals
 
     def write_output(self):
         output_file = open(self.options['output_filename'] + '.csv', 'a')

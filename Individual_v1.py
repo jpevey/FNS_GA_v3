@@ -21,6 +21,9 @@ class individual:
         self.parent_string = "random_initialized,"
         self.born_from_crossover = False
 
+        if options['enforced_maximum_eigenvalue'] == True:
+            self.acceptable_eigenvalue = False
+
         self.default_materials = collections.OrderedDict()
 
     def create_random_pattern(self):
@@ -236,4 +239,10 @@ class individual:
             for material_count, material in enumerate(_):
                 index_value += 1
 
+    def evaluate_eigenvalue(self):
+        if self.options['solver'] == 'mcnp':
+            print("Evaluating with mcnp")
+            setattr(self, 'keff_mcnp_input')
+    def get_eigenvalue(self):
+        pass
 
