@@ -46,7 +46,7 @@ class genetic_algorithm:
                     print(_)
 
         if self.options['enforce_fuel_count']:
-            print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
+            print("enforcing material",self.options['enforce_material_number'],' count:', self.options['enforced_fuel_count_value'])
             for ind_count, ind in enumerate(self.individuals):
                 ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
 
@@ -140,9 +140,6 @@ class genetic_algorithm:
                 #if child.material_matrix == comparison_ind.material_matrix:
                 #    child.create_random_pattern()
         return list_of_children
-
-
-
 
     def evaluate_bitwise_diversity_of_parents(self):
 

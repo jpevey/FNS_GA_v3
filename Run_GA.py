@@ -9,16 +9,18 @@ options['skip_writing_files'] = False
 options['verify_fuel_mass_after_mutation'] = False
 options['verify_fuel_mass_after_crossover'] = False
 options['enforce_fuel_count'] = False
+options['enforce_material_number'] = 1
+options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
 options['number_of_generations'] = 2
-options['number_of_individuals'] = 100
-options['number_of_parents'] = 20
+options['number_of_individuals'] = 10
+options['number_of_parents'] = 5
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
 options['mutation_rate'] = 0.20  # for each individual, % chance that a material flips, 0.05 = 5%
-options[
-    'mutation_type'] = 'bitwise'  # bitwise - each material has a chance to mutate to other material based on mutation_rate
+options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
+                                      # to mutate to other material based on mutation_rate
 options['material_types'] = [1, 2, 3, 4]
 # When doing crossover, select a parent based on specified method (default is uniformly at random)
 # Parent_2 is choosen at random with probabilities based on the diversity score
@@ -28,8 +30,8 @@ options['material_types'] = [1, 2, 3, 4]
 options['choose_parent_based_on_bitwise_diversity'] = True
 options['crossover_type'] = 'bitwise'  # bitwise - each material bit has a chance to come from parent 1 or parent 2
 # options['crossover_type'] = 'singlepoint' # bitwise - each material bit has a chance to come from parent 1 or parent 2
-options['enforced_fuel_count_value'] = 0
-options['grid_x'] = 4  # specifies how big a grid to create for this geometry
+
+options['grid_x'] = 10  # specifies how big a grid to create for this geometry
 options['grid_y'] = 1
 # options['grid_z'] = 1 need to code 3rd dimension for fns
 options['total_materials'] = options['grid_x'] * options['grid_y']
@@ -44,7 +46,11 @@ options['solver_location'] = 'necluster'
 # options['geometry'] = 'cyl'
 options['geometry'] = 'grid'
 options['template_keywords'] = collections.OrderedDict()
-options['keywords_list'] = ['mat_1', 'mat_2', 'mat_3', 'mat_4']
+### Creating keywords list for template file
+options['keywords_list'] = []
+options['keywords_template'] = 'mat_'
+for x in range(options['grid_x']):
+    options['keywords_list'].append(options['keywords_template'] + str(x+1))
 for val in options['keywords_list']:
     options['template_keywords'][val] = ""
 options['write_output_csv'] = True
