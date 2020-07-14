@@ -131,7 +131,7 @@ class genetic_algorithm:
                 for child_mat, comp_mat in zip(child.material_matrix, comparison_ind.material_matrix):
                     if child_mat == comp_mat:
                         comparison_score += 1
-                    if comparison_score == 4:
+                    if comparison_score == self.options['total_materials']:
                         print("Duplicate child found!!!")
                         print(child.material_matrix)
                         child.create_random_pattern()
