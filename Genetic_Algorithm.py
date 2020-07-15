@@ -238,8 +238,11 @@ class genetic_algorithm:
                         if self.options['fake_fitness_debug'] == True:
                             individual.representativity = random.uniform(0, 1.0)
                         else:
-                            current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                            individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
+                            if individual.acceptable_eigenvalue == True:
+                                current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
+                                individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
+                            if individual.acceptable_eigenvalue == False:
+                                individual.representativity = 0.0
 
                         print("individual.representativity", individual.representativity)
 
