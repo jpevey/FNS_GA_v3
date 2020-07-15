@@ -221,7 +221,34 @@ class mcnp_file_handler():
         return R[0][0]
 
     def run_mcnp_input(self, input_file):
+
         if input_file.endswith('.inp') == False:
             input_file += ".inp"
         os.system('qsub ' + input_file + ".sh")
         print("Submitted:" , input_file + ".sh")
+
+        #if location == "local":
+            #os.system("mcnp6 tasks 8 inp=" + input_file)
+
+    def get_keff(self, output_file_string):
+
+        if output_file_string.endswith("o") == False:
+            output_file_string = output_file_string + "o"
+
+        try:
+            output_file = open(output_file_string, 'r')
+        except:
+            print("Unable to open output file:", output_file_string, "returning 0 and continuing")
+            return 0.0
+
+        found_keff = False
+        for line in output_file:
+            if "the final estimated combined collision/absorption/track-length keff =" in line:
+                line_split_1 = line.split('the final estimated combined collision/absorption/track-length keff = ')
+                line_split_2 = line_split_1[1].split(' with ')
+                keff = line_split_2[0]
+                found_keff = True
+        if found_keff == False:
+            print("Unable to find a keff for input " + output_file_string, "returning 0 and continuing")
+            return 0.0
+        return keff

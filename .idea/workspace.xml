@@ -5,8 +5,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simplecyl.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl.inp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -369,14 +369,7 @@
       <option name="project" value="LOCAL" />
       <updated>1594695513766</updated>
     </task>
-    <task id="LOCAL-00031" summary="qol update to template_keywords option and how input files are written from template">
-      <created>1594742460334</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1594742460334</updated>
-    </task>
-    <option name="localTasksCounter" value="32" />
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -393,73 +386,72 @@
     <MESSAGE value="fixing 2x representativity typos" />
     <MESSAGE value="fixed input_file name writeout to csv" />
     <MESSAGE value="fixed duplicate child check bug" />
-    <MESSAGE value="qol update to template_keywords option and how input files are written from template" />
-    <option name="LAST_COMMIT_MESSAGE" value="qol update to template_keywords option and how input files are written from template" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed duplicate child check bug" />
   </component>
   <component name="WindowStateProjectService">
     <state x="503" y="67" key="#Run_GA" timestamp="1593705666402">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1594742458928">
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1594695513090">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594742458928" />
-    <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1594741836684">
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1594695513090" />
+    <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1594849563237">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594741836684" />
-    <state width="1537" height="218" key="GridCell.Tab.0.center" timestamp="1594741836684">
+    <state width="1537" height="218" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594849563237" />
+    <state width="1537" height="218" key="GridCell.Tab.0.center" timestamp="1594849563236">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1594741836684" />
-    <state width="1537" height="218" key="GridCell.Tab.0.left" timestamp="1594741836684">
+    <state width="1537" height="218" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1594849563236" />
+    <state width="1537" height="218" key="GridCell.Tab.0.left" timestamp="1594849563236">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1594741836684" />
-    <state width="1537" height="218" key="GridCell.Tab.0.right" timestamp="1594741836684">
+    <state width="1537" height="218" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1594849563236" />
+    <state width="1537" height="218" key="GridCell.Tab.0.right" timestamp="1594849563237">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="218" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1594741836684" />
-    <state width="1537" height="270" key="GridCell.Tab.1.bottom" timestamp="1593718682927">
+    <state width="1537" height="218" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1594849563237" />
+    <state width="1537" height="270" key="GridCell.Tab.1.bottom" timestamp="1594783440648">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1593718682927" />
-    <state width="1537" height="270" key="GridCell.Tab.1.center" timestamp="1593718682927">
+    <state width="1537" height="270" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1594783440648" />
+    <state width="1537" height="270" key="GridCell.Tab.1.center" timestamp="1594783440647">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1593718682927" />
-    <state width="1537" height="270" key="GridCell.Tab.1.left" timestamp="1593718682927">
+    <state width="1537" height="270" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1594783440647" />
+    <state width="1537" height="270" key="GridCell.Tab.1.left" timestamp="1594783440647">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1593718682927" />
-    <state width="1537" height="270" key="GridCell.Tab.1.right" timestamp="1593718682927">
+    <state width="1537" height="270" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1594783440647" />
+    <state width="1537" height="270" key="GridCell.Tab.1.right" timestamp="1594783440648">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1593718682927" />
-    <state x="481" y="131" key="MultipleFileMergeDialog" timestamp="1594323961636">
+    <state width="1537" height="270" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1594783440648" />
+    <state x="481" y="131" key="MultipleFileMergeDialog" timestamp="1594844842872">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="481" y="131" key="MultipleFileMergeDialog/0.0.1536.824@0.0.1536.824" timestamp="1594323961636" />
+    <state x="481" y="131" key="MultipleFileMergeDialog/0.0.1536.824@0.0.1536.824" timestamp="1594844842872" />
     <state x="389" y="66" key="SettingsEditor" timestamp="1594324261495">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="389" y="66" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1594324261495" />
-    <state x="361" y="149" key="Vcs.Push.Dialog.v2" timestamp="1594742565141">
+    <state width="242" height="198" key="ShowFilterAction_Filter_Popup" timestamp="1594846858400">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="149" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1594742565141" />
+    <state width="242" height="198" key="ShowFilterAction_Filter_Popup/0.0.1536.824@0.0.1536.824" timestamp="1594846858400" />
     <state x="93" y="93" width="1350" height="638" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1594250119996">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="93" y="93" width="1350" height="638" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1536.824@0.0.1536.824" timestamp="1594250119996" />
-    <state x="550" y="129" key="git4idea.branch.GitSmartOperationDialog" timestamp="1594323953830">
+    <state x="550" y="129" key="git4idea.branch.GitSmartOperationDialog" timestamp="1594844835589">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="550" y="129" key="git4idea.branch.GitSmartOperationDialog/0.0.1536.824@0.0.1536.824" timestamp="1594323953830" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1594332941386">
+    <state x="550" y="129" key="git4idea.branch.GitSmartOperationDialog/0.0.1536.824@0.0.1536.824" timestamp="1594844835589" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1594846858831">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1594332941386" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1594846858831" />
   </component>
 </project>

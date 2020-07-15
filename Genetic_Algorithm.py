@@ -12,6 +12,7 @@ import MCNP_File_Handler
 
 class genetic_algorithm:
     def __init__(self, options_dict):
+        self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
         print("Initializing GA with:", options_dict)
         self.options = options_dict
         ### List of current generation individuals
@@ -65,7 +66,7 @@ class genetic_algorithm:
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
         self.evaluate(self.options['fitness'])
-        self.individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
+        self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
@@ -94,7 +95,6 @@ class genetic_algorithm:
 
             print("evaluating children")
             self.evaluate(self.options['fitness'], list_of_mutated_children)
-            print("CHILDREN:::")
             for ind_count, ind_ in enumerate(list_of_mutated_children):
                 print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
 
@@ -103,7 +103,7 @@ class genetic_algorithm:
             ### combining now evaluated children with previous list of individuals
             self.individuals = self.individuals + list_of_mutated_children
             print("sorting")
-            self.individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
+            self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
 
             ### Pairing down individuals to be specified number
             self.individuals = self.individuals[:self.options['number_of_individuals']]
@@ -210,86 +210,97 @@ class genetic_algorithm:
 
         return parent_2_index
 
-    def evaluate(self, evaluation_type, list_of_individuals = "Default"):
+    def evaluate(self, evaluation_types, list_of_individuals = "Default"):
         if list_of_individuals == "Default":
             list_of_individuals = self.individuals
-        scale_inputs = []
-        if evaluation_type == 'representativity':
-            print("Solving for representativity")
-            if 'mcnp' in self.options['solver']:
-                self.mcnp_inputs = []
-                mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
-                for individual in list_of_individuals:
-                    ### Building MCNP input file
-                    print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
-                    mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
-                                                       dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
-                                                       input_file_str = individual.input_file_string)
-                    mcnp_file_handler.build_mcnp_running_script(individual.input_file_string)
-                    mcnp_file_handler.run_mcnp_input(individual.input_file_string)
-                    self.mcnp_inputs.append(individual.input_file_string)
+        for evaluation_type in evaluation_types:
+            if "#" in evaluation_type:
+                evaluation_type, evaluation_options = evaluation_type.split("#")
+            scale_inputs = []
+            if evaluation_type == 'representativity':
+                print("Solving for representativity")
+                if 'mcnp' in self.options['solver']:
+                    self.mcnp_inputs = []
+                    for individual in list_of_individuals:
+                        if individual.acceptable_eigenvalue == True:
+                            ### Building MCNP input file
+                            self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
+                                                               dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
+                                                               input_file_str = individual.input_file_string)
+                            self.mcnp_file_handler.build_mcnp_running_script(individual.input_file_string)
 
-                self.wait_on_jobs('mcnp')
+                            self.mcnp_file_handler.run_mcnp_input(individual.input_file_string)
+                            self.mcnp_inputs.append(individual.input_file_string)
 
-                for individual in list_of_individuals:
-                    if self.options['fake_fitness_debug'] == True:
-                        individual.representativity = random.uniform(0, 1.0)
-                    else:
-                        current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                        individual.representativity = mcnp_file_handler.calculate_representativity(current_vals, current_unc)
+                    self.wait_on_jobs('mcnp')
 
-                    print("individual.representativity", individual.representativity)
-
-
-
-        if evaluation_type == 'keff':
-            if 'mcnp' in self.options['solver']:
-                self.mcnp_inputs = []
-                mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
-                for individual in list_of_individuals:
-                    ### Building MCNP input file
-                    print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
-                    mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
-                                                       dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
-                                                       input_file_str = individual.input_file_string)
-                    mcnp_file_handler.build_mcnp_running_script(individual.input_file_string)
-                    mcnp_file_handler.run_mcnp_input(individual.input_file_string)
-                    self.mcnp_inputs.append(individual.input_file_string)
-                self.wait_on_jobs('mcnp')
-            if 'scale' in self.options['solver']:
-                ### create scale inputs, add filenames to list
-                for individual in self.individuals:
-                    if individual.evaluated_keff == False:
-                        if self.options['geometry'] == 'cyl':
-                            individual.make_material_string_scale('cyl_materials')
-                        elif self.options['geometry'] == 'grid':
-                            individual.make_material_string_scale('%array%1')
+                    for individual in list_of_individuals:
+                        if self.options['fake_fitness_debug'] == True:
+                            individual.representativity = random.uniform(0, 1.0)
                         else:
-                            print("Geometry not handled in evaluate function")
-                            exit()
-                        scale_inputs.append(individual.setup_scale(self.generation))
-                        individual.evaluated_keff = True
-                        if self.options['fake_fitness_debug']:
-                            individual.keff = random.uniform(0.5, 1.5)
-                self.scale_inputs = scale_inputs
-                ### submitting all jobs and waiting on all jobs
-                if self.options['solver_location']  == 'necluster':
-                    self.submit_jobs(self.scale_inputs)
-                    self.wait_on_jobs('scale')
+                            current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
+                            individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
 
-                if self.options['solver_location'] == 'local':
-                    print("Cant run scale locally... yet... fix this")
-                    exit()
+                        print("individual.representativity", individual.representativity)
 
-                for individual in self.individuals:
-                    individual.get_scale_keff()
-            else:
-                print("Not able to evaluate keff with mcnp yet")
-                ### todo: add mcnp keff capability
-        #if 'cnn' in self.options['solver']:
-        #    print("solving for k with cnn")
-        #    self.create_cnn_input()
-        #    self.solve_for_keff_with_cnn()
+
+
+            if evaluation_type == 'keff':
+                if 'mcnp' in self.options['solver']:
+                    self.mcnp_keff_inputs = []
+                    self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
+                    for individual in list_of_individuals:
+                        ### Building MCNP input file
+                        print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
+                        self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_keff_template_file_string'],
+                                                           dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
+                                                           input_file_str = individual.keff_input_file_string)
+                        self.mcnp_file_handler.build_mcnp_running_script(individual.keff_input_file_string)
+                        self.mcnp_file_handler.run_mcnp_input(individual.keff_input_file_string)
+                        self.mcnp_keff_inputs.append(individual.keff_input_file_string)
+
+                    self.wait_on_jobs('mcnp_keff')
+
+                    for ind in list_of_individuals:
+                        ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
+
+                        if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
+                            print("keff, ", ind.keff, "too high. Skipping source calculation")
+                            ind.acceptable_eigenvalue = False
+                        else:
+                            ind.acceptable_eigenvalue = True
+                if 'scale' in self.options['solver']:
+                    ### create scale inputs, add filenames to list
+                    for individual in self.individuals:
+                        if individual.evaluated_keff == False:
+                            if self.options['geometry'] == 'cyl':
+                                individual.make_material_string_scale('cyl_materials')
+                            elif self.options['geometry'] == 'grid':
+                                individual.make_material_string_scale('%array%1')
+                            else:
+                                print("Geometry not handled in evaluate function")
+                                exit()
+                            scale_inputs.append(individual.setup_scale(self.generation))
+                            individual.evaluated_keff = True
+                            if self.options['fake_fitness_debug']:
+                                individual.keff = random.uniform(0.5, 1.5)
+                    self.scale_inputs = scale_inputs
+                    ### submitting all jobs and waiting on all jobs
+                    if self.options['solver_location']  == 'necluster':
+                        self.submit_jobs(self.scale_inputs)
+                        self.wait_on_jobs('scale')
+
+                    if self.options['solver_location'] == 'local':
+                        print("Cant run scale locally... yet... fix this")
+                        exit()
+
+                    for individual in self.individuals:
+                        individual.get_scale_keff()
+
+            #if 'cnn' in self.options['solver']:
+            #    print("solving for k with cnn")
+            #    self.create_cnn_input()
+            #    self.solve_for_keff_with_cnn()
         return list_of_individuals
     #def create_cnn_input(self):
     #    data_array = self.cnn_handler.build_individuals_array(self.individuals, generation=self.generation)
@@ -403,12 +414,11 @@ class genetic_algorithm:
 
     def mutate(self, list_of_individuals):
         ### Currently only works on a material-basis
+        print("MUTATING!!!")
         if self.options['mutation_type'] == 'bitwise':
+            print("BITWISE!", len(list_of_individuals))
             for ind_count, individual in enumerate(list_of_individuals):
-                ### Will not mutate parents/elite population
-                if ind_count < self.options['number_of_parents']:
-                    continue
-
+                print("MUTATING:", ind_count)
                 original_material_matrix = copy.deepcopy(individual.material_matrix)
                 individual.material_matrix = self.single_bit_mutation(original_material_matrix)
 
@@ -432,8 +442,10 @@ class genetic_algorithm:
             material_matrix_sublist = []
             for material in material_list:
                 ### Attempting mutation
+
                 if random.uniform(0, 1.0) < self.options['mutation_rate']:
                     new_index = random.randint(0, len(self.options['material_types']) - 1)
+
                     while material == self.options['material_types'][new_index]:
                         new_index = random.randint(0, len(self.options['material_types']) - 1)
                     # print("new material: ", self.options['material_types'][new_index], "old", material)
@@ -447,7 +459,7 @@ class genetic_algorithm:
             print("Submitting job:", job)
             os.system('qsub ' + job)
 
-    def wait_on_jobs(self, run_type):
+    def wait_on_jobs(self, run_type, unique_flag = ""):
         waiting_on_jobs = True
         jobs_completed = 0
         jobs_to_be_waited_on = getattr(self, run_type + "_inputs")
@@ -457,11 +469,12 @@ class genetic_algorithm:
             for file in os.listdir():
                 if "gen_" + str(self.generation) in file:
                     if "_done.dat" in file:
-                        file_temp = file.split("_done.dat")
-                        script_str = file_temp[0]
-                        if script_str in temp_file_list:
-                            temp_file_list.remove(file_temp[0])
-                            jobs_completed += 1
+                        if unique_flag in file:
+                            file_temp = file.split("_done.dat")
+                            script_str = file_temp[0]
+                            if script_str in temp_file_list:
+                                temp_file_list.remove(file_temp[0])
+                                jobs_completed += 1
             if jobs_completed == len(jobs_to_be_waited_on):
                 print("All jobs are complete, continuing")
                 return
@@ -481,21 +494,6 @@ class genetic_algorithm:
             if fuel_count != self.options['enforced_fuel_count_value']:
                 individual.fix_material_count(1, self.options['enforced_fuel_count_value'])
 
-    def check_eigenvalue_function(self, list_of_individuals):
-        print("Enforcing eigenvalue on population, individuals with a keff >",
-              self.options['enforced_maximum_eigenvalue'], 'will not have a source calculation run')
-
-        for ind in list_of_individuals:
-            ind.evaluate_eigenvalue()
-            ind.get_eigenvalue('mcnp')
-
-            if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
-                print("keff, ", ind.keff, "too high. Skipping source calculation")
-
-            else:
-                ind.acceptable_eigenvalue = True
-
-        return list_of_individuals
 
     def write_output(self):
         output_file = open(self.options['output_filename'] + '.csv', 'a')

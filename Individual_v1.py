@@ -17,12 +17,12 @@ class individual:
         self.options = options
         self.ind_count = individual_count
         self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
+        self.keff_input_file_string = "keff_" + self.input_file_string
         self.create_random_pattern()
         self.parent_string = "random_initialized,"
         self.born_from_crossover = False
 
-        if options['enforced_maximum_eigenvalue'] == True:
-            self.acceptable_eigenvalue = False
+        self.acceptable_eigenvalue = True
 
         self.default_materials = collections.OrderedDict()
 
@@ -242,7 +242,10 @@ class individual:
     def evaluate_eigenvalue(self):
         if self.options['solver'] == 'mcnp':
             print("Evaluating with mcnp")
-            setattr(self, 'keff_mcnp_input')
+
+
+
+
     def get_eigenvalue(self):
         pass
 

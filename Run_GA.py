@@ -12,13 +12,13 @@ options['enforce_fuel_count'] = False
 options['enforce_material_number'] = 1
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 2
-options['number_of_individuals'] = 10
-options['number_of_parents'] = 5
+options['number_of_generations'] = 1
+options['number_of_individuals'] = 3
+options['number_of_parents'] = 2
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
-options['mutation_rate'] = 0.20  # for each individual, % chance that a material flips, 0.05 = 5%
+options['mutation_rate'] = 1 # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
                                       # to mutate to other material based on mutation_rate
 options['material_types'] = [1, 2, 3, 4]
@@ -37,6 +37,7 @@ options['grid_y'] = 1
 options['total_materials'] = options['grid_x'] * options['grid_y']
 options['scale_template_file_string'] = '11x11_grid_array_template.inp'
 options['mcnp_template_file_string'] = 'simplecyl.inp'
+options['mcnp_keff_template_file_string'] = 'simplecyl_keff.inp'
 options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
@@ -56,7 +57,8 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = '_output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = 'representativity'
+options['fitness'] = ['keff#threshold','representativity']
+options['fitness_sort_by'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
 options['default_mcnp_mat_count_and_density'][1] = '1 -18.95'
 options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'
