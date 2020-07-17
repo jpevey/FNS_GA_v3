@@ -26,9 +26,7 @@ class genetic_algorithm:
             self.individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
             self.individual_count += 1
 
-        if self.options['remake_duplicate_children'] == True:
-            self.all_individuals = copy.deepcopy(self.individuals)
-            print("All individuals:", self.all_individuals)
+
         ### Loading CNN if needed
         #if 'cnn' in self.options['solver']:
         #    model_string = "CNN_3d_11x11_fm_cad_4x4_kern_v2.hdf5"
@@ -60,14 +58,20 @@ class genetic_algorithm:
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
         self.evaluate(self.options['fitness'])
+
+
+        self.all_individuals = copy.deepcopy(self.individuals)
+        #print("All individuals:", self.all_individuals)
+
         self.individuals.sort(key=lambda x: getattr(x, self.options['fitness']), reverse=True)
+
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
             print("Evaluating diversity of parents")
             self.evaluate_bitwise_diversity_of_parents()
 
-        self.write_output_v2()
+        self.write_output_v2(self.individuals)
         self.generation += 1
 
         ### Running GA algo
@@ -89,9 +93,9 @@ class genetic_algorithm:
 
             print("evaluating children")
             self.evaluate(self.options['fitness'], list_of_mutated_children)
-            print("CHILDREN:::")
-            for ind_count, ind_ in enumerate(list_of_mutated_children):
-                print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
+            #print("CHILDREN:::")
+            #for ind_count, ind_ in enumerate(list_of_mutated_children):
+                #print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
 
             ### Checking if any of the children have already been created/evaluated
 
@@ -109,33 +113,47 @@ class genetic_algorithm:
                 print("Evaluating diversity of parents")
                 self.evaluate_bitwise_diversity_of_parents()
 
-            for ind_count, ind_ in enumerate(self.individuals):
-                print(ind_count, ind_.ind_count, ind_.generation)
+            #for ind_count, ind_ in enumerate(self.individuals):
+                #print(ind_count, ind_.ind_count, ind_.generation)
 
             print("write output")
             if self.options['write_output_csv']:
-                self.write_output_v2()
+                self.write_output_v2(self.individuals)
 
             self.generation += 1
 
             if self.options['remake_duplicate_children'] == True:
                 self.all_individuals += list_of_mutated_children
 
+            #print("Printing all individuals!")
+            #for ind_ in self.all_individuals:
+                #print(ind_.input_file_string, ind_.representativity)
+
+        if self.options['output_all_individuals_at_end_of_calculation'] == True:
+            output_csv = open(self.options['output_all_individuals_at_end_of_calculation_file_name'] + '.csv', 'w')
+            for flag in self.options:
+                output_csv.write("{},{}\n".format(flag, self.options[flag]))
+            output_csv.close()
+            print(self.options['output_all_individuals_at_end_of_calculation_file_name'])
+            self.write_output_v2(list_of_individuals = self.all_individuals, output_file_name = self.options['output_all_individuals_at_end_of_calculation_file_name'])
+
+
+
     def remake_duplicate_children(self, list_of_children, comparison_list):
 
         for child in list_of_children:
             print("Checking child:", child.material_matrix, comparison_list)
             for comparison_ind in comparison_list:
-                print("comparison", child.material_matrix, comparison_ind.material_matrix)
+                #print("comparison", child.material_matrix, comparison_ind.material_matrix)
                 comparison_score = 0
                 for child_mat, comp_mat in zip(child.material_matrix, comparison_ind.material_matrix):
                     if child_mat == comp_mat:
                         comparison_score += 1
                     if comparison_score == self.options['total_materials']:
-                        print("Duplicate child found!!!")
-                        print(child.material_matrix)
-                        child.create_random_pattern()
-                        print(child.material_matrix)
+                        print("Duplicate child found! Forcing mutation")
+                        print("Before", child.material_matrix)
+                        child.material_matrix = self.single_bit_mutation(child.material_matrix, force_mutation=True, force_mutation_per_material_sublist=2)
+                        print("After", child.material_matrix)
                 #print(child.material_matrix, comparison_ind.material_matrix)
                 #if child.material_matrix == comparison_ind.material_matrix:
                 #    child.create_random_pattern()
@@ -216,7 +234,7 @@ class genetic_algorithm:
                 mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
                 for individual in list_of_individuals:
                     ### Building MCNP input file
-                    print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
+                    #print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
                     mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
                                                        dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
                                                        input_file_str = individual.input_file_string)
@@ -233,7 +251,7 @@ class genetic_algorithm:
                         current_vals, current_unc = mcnp_file_handler.get_flux(individual.input_file_string + "o")
                         individual.representativity = mcnp_file_handler.calculate_representativity(current_vals, current_unc)
 
-                    print("individual.representativity", individual.representativity)
+                    #print("individual.representativity", individual.representativity)
 
 
 
@@ -243,7 +261,7 @@ class genetic_algorithm:
                 mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
                 for individual in list_of_individuals:
                     ### Building MCNP input file
-                    print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
+                    #print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
                     mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
                                                        dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
                                                        input_file_str = individual.input_file_string)
@@ -405,8 +423,10 @@ class genetic_algorithm:
                     continue
 
                 original_material_matrix = copy.deepcopy(individual.material_matrix)
+                #print(individual.input_file_string)
+                #print(individual.material_matrix)
                 individual.material_matrix = self.single_bit_mutation(original_material_matrix)
-
+                #print(individual.material_matrix)
                 if self.options['verify_fuel_mass_after_mutation']:
                     ### Checking if new child meets fuel # requirement
                     fuel_count = individual.count_material(1)
@@ -421,20 +441,49 @@ class genetic_algorithm:
 
         return list_of_individuals
 
-    def single_bit_mutation(self, material_matrix):
+    def single_bit_mutation(self, material_matrix, force_mutation = False, force_mutation_per_material_sublist = 1):
         new_material_matrix = []
+        #print("old material matrix:", material_matrix)
+        ### If forcing a certain number of mutations per material sublist:
+        force_mutation_index = []
+        if force_mutation:
+            for _ in range(force_mutation_per_material_sublist):
+                rand_val = random.randint(0, len(material_matrix) - 1)
+                while rand_val in force_mutation_index:
+                    rand_val = random.randint(0, len(material_matrix) - 1)
+                    print(rand_val, force_mutation_index)
+                force_mutation_index.append(rand_val)
+            print("FORCING A MUTATION! at index(es):", force_mutation_index)
+
         for material_list in material_matrix:
             material_matrix_sublist = []
-            for material in material_list:
+
+
+
+            for material_count, material in enumerate(material_list):
                 ### Attempting mutation
-                if random.uniform(0, 1.0) < self.options['mutation_rate']:
+                random_val = random.uniform(0, 1.0)
+
+                ### If the current material count is in the force mutation list, forcing the mutation
+                if force_mutation:
+                    if material_count in force_mutation_index:
+                        random_val = self.options['mutation_rate']
+                        print("Forcing a mutation in material:", material_count)
+
+
+                if random_val <= self.options['mutation_rate']:
+
                     new_index = random.randint(0, len(self.options['material_types']) - 1)
+
                     while material == self.options['material_types'][new_index]:
                         new_index = random.randint(0, len(self.options['material_types']) - 1)
+                    # print("NEW_INDEX: ", new_index, len(self.options['material_types']) - 1)
                     # print("new material: ", self.options['material_types'][new_index], "old", material)
                     material = self.options['material_types'][new_index]
                 material_matrix_sublist.append(material)
             new_material_matrix.append(material_matrix_sublist)
+        print("new_material_matrix:", new_material_matrix)
+
         return new_material_matrix
 
     def submit_jobs(self, job_list):
@@ -513,11 +562,21 @@ class genetic_algorithm:
                 continue
         output_file.close()
 
-    def write_output_v2(self):
-        output_file = open(self.options['output_filename'] + '.csv', 'a')
+    def write_output_v2(self, list_of_individuals, output_file_name = ""):
+
+        ### Setting the default value, for the by-generation output
+        if output_file_name == "":
+            output_file_name = self.options['output_filename'] + '.csv'
+
+        if output_file_name.endswith('.csv') != True:
+            output_file_name += ".csv"
+
+
+        output_file = open(output_file_name, 'a')
 
         ###Building string to write
-        for ind_count, individual in enumerate(self.individuals):
+        for ind_count, individual in enumerate(list_of_individuals):
+            #print(ind_count, individual.input_file_string)
             write_string = self.write_options_funct(output_file, individual)
             # print("writing out child:", self.generation, ind_count, write_string)
             output_file.write(write_string + "\n")

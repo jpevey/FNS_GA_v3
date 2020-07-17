@@ -64,7 +64,7 @@ class individual:
 
         material_dictionary = collections.OrderedDict()
         for count, item in enumerate(keywords_list):
-            print('self.material_matrix[count]', self.material_matrix[count][0], self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]])
+            #print('self.material_matrix[count]', self.material_matrix[count][0], self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]])
             material_dictionary[item] = self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]]
         return material_dictionary
 
