@@ -12,13 +12,13 @@ options['enforce_fuel_count'] = False
 options['enforce_material_number'] = 1
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 2
-options['number_of_individuals'] = 10
-options['number_of_parents'] = 5
+options['number_of_generations'] = 20
+options['number_of_individuals'] = 100
+options['number_of_parents'] = 20
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
-options['mutation_rate'] = 0.20  # for each individual, % chance that a material flips, 0.05 = 5%
+options['mutation_rate'] = 0.10  # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
                                       # to mutate to other material based on mutation_rate
 options['material_types'] = [1, 2, 3, 4]
@@ -31,7 +31,7 @@ options['choose_parent_based_on_bitwise_diversity'] = True
 options['crossover_type'] = 'bitwise'  # bitwise - each material bit has a chance to come from parent 1 or parent 2
 # options['crossover_type'] = 'singlepoint' # bitwise - each material bit has a chance to come from parent 1 or parent 2
 
-options['grid_x'] = 10  # specifies how big a grid to create for this geometry
+options['grid_x'] = 12  # specifies how big a grid to create for this geometry
 options['grid_y'] = 1
 # options['grid_z'] = 1 need to code 3rd dimension for fns
 options['total_materials'] = options['grid_x'] * options['grid_y']
@@ -40,7 +40,6 @@ options['mcnp_template_file_string'] = 'simplecyl.inp'
 options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
-options['store_all_individuals'] = False
 options['solver_location'] = 'necluster'
 # options['solver'] = 'cnn'
 # options['geometry'] = 'cyl'
@@ -58,10 +57,12 @@ options['output_filename'] = '_output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
 options['fitness'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
-options['default_mcnp_mat_count_and_density'][1] = '1 -18.95'
-options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'
-options['default_mcnp_mat_count_and_density'][3] = '3 -18.94'
-options['default_mcnp_mat_count_and_density'][4] = '4 -2.1596'
+options['default_mcnp_mat_count_and_density'][1] = '0'
+options['default_mcnp_mat_count_and_density'][2] = '1 -0.93'
+options['default_mcnp_mat_count_and_density'][3] = '2 -18.94'
+options['default_mcnp_mat_count_and_density'][4] = '3 -0.971'
+options['output_all_individuals_at_end_of_calculation'] = True
+options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'representativity', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
