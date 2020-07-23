@@ -177,6 +177,8 @@ class genetic_algorithm:
             individual.total_diversity_score = total_diversity_score
             # print(individual.total_diversity_score)
 
+
+
     def evaluate_bitwise_diversity(self, individual, comparison_individual):
         score = self.options['total_materials']
         for material_list_count, material_list in enumerate(individual.material_matrix):
@@ -254,6 +256,8 @@ class genetic_algorithm:
                     self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
                     for individual in list_of_individuals:
                         ### Building MCNP input file
+                        data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list'])
+                        data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
                         print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
                         self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_keff_template_file_string'],
                                                            dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),

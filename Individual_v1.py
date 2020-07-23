@@ -61,6 +61,13 @@ class individual:
         self.material_matrix = material_matrix
         print("Material Matrix:", self.material_matrix)
 
+    def find_fuel_location(self):
+        for count, mat in enumerate(self.material_matrix):
+            print(count, mat[0])
+            if mat[0] == self.options['fuel_index']:
+                print("Found fuel in location index: ", count, 2.54 / 4 + count * self.options['fuel_index_multiplier'])
+                return 2.54 / 4 + count * self.options['fuel_index_multiplier']
+
     def create_discrete_material_mcnp_dictionary(self, keywords_list = []):
         if keywords_list == []:
             keywords_list = self.options['keywords_list']

@@ -60,10 +60,10 @@ options['output_filename'] = '_output'
 options['fitness'] = ['keff#threshold','representativity']
 options['fitness_sort_by'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
-options['default_mcnp_mat_count_and_density'][1] = '1 -18.95'
+options['default_mcnp_mat_count_and_density'][1] = '0'
 options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'
 options['default_mcnp_mat_count_and_density'][3] = '3 -18.94'
-options['default_mcnp_mat_count_and_density'][4] = '4 -2.1596'
+options['default_mcnp_mat_count_and_density'][4] = '4 -0.910'
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'representativity', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
@@ -156,6 +156,8 @@ options['cyl_scale_template'] = [
 options['check_eigenvalue'] = True
 options['check_eigenvalue_function'] = 'enforced_maximum_eigenvalue'
 options['enforced_maximum_eigenvalue'] = 0.98
+options['fuel_index'] = 3
+options['fuel_index_multiplier'] = 2.54 / 2
+
 if __name__ == '__main__':
     ga = Genetic_Algorithm.genetic_algorithm(options)
-
