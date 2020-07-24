@@ -258,9 +258,9 @@ class genetic_algorithm:
                         ### Building MCNP input file
                         data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list'])
                         data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
-                        print(individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']))
+                        print(data_dictionary_)
                         self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_keff_template_file_string'],
-                                                           dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
+                                                           dictionary_of_replacements = data_dictionary_,
                                                            input_file_str = individual.keff_input_file_string)
                         self.mcnp_file_handler.build_mcnp_running_script(individual.keff_input_file_string)
                         self.mcnp_file_handler.run_mcnp_input(individual.keff_input_file_string)

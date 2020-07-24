@@ -18,7 +18,7 @@ options['number_of_parents'] = 2
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
-options['mutation_rate'] = 1 # for each individual, % chance that a material flips, 0.05 = 5%
+options['mutation_rate'] = 0.05 # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
                                       # to mutate to other material based on mutation_rate
 options['material_types'] = [1, 2, 3, 4]
@@ -31,13 +31,13 @@ options['choose_parent_based_on_bitwise_diversity'] = True
 options['crossover_type'] = 'bitwise'  # bitwise - each material bit has a chance to come from parent 1 or parent 2
 # options['crossover_type'] = 'singlepoint' # bitwise - each material bit has a chance to come from parent 1 or parent 2
 
-options['grid_x'] = 10  # specifies how big a grid to create for this geometry
+options['grid_x'] = 30  # specifies how big a grid to create for this geometry
 options['grid_y'] = 1
 # options['grid_z'] = 1 need to code 3rd dimension for fns
 options['total_materials'] = options['grid_x'] * options['grid_y']
 options['scale_template_file_string'] = '11x11_grid_array_template.inp'
-options['mcnp_template_file_string'] = 'simplecyl.inp'
-options['mcnp_keff_template_file_string'] = 'simplecyl_keff.inp'
+options['mcnp_template_file_string'] = 'simplecyl_30x15in.inp'
+options['mcnp_keff_template_file_string'] = 'simplecyl_keff_30x15in.inp'
 options['file_keyword'] = 'stacked_cylinders_test_'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
