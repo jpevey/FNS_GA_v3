@@ -243,10 +243,9 @@ class mcnp_file_handler():
 
         found_keff = False
         for line in output_file:
-            if "the final estimated combined collision/absorption/track-length keff =" in line:
-                line_split_1 = line.split('the final estimated combined collision/absorption/track-length keff = ')
-                line_split_2 = line_split_1[1].split(' with ')
-                keff = line_split_2[0]
+            if "final result" in line:
+                line_split_1 = line.split()
+                keff = line_split_1[2]
                 found_keff = True
         if found_keff == False:
             print("Unable to find a keff for input " + output_file_string, "returning 10 and continuing")

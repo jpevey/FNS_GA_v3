@@ -4,9 +4,6 @@
     <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simplecyl_30x15in.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl_30x15in.inp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -404,7 +401,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595602427382</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="added fuel location function">
+      <created>1595604399775</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1595604399775</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -431,10 +435,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1595602426533">
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1595604398095">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1595602426533" />
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1595604398095" />
     <state width="1537" height="218" key="GridCell.Tab.0.bottom" timestamp="1595602364242">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
