@@ -61,9 +61,9 @@ options['fitness'] = ['keff#threshold','representativity']
 options['fitness_sort_by'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
 options['default_mcnp_mat_count_and_density'][1] = '0'
-options['default_mcnp_mat_count_and_density'][2] = '2 -0.93'
-options['default_mcnp_mat_count_and_density'][3] = '3 -18.94'
-options['default_mcnp_mat_count_and_density'][4] = '4 -0.910'
+options['default_mcnp_mat_count_and_density'][2] = '1 -0.93'
+options['default_mcnp_mat_count_and_density'][3] = '2 -18.94'
+options['default_mcnp_mat_count_and_density'][4] = '3 -0.971'
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'representativity', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \

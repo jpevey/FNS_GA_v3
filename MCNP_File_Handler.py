@@ -249,6 +249,6 @@ class mcnp_file_handler():
                 keff = line_split_2[0]
                 found_keff = True
         if found_keff == False:
-            print("Unable to find a keff for input " + output_file_string, "returning 0 and continuing")
-            return 0.0
+            print("Unable to find a keff for input " + output_file_string, "returning 10 and continuing")
+            return 10.0
         return keff
