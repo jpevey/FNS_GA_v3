@@ -64,7 +64,7 @@ options['default_mcnp_mat_count_and_density'][1] = '0'
 options['default_mcnp_mat_count_and_density'][2] = '1 -0.93'
 options['default_mcnp_mat_count_and_density'][3] = '2 -18.94'
 options['default_mcnp_mat_count_and_density'][4] = '3 -0.971'
-options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'representativity', 'number_of_fuel',
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff','representativity', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
 # """#!/bin/bash
