@@ -73,7 +73,7 @@ class genetic_algorithm:
             print("Evaluating diversity of parents")
             self.evaluate_bitwise_diversity_of_parents()
 
-        self.write_output_v2()
+        self.write_output_v2(self.individuals)
         self.generation += 1
 
         ### Running GA algo
@@ -97,6 +97,9 @@ class genetic_algorithm:
             self.evaluate(self.options['fitness'], list_of_mutated_children)
             for ind_count, ind_ in enumerate(list_of_mutated_children):
                 print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
+            #print("CHILDREN:::")
+            #for ind_count, ind_ in enumerate(list_of_mutated_children):
+                #print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
 
             ### Checking if any of the children have already been created/evaluated
 
@@ -114,33 +117,47 @@ class genetic_algorithm:
                 print("Evaluating diversity of parents")
                 self.evaluate_bitwise_diversity_of_parents()
 
-            for ind_count, ind_ in enumerate(self.individuals):
-                print(ind_count, ind_.ind_count, ind_.generation)
+            #for ind_count, ind_ in enumerate(self.individuals):
+                #print(ind_count, ind_.ind_count, ind_.generation)
 
             print("write output")
             if self.options['write_output_csv']:
-                self.write_output_v2()
+                self.write_output_v2(self.individuals)
 
             self.generation += 1
 
             if self.options['remake_duplicate_children'] == True:
                 self.all_individuals += list_of_mutated_children
 
+            #print("Printing all individuals!")
+            #for ind_ in self.all_individuals:
+                #print(ind_.input_file_string, ind_.representativity)
+
+        if self.options['output_all_individuals_at_end_of_calculation'] == True:
+            output_csv = open(self.options['output_all_individuals_at_end_of_calculation_file_name'] + '.csv', 'w')
+            for flag in self.options:
+                output_csv.write("{},{}\n".format(flag, self.options[flag]))
+            output_csv.close()
+            print(self.options['output_all_individuals_at_end_of_calculation_file_name'])
+            self.write_output_v2(list_of_individuals = self.all_individuals, output_file_name = self.options['output_all_individuals_at_end_of_calculation_file_name'])
+
+
+
     def remake_duplicate_children(self, list_of_children, comparison_list):
 
         for child in list_of_children:
             print("Checking child:", child.material_matrix, comparison_list)
             for comparison_ind in comparison_list:
-                print("comparison", child.material_matrix, comparison_ind.material_matrix)
+                #print("comparison", child.material_matrix, comparison_ind.material_matrix)
                 comparison_score = 0
                 for child_mat, comp_mat in zip(child.material_matrix, comparison_ind.material_matrix):
                     if child_mat == comp_mat:
                         comparison_score += 1
                     if comparison_score == self.options['total_materials']:
-                        print("Duplicate child found!!!")
-                        print(child.material_matrix)
-                        child.create_random_pattern()
-                        print(child.material_matrix)
+                        print("Duplicate child found! Forcing mutation")
+                        print("Before", child.material_matrix)
+                        child.material_matrix = self.single_bit_mutation(child.material_matrix, force_mutation=True, force_mutation_per_material_sublist=2)
+                        print("After", child.material_matrix)
                 #print(child.material_matrix, comparison_ind.material_matrix)
                 #if child.material_matrix == comparison_ind.material_matrix:
                 #    child.create_random_pattern()
@@ -176,8 +193,6 @@ class genetic_algorithm:
 
             individual.total_diversity_score = total_diversity_score
             # print(individual.total_diversity_score)
-
-
 
     def evaluate_bitwise_diversity(self, individual, comparison_individual):
         score = self.options['total_materials']
@@ -443,22 +458,48 @@ class genetic_algorithm:
 
         return list_of_individuals
 
-    def single_bit_mutation(self, material_matrix):
+    def single_bit_mutation(self, material_matrix, force_mutation = False, force_mutation_per_material_sublist = 1):
         new_material_matrix = []
+        #print("old material matrix:", material_matrix)
+        ### If forcing a certain number of mutations per material sublist:
+        force_mutation_index = []
+        if force_mutation:
+            for _ in range(force_mutation_per_material_sublist):
+                rand_val = random.randint(0, len(material_matrix) - 1)
+                while rand_val in force_mutation_index:
+                    rand_val = random.randint(0, len(material_matrix) - 1)
+                    print(rand_val, force_mutation_index)
+                force_mutation_index.append(rand_val)
+            print("FORCING A MUTATION! at index(es):", force_mutation_index)
+
         for material_list in material_matrix:
             material_matrix_sublist = []
-            for material in material_list:
+
+
+
+            for material_count, material in enumerate(material_list):
                 ### Attempting mutation
+                random_val = random.uniform(0, 1.0)
 
-                if random.uniform(0, 1.0) < self.options['mutation_rate']:
+                ### If the current material count is in the force mutation list, forcing the mutation
+                if force_mutation:
+                    if material_count in force_mutation_index:
+                        random_val = self.options['mutation_rate']
+                        print("Forcing a mutation in material:", material_count)
+
+
+                if random_val <= self.options['mutation_rate']:
+
                     new_index = random.randint(0, len(self.options['material_types']) - 1)
-
                     while material == self.options['material_types'][new_index]:
                         new_index = random.randint(0, len(self.options['material_types']) - 1)
+                    # print("NEW_INDEX: ", new_index, len(self.options['material_types']) - 1)
                     # print("new material: ", self.options['material_types'][new_index], "old", material)
                     material = self.options['material_types'][new_index]
                 material_matrix_sublist.append(material)
             new_material_matrix.append(material_matrix_sublist)
+        print("new_material_matrix:", new_material_matrix)
+
         return new_material_matrix
 
     def submit_jobs(self, job_list):
@@ -501,7 +542,6 @@ class genetic_algorithm:
             if fuel_count != self.options['enforced_fuel_count_value']:
                 individual.fix_material_count(1, self.options['enforced_fuel_count_value'])
 
-
     def write_output(self):
         output_file = open(self.options['output_filename'] + '.csv', 'a')
 
@@ -539,11 +579,21 @@ class genetic_algorithm:
                 continue
         output_file.close()
 
-    def write_output_v2(self):
-        output_file = open(self.options['output_filename'] + '.csv', 'a')
+    def write_output_v2(self, list_of_individuals, output_file_name = ""):
+
+        ### Setting the default value, for the by-generation output
+        if output_file_name == "":
+            output_file_name = self.options['output_filename'] + '.csv'
+
+        if output_file_name.endswith('.csv') != True:
+            output_file_name += ".csv"
+
+
+        output_file = open(output_file_name, 'a')
 
         ###Building string to write
-        for ind_count, individual in enumerate(self.individuals):
+        for ind_count, individual in enumerate(list_of_individuals):
+            #print(ind_count, individual.input_file_string)
             write_string = self.write_options_funct(output_file, individual)
             # print("writing out child:", self.generation, ind_count, write_string)
             output_file.write(write_string + "\n")
