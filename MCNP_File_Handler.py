@@ -238,8 +238,8 @@ class mcnp_file_handler():
         try:
             output_file = open(output_file_string, 'r')
         except:
-            print("Unable to open output file:", output_file_string, "returning 0 and continuing")
-            return 0.0
+            print("Unable to find a keff for input " + output_file_string, "returning 10 and continuing")
+            return 10.0
 
         found_keff = False
         for line in output_file:
