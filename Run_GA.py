@@ -18,7 +18,7 @@ options['number_of_parents'] = 20
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
-options['mutation_rate'] = 0.10  # for each individual, % chance that a material flips, 0.05 = 5%
+options['mutation_rate'] = 0.05  # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
                                       # to mutate to other material based on mutation_rate
 options['material_types'] = [1, 2, 3, 4]
@@ -156,7 +156,7 @@ options['cyl_scale_template'] = [
 
 options['check_eigenvalue'] = True
 options['check_eigenvalue_function'] = 'enforced_maximum_eigenvalue'
-options['enforced_maximum_eigenvalue'] = 0.98
+options['enforced_maximum_eigenvalue'] = 0.95
 options['fuel_index'] = 3
 options['fuel_index_multiplier'] = 2.54 / 2
 
