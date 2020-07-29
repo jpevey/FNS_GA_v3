@@ -66,7 +66,14 @@ class genetic_algorithm:
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
         self.evaluate(self.options['fitness'])
-        self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
+
+        if self.options['use_non_dominated_sorting'] == True:
+            self.individuals = self.non_dominated_sorting()
+        else:
+            self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
+            ### Pairing down individuals to be specified number
+            self.individuals = self.individuals[:self.options['number_of_individuals']]
+
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
@@ -106,10 +113,17 @@ class genetic_algorithm:
             ### combining now evaluated children with previous list of individuals
             self.individuals = self.individuals + list_of_mutated_children
             print("sorting")
-            self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
 
-            ### Pairing down individuals to be specified number
-            self.individuals = self.individuals[:self.options['number_of_individuals']]
+            if self.options['use_non_dominated_sorting'] == True:
+                self.individuals = self.non_dominated_sorting()
+            else:
+                self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
+                ### Pairing down individuals to be specified number
+                self.individuals = self.individuals[:self.options['number_of_individuals']]
+
+
+
+
 
 
             ### Evaluating diversity of population
@@ -140,6 +154,134 @@ class genetic_algorithm:
             output_csv.close()
             print(self.options['output_all_individuals_at_end_of_calculation_file_name'])
             self.write_output_v2(list_of_individuals = self.all_individuals, output_file_name = self.options['output_all_individuals_at_end_of_calculation_file_name'])
+
+
+
+    def non_dominated_sorting(self):
+        ###
+        front = [[]]
+        for individual in self.individuals:
+            individual.front_rank = 'none'
+            print("Nondominated sorting", individual.input_file_string, individual.keff, individual.representativity)
+            ### Initializing lists
+            dominated_list = []
+            number_of_inds_that_dominate_individual = 0
+            #for fitness_ in self.options['fitness']:
+            #dominated_list.append([])
+            #number_of_inds_that_dominate_individual.append(0)
+
+            ### Iterating over all individuals, comparing fitnesses
+            for individual_ in self.individuals:
+                if individual == individual_:
+                    continue
+                individual_.front_number = 0
+
+                if self.check_domination(individual, individual_):
+                    if individual_ not in dominated_list:
+                        dominated_list.append(individual_)
+
+                elif self.check_domination(individual_, individual):
+                    number_of_inds_that_dominate_individual += 1
+
+
+            individual.dominated_list = dominated_list
+            individual.number_of_inds_that_dominate_individual = number_of_inds_that_dominate_individual
+            print(individual.input_file_string, individual.keff, individual.representativity, len(individual.dominated_list), individual.number_of_inds_that_dominate_individual)
+
+            #for fitness_index, fitness_ in enumerate(self.options['fitness']):
+            if individual.number_of_inds_that_dominate_individual == 0:
+                individual.front_rank = 0
+                print("Ind is rank one:", individual.input_file_string, individual.representativity, individual.keff)
+                front[0].append(individual)
+        ### Front counter
+
+
+        pareto_front = 0
+        while front[pareto_front] != []:
+            current_front = []
+            for individual in front[pareto_front]:
+                print(individual.input_file_string, "dominates:")
+                for individual_ in individual.dominated_list:
+                    if individual_.input_file_string == individual.input_file_string:
+                        continue
+                    print(individual_.input_file_string, individual_.number_of_inds_that_dominate_individual)
+                    individual_.number_of_inds_that_dominate_individual -= 1
+                    print(individual_.input_file_string, individual_.number_of_inds_that_dominate_individual)
+                    if individual_.number_of_inds_that_dominate_individual == 0:
+
+                        if individual_.front_rank == 'none':
+                            individual_.front_rank = pareto_front + 1
+                            current_front.append(individual_)
+                    print(individual_.input_file_string, individual_.front_rank, current_front)
+
+            front.append(current_front)
+            pareto_front += 1
+        print("Pareto fronts:")
+        for front_count, front_list in enumerate(front):
+            #print(front_list)
+            for ind in front_list:
+                print(front_count, ind.representativity, ind.keff)
+        self.pareto_front = front
+
+        for individual_ in self.individuals:
+            print(individual_.input_file_string,  individual_.representativity, individual_.keff)
+
+        exit()
+        ### Building list of parents
+        parents_list = []
+        for front in self.pareto_front:
+            print("Front:", front)
+            front = self.crowding_distance(front)
+            if len(front) < (self.options['number_of_parents'] - len(parents_list)):
+                parents_list = parents_list + front
+            else:
+                front = self.crowding_distance(front)
+                front.sort(key=lambda x: x.crowding_distance, reverse=True)
+
+
+        return self.individuals
+
+
+    def crowding_distance(self, front):
+
+        for ind in front:
+            print(ind)
+            ind.crowding_distance = 0.0
+
+        for fitness in self.options['fitness']:
+            if "#" in fitness:
+                fitness = fitness.split("#")
+                fitness = fitness[0]
+
+            front.sort(key=lambda x: getattr(x, fitness), reverse=True)
+            front[0].crowding_distance = 99999999999999999.0
+            front[-1].crowding_distance = 99999999999999999.0
+
+
+        for _ in front:
+            print(_.crowding_distance)
+
+
+
+
+        return self.individuals
+
+### Checks if ind_1 dominates ind_2
+    def check_domination(self, ind_1, ind_2):
+        for fit_count, fitness_ in enumerate(self.options['fitness']):
+            if "#" in fitness_:
+                fitness_ = fitness_.split("#")
+                fitness_ = fitness_[0]
+
+            ind_value = getattr(ind_1, fitness_)
+            comparison_value = getattr(ind_2, fitness_)
+
+            if ind_value >= comparison_value:
+                continue
+            else:
+                return False
+
+        return True
 
 
 
@@ -270,6 +412,7 @@ class genetic_algorithm:
                     self.mcnp_keff_inputs = []
                     self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
                     for individual in list_of_individuals:
+
                         ### Building MCNP input file
                         data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list'])
                         data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
@@ -284,7 +427,10 @@ class genetic_algorithm:
                     self.wait_on_jobs('mcnp_keff')
 
                     for ind in list_of_individuals:
-                        ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
+                        if self.options['fake_fitness_debug']:
+                            ind.keff = random.uniform(0.5, 1.5)
+                        else:
+                            ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
 
                         if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
                             print("keff, ", ind.keff, "too high. Skipping source calculation")
@@ -610,7 +756,10 @@ class genetic_algorithm:
             if write_option == 'keff':
                 write_string += str(individual.keff) + ","
             if write_option == 'representativity':
-                write_string += str(individual.representativity) + ","
+                try:
+                    write_string += str(individual.representativity) + ","
+                except:
+                    write_string += "N/A,"
             if write_option == 'materials':
                 write_string += str(individual.make_material_string_csv())
             if write_option == 'input_name':

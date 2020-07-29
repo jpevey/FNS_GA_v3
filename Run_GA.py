@@ -5,16 +5,16 @@ import Individual_v1
 options = collections.OrderedDict()
 options['skip_waiting_on_jobs_debug'] = True
 options['fake_fitness_debug'] = True
-options['skip_writing_files'] = False
+options['skip_writing_files'] = True
 options['verify_fuel_mass_after_mutation'] = False
 options['verify_fuel_mass_after_crossover'] = False
 options['enforce_fuel_count'] = False
 options['enforce_material_number'] = 1
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 20
+options['number_of_generations'] = 1
 options['number_of_individuals'] = 100
-options['number_of_parents'] = 20
+options['number_of_parents'] = 3
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
@@ -65,7 +65,7 @@ options['default_mcnp_mat_count_and_density'][3] = '2 -18.94'
 options['default_mcnp_mat_count_and_density'][4] = '3 -0.971'
 options['output_all_individuals_at_end_of_calculation'] = True
 options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
-options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'representativity', 'number_of_fuel',
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity','front', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
 # """#!/bin/bash
@@ -159,7 +159,8 @@ options['check_eigenvalue_function'] = 'enforced_maximum_eigenvalue'
 options['enforced_maximum_eigenvalue'] = 0.98
 options['fuel_index'] = 3
 options['fuel_index_multiplier'] = 2.54 / 2
-
+options['use_non_dominated_sorting'] = True
+options['use_crowding_distance'] = True
 if __name__ == '__main__':
     ga = Genetic_Algorithm.genetic_algorithm(options)
 
