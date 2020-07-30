@@ -610,7 +610,10 @@ class genetic_algorithm:
             if write_option == 'keff':
                 write_string += str(individual.keff) + ","
             if write_option == 'representativity':
-                write_string += str(individual.representativity) + ","
+                try:
+                    write_string += str(individual.representativity) + ","
+                except:
+                    write_string += "N/A,"
             if write_option == 'materials':
                 write_string += str(individual.make_material_string_csv())
             if write_option == 'input_name':
