@@ -415,23 +415,30 @@ class genetic_algorithm:
 
                         ### Building MCNP input file
                         data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list'])
+                        ### Finding and adding the fuel location to geometry dictionary
                         data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
-                        print(data_dictionary_)
+                        ### Building MCNP input
                         self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_keff_template_file_string'],
                                                            dictionary_of_replacements = data_dictionary_,
                                                            input_file_str = individual.keff_input_file_string)
+                        ### Building MCNP input script for cluster
                         self.mcnp_file_handler.build_mcnp_running_script(individual.keff_input_file_string)
+                        ### Running MCNP input
                         self.mcnp_file_handler.run_mcnp_input(individual.keff_input_file_string)
+                        ### Adding input name to list, used to determine if the jobs have completed or not
                         self.mcnp_keff_inputs.append(individual.keff_input_file_string)
 
+                    ### Waits on the jobs to be completed (looking for "_done.dat" files)
                     self.wait_on_jobs('mcnp_keff')
 
+                    ### Grabs keff from the output files
                     for ind in list_of_individuals:
                         if self.options['fake_fitness_debug']:
                             ind.keff = random.uniform(0.5, 1.5)
                         else:
                             ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
 
+                        ### If that keff is above a set threshold, sets acceptable_eigenvalue to false. Else, sets it True.
                         if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
                             print("keff, ", ind.keff, "too high. Skipping source calculation")
                             ind.acceptable_eigenvalue = False
@@ -656,6 +663,7 @@ class genetic_algorithm:
     def wait_on_jobs(self, run_type, unique_flag = ""):
         waiting_on_jobs = True
         jobs_completed = 0
+        total_time = 0
         jobs_to_be_waited_on = getattr(self, run_type + "_inputs")
         temp_file_list = copy.deepcopy(jobs_to_be_waited_on)
         print("Jobs waiting on: ", jobs_to_be_waited_on)
@@ -679,8 +687,9 @@ class genetic_algorithm:
             if self.options['skip_waiting_on_jobs_debug']:
                 print("""options['skip_waiting_on_jobs_debug'] is True, continuing""")
                 return
-            print("Waiting 15 seconds.")
+            print("Waiting 15 seconds. Total time (mins):", str(total_time/60))
             time.sleep(15)
+            total_time += 15
 
     def enforce_fuel_count(self):
         for individual in self.individuals:
