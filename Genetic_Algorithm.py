@@ -259,8 +259,8 @@ class genetic_algorithm:
             front.sort(key=lambda x: getattr(x, fitness), reverse=True)
             front[0].crowding_distance = 99999999999999999.0
             front[-1].crowding_distance = 99999999999999999.0
-            max_value = getattr(front[0],fitness)
-            min_value = getattr(front[-1], fitness)
+            max_value = float(getattr(front[0],fitness))
+            min_value = float(getattr(front[-1], fitness))
             diff_max_min = max_value - min_value
             ### Adding crowding distance for this fitness
             for count, ind in enumerate(front):
@@ -270,9 +270,12 @@ class genetic_algorithm:
                 if count == (len(front) - 1):
                     continue
 
-                ind_n_plus_one  = getattr(front[count-1],fitness)
-                ind_n_minus_one = getattr(front[count+1],fitness)
-                ind.crowding_distance = ind.crowding_distance + (ind_n_plus_one - ind_n_minus_one)/(diff_max_min)
+                ind_n_plus_one  = float(getattr(front[count-1],fitness))
+                ind_n_minus_one = float(getattr(front[count+1],fitness))
+                try:
+                    ind.crowding_distance = ind.crowding_distance + (ind_n_plus_one - ind_n_minus_one)/(diff_max_min)
+                except:
+                    continue
                 #print("CROWDING DISTANCE!!!", ind.crowding_distance, count, len(front))
 
         return front
@@ -287,7 +290,7 @@ class genetic_algorithm:
             ind_value = getattr(ind_1, fitness_)
             comparison_value = getattr(ind_2, fitness_)
 
-            if ind_value >= comparison_value:
+            if float(ind_value) >= float(comparison_value):
                 continue
             else:
                 return False
@@ -471,6 +474,7 @@ class genetic_algorithm:
                         if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
                             print("keff, ", ind.keff, "too high. Skipping source calculation")
                             ind.acceptable_eigenvalue = False
+                            ind.keff = 0.0
                         else:
                             ind.acceptable_eigenvalue = True
                 if 'scale' in self.options['solver']:

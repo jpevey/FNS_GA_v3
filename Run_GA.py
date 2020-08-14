@@ -157,7 +157,7 @@ options['cyl_scale_template'] = [
 
 options['check_eigenvalue'] = True
 options['check_eigenvalue_function'] = 'enforced_maximum_eigenvalue'
-options['enforced_maximum_eigenvalue'] = 0.98
+options['enforced_maximum_eigenvalue'] = 0.95
 options['fuel_index'] = 3
 options['fuel_index_multiplier'] = 2.54 / 2
 options['use_non_dominated_sorting'] = True
