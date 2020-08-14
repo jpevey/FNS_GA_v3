@@ -21,6 +21,7 @@ class individual:
         self.create_random_pattern()
         self.parent_string = "random_initialized,"
         self.born_from_crossover = False
+        self.ran_source_calculation = False
 
         self.acceptable_eigenvalue = True
 

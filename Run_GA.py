@@ -12,9 +12,9 @@ options['enforce_fuel_count'] = False
 options['enforce_material_number'] = 1
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 1
+options['number_of_generations'] = 5
 options['number_of_individuals'] = 100
-options['number_of_parents'] = 3
+options['number_of_parents'] = 20
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
@@ -23,11 +23,11 @@ options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
                                       # to mutate to other material based on mutation_rate
 options['material_types'] = [1, 2, 3, 4]
 # When doing crossover, select a parent based on specified method (default is uniformly at random)
-# Parent_2 is choosen at random with probabilities based on the diversity score
-# For example, given 3 parents the first is choosen at random (default)
+# Parent_2 is chosen at random with probabilities based on the diversity score
+# For example, given 3 parents the first is chosen at random (default)
 # Then, starting with the most dissimilar parent, a chance of choosing each parent based on
 # (diversity score / sum of all diversity scores)
-options['choose_parent_based_on_bitwise_diversity'] = True
+options['choose_parent_based_on_bitwise_diversity'] = False
 options['crossover_type'] = 'bitwise'  # bitwise - each material bit has a chance to come from parent 1 or parent 2
 # options['crossover_type'] = 'singlepoint' # bitwise - each material bit has a chance to come from parent 1 or parent 2
 
@@ -56,7 +56,8 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = '_output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = ['keff#threshold','representativity']
+options['fitness'] = ['representativity', 'keff#threshold']
+options['constraint'] = ['keff#evalute#threshold']
 options['fitness_sort_by'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
 options['default_mcnp_mat_count_and_density'][1] = '0'
@@ -65,7 +66,7 @@ options['default_mcnp_mat_count_and_density'][3] = '2 -18.94'
 options['default_mcnp_mat_count_and_density'][4] = '3 -0.971'
 options['output_all_individuals_at_end_of_calculation'] = True
 options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
-options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity','front', 'number_of_fuel',
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity','front_rank', 'crowding_distance','number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
 # """#!/bin/bash

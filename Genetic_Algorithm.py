@@ -68,7 +68,7 @@ class genetic_algorithm:
         self.evaluate(self.options['fitness'])
 
         if self.options['use_non_dominated_sorting'] == True:
-            self.individuals = self.non_dominated_sorting()
+            self.parents_list = self.non_dominated_sorting()
         else:
             self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
             ### Pairing down individuals to be specified number
@@ -80,7 +80,7 @@ class genetic_algorithm:
             print("Evaluating diversity of parents")
             self.evaluate_bitwise_diversity_of_parents()
 
-        self.write_output_v2(self.individuals)
+        self.write_output_v2(self.parents_list)
         self.generation += 1
 
         ### Running GA algo
@@ -102,8 +102,8 @@ class genetic_algorithm:
 
             print("evaluating children")
             self.evaluate(self.options['fitness'], list_of_mutated_children)
-            for ind_count, ind_ in enumerate(list_of_mutated_children):
-                print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
+            #for ind_count, ind_ in enumerate(list_of_mutated_children):
+            #    print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
             #print("CHILDREN:::")
             #for ind_count, ind_ in enumerate(list_of_mutated_children):
                 #print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
@@ -111,32 +111,18 @@ class genetic_algorithm:
             ### Checking if any of the children have already been created/evaluated
 
             ### combining now evaluated children with previous list of individuals
-            self.individuals = self.individuals + list_of_mutated_children
-            print("sorting")
-
-            if self.options['use_non_dominated_sorting'] == True:
-                self.individuals = self.non_dominated_sorting()
-            else:
-                self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
-                ### Pairing down individuals to be specified number
-                self.individuals = self.individuals[:self.options['number_of_individuals']]
+            self.individuals = self.parents_list + list_of_mutated_children
 
 
 
 
-
-
-            ### Evaluating diversity of population
-            if self.options['choose_parent_based_on_bitwise_diversity']:
-                print("Evaluating diversity of parents")
-                self.evaluate_bitwise_diversity_of_parents()
-
-            #for ind_count, ind_ in enumerate(self.individuals):
-                #print(ind_count, ind_.ind_count, ind_.generation)
+            print("All individuals in this generation!")
+            for ind_count, ind_ in enumerate(self.individuals):
+                print(ind_count, ind_.ind_count, ind_.generation, ind_.keff, ind_.representativity)
 
             print("write output")
             if self.options['write_output_csv']:
-                self.write_output_v2(self.individuals)
+                self.write_output_v2(self.parents_list)
 
             self.generation += 1
 
@@ -154,6 +140,7 @@ class genetic_algorithm:
             output_csv.close()
             print(self.options['output_all_individuals_at_end_of_calculation_file_name'])
             self.write_output_v2(list_of_individuals = self.all_individuals, output_file_name = self.options['output_all_individuals_at_end_of_calculation_file_name'])
+
 
 
 
@@ -186,7 +173,7 @@ class genetic_algorithm:
 
             individual.dominated_list = dominated_list
             individual.number_of_inds_that_dominate_individual = number_of_inds_that_dominate_individual
-            print(individual.input_file_string, individual.keff, individual.representativity, len(individual.dominated_list), individual.number_of_inds_that_dominate_individual)
+            #print(individual.input_file_string, individual.keff, individual.representativity, len(individual.dominated_list), individual.number_of_inds_that_dominate_individual)
 
             #for fitness_index, fitness_ in enumerate(self.options['fitness']):
             if individual.number_of_inds_that_dominate_individual == 0:
@@ -200,71 +187,95 @@ class genetic_algorithm:
         while front[pareto_front] != []:
             current_front = []
             for individual in front[pareto_front]:
-                print(individual.input_file_string, "dominates:")
+                #print(individual.input_file_string, "dominates:")
                 for individual_ in individual.dominated_list:
                     if individual_.input_file_string == individual.input_file_string:
                         continue
-                    print(individual_.input_file_string, individual_.number_of_inds_that_dominate_individual)
+                    #print(individual_.input_file_string, individual_.number_of_inds_that_dominate_individual)
                     individual_.number_of_inds_that_dominate_individual -= 1
-                    print(individual_.input_file_string, individual_.number_of_inds_that_dominate_individual)
+                    #print(individual_.input_file_string, individual_.number_of_inds_that_dominate_individual)
                     if individual_.number_of_inds_that_dominate_individual == 0:
 
                         if individual_.front_rank == 'none':
                             individual_.front_rank = pareto_front + 1
                             current_front.append(individual_)
-                    print(individual_.input_file_string, individual_.front_rank, current_front)
+                    #print(individual_.input_file_string, individual_.front_rank, current_front)
 
             front.append(current_front)
             pareto_front += 1
-        print("Pareto fronts:")
-        for front_count, front_list in enumerate(front):
+        #print("Pareto fronts:")
+        #for front_count, front_list in enumerate(front):
             #print(front_list)
-            for ind in front_list:
-                print(front_count, ind.representativity, ind.keff)
+            #for ind in front_list:
+                #print(front_count, ind.representativity, ind.keff)
         self.pareto_front = front
 
-        for individual_ in self.individuals:
-            print(individual_.input_file_string,  individual_.representativity, individual_.keff)
+        #for individual_ in self.individuals:
+            #print(individual_.input_file_string,  individual_.representativity, individual_.keff)
 
-        exit()
+
         ### Building list of parents
         parents_list = []
         for front in self.pareto_front:
-            print("Front:", front)
-            front = self.crowding_distance(front)
+            if front == []:
+                continue
+            print("Front:", len(front))
             if len(front) < (self.options['number_of_parents'] - len(parents_list)):
+                print("Length of parent list!!!", len(parents_list))
                 parents_list = parents_list + front
+                print("Length of parent list!!!", len(parents_list))
             else:
+
                 front = self.crowding_distance(front)
+                print(len(front), self.options['number_of_parents'], len(parents_list))
                 front.sort(key=lambda x: x.crowding_distance, reverse=True)
 
-
-        return self.individuals
+                ind_count = 0
+                print("Adding parents to parents list")
+                while self.options['number_of_parents'] != len(parents_list):
+                    parents_list.append(front[ind_count])
+                    ind_count += 1
+            #print("parent_list len, etc", len(parents_list), self.options['number_of_parents'])
+        #for parent in parents_list:
+            #print(parent.input_file_string, parent.keff, parent.representativity, parent.crowding_distance)
+        return parents_list
 
 
     def crowding_distance(self, front):
+        if front == []:
+            return
 
         for ind in front:
-            print(ind)
             ind.crowding_distance = 0.0
 
         for fitness in self.options['fitness']:
+            #print("fitness",fitness)
+            if len(front) == 0:
+                continue
             if "#" in fitness:
                 fitness = fitness.split("#")
                 fitness = fitness[0]
-
+            ### Setting highest and lowest ind's to have large crowding distance
             front.sort(key=lambda x: getattr(x, fitness), reverse=True)
             front[0].crowding_distance = 99999999999999999.0
             front[-1].crowding_distance = 99999999999999999.0
+            max_value = getattr(front[0],fitness)
+            min_value = getattr(front[-1], fitness)
+            diff_max_min = max_value - min_value
+            ### Adding crowding distance for this fitness
+            for count, ind in enumerate(front):
 
+                if count == 0:
+                    continue
+                if count == (len(front) - 1):
+                    continue
 
-        for _ in front:
-            print(_.crowding_distance)
+                ind_n_plus_one  = getattr(front[count-1],fitness)
+                ind_n_minus_one = getattr(front[count+1],fitness)
+                ind.crowding_distance = ind.crowding_distance + (ind_n_plus_one - ind_n_minus_one)/(diff_max_min)
+                #print("CROWDING DISTANCE!!!", ind.crowding_distance, count, len(front))
 
-
-
-
-        return self.individuals
+        return front
 
 ### Checks if ind_1 dominates ind_2
     def check_domination(self, ind_1, ind_2):
@@ -377,20 +388,15 @@ class genetic_algorithm:
                 evaluation_type, evaluation_options = evaluation_type.split("#")
             scale_inputs = []
             if evaluation_type == 'representativity':
-                print("Solving for representativity")
+                print("Evaluating Representativity")
                 if 'mcnp' in self.options['solver']:
                     self.mcnp_inputs = []
                     for individual in list_of_individuals:
-                        if individual.acceptable_eigenvalue == True:
-                            ### Building MCNP input file
-                            self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_template_file_string'],
-                                                               dictionary_of_replacements = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list']),
-                                                               input_file_str = individual.input_file_string)
-                            self.mcnp_file_handler.build_mcnp_running_script(individual.input_file_string)
-
-                            self.mcnp_file_handler.run_mcnp_input(individual.input_file_string)
-                            self.mcnp_inputs.append(individual.input_file_string)
-
+                        if individual.ran_source_calculation == False:
+                            if individual.acceptable_eigenvalue == True:
+                                ### Building MCNP input file
+                                self.build_mcnp_source_input(individual)
+                                individual.ran_source_calculations = True
                     self.wait_on_jobs('mcnp')
 
                     for individual in list_of_individuals:
@@ -405,7 +411,30 @@ class genetic_algorithm:
 
                         print("individual.representativity", individual.representativity)
 
+            if evaluation_type == 'total_flux':
+                print("Evaluating Total Flux")
+                if 'mcnp' in self.options['solver']:
+                    self.mcnp_inputs = []
+                    for individual in list_of_individuals:
+                        if individual.ran_source_calculation == False:
+                            if individual.acceptable_eigenvalue == True:
+                                ### Building MCNP input file
+                                self.build_mcnp_source_input(individual)
+                                individual.ran_source_calculations = True
 
+                    self.wait_on_jobs('mcnp')
+
+                    for individual in list_of_individuals:
+                        if self.options['fake_fitness_debug'] == True:
+                            individual.representativity = random.uniform(0, 1.0)
+                        else:
+                            if individual.acceptable_eigenvalue == True:
+                                current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
+                                individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
+                            if individual.acceptable_eigenvalue == False:
+                                individual.representativity = 0.0
+
+                        print("individual.representativity", individual.representativity)
 
             if evaluation_type == 'keff':
                 if 'mcnp' in self.options['solver']:
@@ -497,6 +526,20 @@ class genetic_algorithm:
 
     ### The crossover function creates total population - number of parents
     def crossover(self):
+
+        if self.options['use_non_dominated_sorting'] == True:
+            self.parents_list = self.non_dominated_sorting()
+        else:
+            self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
+            ### Pairing down individuals to be specified number
+            self.individuals = self.individuals[:self.options['number_of_individuals']]
+            self.parents_list = self.individuals[:10]
+
+        ### Evaluating diversity of population
+        if self.options['choose_parent_based_on_bitwise_diversity']:
+            print("Evaluating diversity of parents")
+            self.evaluate_bitwise_diversity_of_parents()
+
         number_of_children = self.options['number_of_individuals'] - \
                              self.options['number_of_parents']
         list_of_children = []
@@ -511,8 +554,8 @@ class genetic_algorithm:
                 # print("Choosing parent 2 based on diversity score")
                 parent_2 = self.choose_parent_based_on_bitwise_diversity(parent_1)
 
-            parent_1 = self.individuals[parent_1]
-            parent_2 = self.individuals[parent_2]
+            parent_1 = self.parents_list[parent_1]
+            parent_2 = self.parents_list[parent_2]
             if self.options['crossover_type'] == 'bitwise':
                 new_child_ind = self.bitwise_crossover(parent_1, parent_2)
 
@@ -544,6 +587,18 @@ class genetic_algorithm:
             list_of_children.append(new_child_ind)
 
         return list_of_children
+
+    def build_mcnp_source_input(self, individual_):
+        ### Building MCNP input file
+        self.mcnp_file_handler.write_mcnp_input(template_file=self.options['mcnp_template_file_string'],
+                                                dictionary_of_replacements=individual_.create_discrete_material_mcnp_dictionary(
+                                                    self.options['keywords_list']),
+                                                input_file_str=individual_.input_file_string)
+        self.mcnp_file_handler.build_mcnp_running_script(individual_.input_file_string)
+
+        self.mcnp_file_handler.run_mcnp_input(individual_.input_file_string)
+        self.mcnp_inputs.append(individual_.input_file_string)
+        return
 
     def bitwise_crossover(self, parent_1, parent_2):
         child_ind = individual.individual(self.options, self.generation, self.individual_count)
@@ -764,6 +819,16 @@ class genetic_algorithm:
                 write_string += str(individual.ind_count) + ","
             if write_option == 'keff':
                 write_string += str(individual.keff) + ","
+            if write_option == 'front_rank':
+                try:
+                    write_string += str(individual.front_rank) + ","
+                except:
+                    write_string += "N/A,"
+            if write_option == 'crowding_distance':
+                try:
+                    write_string += str(individual.crowding_distance) + ","
+                except:
+                    write_string += "N/A,"
             if write_option == 'representativity':
                 try:
                     write_string += str(individual.representativity) + ","
