@@ -56,7 +56,7 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = '_output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = ['representativity', 'keff#threshold']
+options['fitness'] = ['keff#threshold', 'representativity']
 options['constraint'] = ['keff#evalute#threshold']
 options['fitness_sort_by'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()

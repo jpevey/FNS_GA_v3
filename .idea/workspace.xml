@@ -3,12 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simplecyl_30x15in.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl_30x15in.inp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -477,7 +472,14 @@
       <option name="project" value="LOCAL" />
       <updated>1597280030082</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="working on adding nondominated sort/crowding distance. changed output to be just parents (still outputting all at the end)">
+      <created>1597376346292</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1597376346292</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -501,17 +503,18 @@
     <MESSAGE value="removed importances from source calc" />
     <MESSAGE value="added keff to output" />
     <MESSAGE value="added print" />
-    <option name="LAST_COMMIT_MESSAGE" value="added print" />
+    <MESSAGE value="working on adding nondominated sort/crowding distance. changed output to be just parents (still outputting all at the end)" />
+    <option name="LAST_COMMIT_MESSAGE" value="working on adding nondominated sort/crowding distance. changed output to be just parents (still outputting all at the end)" />
   </component>
   <component name="WindowStateProjectService">
     <state x="503" y="67" key="#Run_GA" timestamp="1593705666402">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1597280029305">
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1597377465497">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1597280029305" />
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1597377465497" />
     <state x="180" y="124" width="1242" height="646" key="DiffContextDialog" timestamp="1597279948110">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
