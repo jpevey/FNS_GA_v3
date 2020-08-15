@@ -109,7 +109,6 @@ class mcnp_file_handler():
             os.wait(15)
 
     def get_flux(self, input_name):
-        ### todo: write function which pulls flux tally out of mcnp output and returns it in a format required for calculate_representivity
         inputfile = open(input_name, 'r')
 
         current_vals = []
@@ -137,6 +136,8 @@ class mcnp_file_handler():
             # bins.pop(239)
             i = i + 1
         return current_vals, current_unc
+
+
 
     def propagate_uncertainty(self, derivative, uncertainty):
         #print(derivative)
