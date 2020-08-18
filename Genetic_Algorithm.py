@@ -142,7 +142,75 @@ class genetic_algorithm:
             self.write_output_v2(list_of_individuals = self.all_individuals, output_file_name = self.options['output_all_individuals_at_end_of_calculation_file_name'])
 
 
+    def apply_constraint(self, list_of_individuals, constraint_type):
+        meet_constraint = False
+        if constraint_type == 'keff':
+            if 'mcnp' in self.options['solver']:
+                self.mcnp_keff_inputs = []
+                self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
+                for individual in list_of_individuals:
+                    ### Building MCNP input file
+                    data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(
+                        self.options['keywords_list'])
+                    ### Finding and adding the fuel location to geometry dictionary
+                    data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
+                    ### Building MCNP input
+                    self.mcnp_file_handler.write_mcnp_input(
+                        template_file=self.options['mcnp_keff_template_file_string'],
+                        dictionary_of_replacements=data_dictionary_,
+                        input_file_str=individual.keff_input_file_string)
+                    ### Building MCNP input script for cluster
+                    self.mcnp_file_handler.build_mcnp_running_script(individual.keff_input_file_string)
+                    ### Running MCNP input
+                    self.mcnp_file_handler.run_mcnp_input(individual.keff_input_file_string)
+                    ### Adding input name to list, used to determine if the jobs have completed or not
+                    self.mcnp_keff_inputs.append(individual.keff_input_file_string)
 
+                ### Waits on the jobs to be completed (looking for "_done.dat" files)
+                self.wait_on_jobs('mcnp_keff')
+
+                ### Grabs keff from the output files
+                for ind in list_of_individuals:
+                    if self.options['fake_fitness_debug']:
+                        ind.keff = random.uniform(0.5, 1.5)
+                    else:
+                        ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
+
+                    ### If that keff is above a set threshold, sets acceptable_eigenvalue to false. Else, sets it True.
+                    if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
+                        print("keff, ", ind.keff, "too high. Skipping source calculation")
+                        ind.acceptable_eigenvalue = False
+                        ind.keff = 0.0
+                    else:
+                        ind.acceptable_eigenvalue = True
+            #if 'scale' in self.options['solver']:
+                ### create scale inputs, add filenames to list
+                #for individual in self.individuals:
+                    #if individual.evaluated_keff == False:
+                        #if self.options['geometry'] == 'cyl':
+                        #    individual.make_material_string_scale('cyl_materials')
+                        #elif self.options['geometry'] == 'grid':
+                        #    individual.make_material_string_scale('%array%1')
+                        #else:
+                        #    print("Geometry not handled in evaluate function")
+                        #    exit()
+                        #scale_inputs.append(individual.setup_scale(self.generation))
+                        #individual.evaluated_keff = True
+                        #if self.options['fake_fitness_debug']:
+                        #    individual.keff = random.uniform(0.5, 1.5)
+                #self.scale_inputs = scale_inputs
+                ### submitting all jobs and waiting on all jobs
+                #if self.options['solver_location'] == 'necluster':
+                #    self.submit_jobs(self.scale_inputs)
+                #    self.wait_on_jobs('scale')
+
+                #if self.options['solver_location'] == 'local':
+                #    print("Cant run scale locally... yet... fix this")
+                #    exit()
+
+                #for individual in self.individuals:
+                #    individual.get_scale_keff()
+        return list_of_individuals
 
     def non_dominated_sorting(self):
         ###
@@ -439,71 +507,7 @@ class genetic_algorithm:
 
                         print("individual.representativity", individual.representativity)
 
-            if evaluation_type == 'keff':
-                if 'mcnp' in self.options['solver']:
-                    self.mcnp_keff_inputs = []
-                    self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
-                    for individual in list_of_individuals:
 
-                        ### Building MCNP input file
-                        data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list'])
-                        ### Finding and adding the fuel location to geometry dictionary
-                        data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
-                        ### Building MCNP input
-                        self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_keff_template_file_string'],
-                                                           dictionary_of_replacements = data_dictionary_,
-                                                           input_file_str = individual.keff_input_file_string)
-                        ### Building MCNP input script for cluster
-                        self.mcnp_file_handler.build_mcnp_running_script(individual.keff_input_file_string)
-                        ### Running MCNP input
-                        self.mcnp_file_handler.run_mcnp_input(individual.keff_input_file_string)
-                        ### Adding input name to list, used to determine if the jobs have completed or not
-                        self.mcnp_keff_inputs.append(individual.keff_input_file_string)
-
-                    ### Waits on the jobs to be completed (looking for "_done.dat" files)
-                    self.wait_on_jobs('mcnp_keff')
-
-                    ### Grabs keff from the output files
-                    for ind in list_of_individuals:
-                        if self.options['fake_fitness_debug']:
-                            ind.keff = random.uniform(0.5, 1.5)
-                        else:
-                            ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
-
-                        ### If that keff is above a set threshold, sets acceptable_eigenvalue to false. Else, sets it True.
-                        if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
-                            print("keff, ", ind.keff, "too high. Skipping source calculation")
-                            ind.acceptable_eigenvalue = False
-                            ind.keff = 0.0
-                        else:
-                            ind.acceptable_eigenvalue = True
-                if 'scale' in self.options['solver']:
-                    ### create scale inputs, add filenames to list
-                    for individual in self.individuals:
-                        if individual.evaluated_keff == False:
-                            if self.options['geometry'] == 'cyl':
-                                individual.make_material_string_scale('cyl_materials')
-                            elif self.options['geometry'] == 'grid':
-                                individual.make_material_string_scale('%array%1')
-                            else:
-                                print("Geometry not handled in evaluate function")
-                                exit()
-                            scale_inputs.append(individual.setup_scale(self.generation))
-                            individual.evaluated_keff = True
-                            if self.options['fake_fitness_debug']:
-                                individual.keff = random.uniform(0.5, 1.5)
-                    self.scale_inputs = scale_inputs
-                    ### submitting all jobs and waiting on all jobs
-                    if self.options['solver_location']  == 'necluster':
-                        self.submit_jobs(self.scale_inputs)
-                        self.wait_on_jobs('scale')
-
-                    if self.options['solver_location'] == 'local':
-                        print("Cant run scale locally... yet... fix this")
-                        exit()
-
-                    for individual in self.individuals:
-                        individual.get_scale_keff()
 
             #if 'cnn' in self.options['solver']:
             #    print("solving for k with cnn")
