@@ -165,7 +165,7 @@ def Plotting(repvals, best_flux, best_rep, best_mat, bins, sfrflux):
     plt.title("Representativities")
     plt.legend()
     #plt.tight_layout()
-    plt.savefig('Representativities(100best/gen).png')
+    plt.savefig('Representativities(10best/gen).png')
     plt.close()
 
 Plotting(repvals, best_flux, best_rep, bestmat, bins, sfrflux)
