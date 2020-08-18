@@ -8,6 +8,7 @@ random.seed(865)
 
 import Individual_v1 as individual
 import MCNP_File_Handler
+import addedfunctionality_v2 as addfunc
 #import CNN_Handler
 
 class genetic_algorithm:
@@ -634,3 +635,9 @@ class genetic_algorithm:
                         write_string += "N/A,"
 
         return write_string
+    def post_plotting(self):
+        self.addfunc.Plotting()
+        
+        return
+    
+ 
