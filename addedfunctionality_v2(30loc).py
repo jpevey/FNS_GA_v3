@@ -156,7 +156,7 @@ def Plotting(repvals, best_flux, best_rep, best_mat, bins, sfrflux):
     plt.ylabel('Flux Data')
     plt.legend(loc='best', prop={'size': 6})
     #plt.tight_layout()
-    plt.savefig('spiderbestvsSFR.png')
+    plt.savefig('BestvsSFR.png')
     plt.close()
     
     #print(len(repvals))
@@ -165,7 +165,7 @@ def Plotting(repvals, best_flux, best_rep, best_mat, bins, sfrflux):
     plt.title("Representativities")
     plt.legend()
     #plt.tight_layout()
-    plt.savefig('spiderrepresentativities.png')
+    plt.savefig('Representativities(100best/gen).png')
     plt.close()
 
 Plotting(repvals, best_flux, best_rep, bestmat, bins, sfrflux)
