@@ -135,7 +135,7 @@ class mcnp_file_handler():
                 total_unc = current_unc.pop(252)
             # bins.pop(239)
             i = i + 1
-        return current_vals, current_unc
+        return current_vals, current_unc, total, total_unc
 
 
 

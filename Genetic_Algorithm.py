@@ -487,29 +487,15 @@ class genetic_algorithm:
                     for individual in list_of_individuals:
                         if self.options['fake_fitness_debug'] == True:
                             individual.representativity = random.uniform(0, 1.0)
+                            individual.total_flux = random.uniform(0, 1.0)
                         else:
                             if individual.acceptable_eigenvalue == True:
-                                current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                                individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
+                                individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
+                                individual.representativity = self.mcnp_file_handler.calculate_representativity(individual.flux_values, individual.flux_uncertainty)
                             if individual.acceptable_eigenvalue == False:
                                 individual.representativity = 0.0
 
                         print("individual.representativity", individual.representativity)
-
-            if evaluation_type == 'total_flux':
-                print("Evaluating Total Flux")
-
-                for individual in list_of_individuals:
-                    if self.options['fake_fitness_debug'] == True:
-                        individual.total_flux = random.uniform(0, 1.0)
-                    else:
-                        if individual.acceptable_eigenvalue == True:
-                            individual.flux_values, individual.flux_uncertainty = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                            individual.total_flux = individual.flux_values[-1]
-                        if individual.acceptable_eigenvalue == False:
-                            individual.total_flux = 0.0
-
-                    print("individual.tota_flux", individual.total_flux)
 
 
 
