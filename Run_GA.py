@@ -56,8 +56,9 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = '_output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = ['keff#threshold', 'representativity']
-options['constraint'] = ['keff#evalute#threshold']
+options['fitness'] = ['representativity', 'total_flux']
+options['constraint'] = ['keff#evaluate#threshold']
+options['enforced_maximum_eigenvalue'] = 0.95
 options['fitness_sort_by'] = 'representativity'
 options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
 options['default_mcnp_mat_count_and_density'][1] = '0'
@@ -66,7 +67,7 @@ options['default_mcnp_mat_count_and_density'][3] = '2 -18.94'
 options['default_mcnp_mat_count_and_density'][4] = '3 -0.971'
 options['output_all_individuals_at_end_of_calculation'] = True
 options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
-options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity','front_rank', 'crowding_distance','number_of_fuel',
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity', 'total_flux','front_rank', 'crowding_distance','number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
 # """#!/bin/bash
@@ -154,10 +155,6 @@ options['cyl_scale_template'] = [
     'cylinder material 1 47.22415102 2.54 0.0',
     'cylinder material 1 48.45095663 2.54 0.0'
 ]
-
-options['check_eigenvalue'] = True
-options['check_eigenvalue_function'] = 'enforced_maximum_eigenvalue'
-options['enforced_maximum_eigenvalue'] = 0.95
 options['fuel_index'] = 3
 options['fuel_index_multiplier'] = 2.54 / 2
 options['use_non_dominated_sorting'] = True

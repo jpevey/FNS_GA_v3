@@ -60,8 +60,8 @@ class genetic_algorithm:
 
 
         ### Running eigenvalue calcs if needed
-        if self.options['enforced_maximum_eigenvalue'] == True:
-            getattr(self, self.options['check_eigenvalue_function'])()
+        #if self.options['enforced_maximum_eigenvalue'] == True:
+        #    getattr(self, self.options['check_eigenvalue_function'])()
 
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
@@ -143,8 +143,16 @@ class genetic_algorithm:
 
 
     def apply_constraint(self, list_of_individuals, constraint_type):
+        print("Applying constraint:", constraint_type)
         meet_constraint = False
-        if constraint_type == 'keff':
+        ### Seperating constraint and options, etc.
+        constraint_split = constraint_type.split("#")
+
+        constraint_type_ = constraint_split[0]
+        constraint_run_location = constraint_split[1]
+        constraint_options = constraint_split[2]
+
+        if constraint_type_ == 'keff':
             if 'mcnp' in self.options['solver']:
                 self.mcnp_keff_inputs = []
                 self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
@@ -454,6 +462,12 @@ class genetic_algorithm:
     def evaluate(self, evaluation_types, list_of_individuals = "Default"):
         if list_of_individuals == "Default":
             list_of_individuals = self.individuals
+
+        ### Updating list of individuals based on whether they meet the constraints in the constraint options
+        for constraint in self.options['constraint']:
+            if 'evaluate' in constraint:
+                list_of_individuals = self.apply_constraint(list_of_individuals, constraint)
+
         for evaluation_type in evaluation_types:
             if "#" in evaluation_type:
                 evaluation_type, evaluation_options = evaluation_type.split("#")
@@ -484,28 +498,18 @@ class genetic_algorithm:
 
             if evaluation_type == 'total_flux':
                 print("Evaluating Total Flux")
-                if 'mcnp' in self.options['solver']:
-                    self.mcnp_inputs = []
-                    for individual in list_of_individuals:
-                        if individual.ran_source_calculation == False:
-                            if individual.acceptable_eigenvalue == True:
-                                ### Building MCNP input file
-                                self.build_mcnp_source_input(individual)
-                                individual.ran_source_calculations = True
 
-                    self.wait_on_jobs('mcnp')
+                for individual in list_of_individuals:
+                    if self.options['fake_fitness_debug'] == True:
+                        individual.total_flux = random.uniform(0, 1.0)
+                    else:
+                        if individual.acceptable_eigenvalue == True:
+                            individual.flux_values, individual.flux_uncertainty = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
+                            individual.total_flux = individual.flux_values[-1]
+                        if individual.acceptable_eigenvalue == False:
+                            individual.total_flux = 0.0
 
-                    for individual in list_of_individuals:
-                        if self.options['fake_fitness_debug'] == True:
-                            individual.representativity = random.uniform(0, 1.0)
-                        else:
-                            if individual.acceptable_eigenvalue == True:
-                                current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                                individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
-                            if individual.acceptable_eigenvalue == False:
-                                individual.representativity = 0.0
-
-                        print("individual.representativity", individual.representativity)
+                    print("individual.tota_flux", individual.total_flux)
 
 
 
@@ -835,6 +839,11 @@ class genetic_algorithm:
             if write_option == 'crowding_distance':
                 try:
                     write_string += str(individual.crowding_distance) + ","
+                except:
+                    write_string += "N/A,"
+            if write_option == 'total_flux':
+                try:
+                    write_string += str(individual.total_flux) + ","
                 except:
                     write_string += "N/A,"
             if write_option == 'representativity':
