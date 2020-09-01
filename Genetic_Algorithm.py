@@ -4,7 +4,7 @@ import math
 import random
 import copy
 import time
-random.seed(865)
+
 
 import Individual_v1 as individual
 import MCNP_File_Handler
@@ -18,7 +18,7 @@ class genetic_algorithm:
         ### List of current generation individuals
         self.individuals = []
 
-
+        random.seed(self.options['python_random_number_seed'])
 
         self.generation = 0
         self.individual_count = 0

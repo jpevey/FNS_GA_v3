@@ -3,8 +3,9 @@ import Genetic_Algorithm
 import Individual_v1
 
 options = collections.OrderedDict()
-options['skip_waiting_on_jobs_debug'] = False
-options['fake_fitness_debug'] = False
+options['skip_waiting_on_jobs_debug'] = True
+options['fake_fitness_debug'] = True
+options['python_random_number_seed'] = 865
 options['skip_writing_files'] = False
 options['verify_fuel_mass_after_mutation'] = False
 options['verify_fuel_mass_after_crossover'] = False
@@ -160,6 +161,8 @@ options['fuel_index'] = 3
 options['fuel_index_multiplier'] = 2.54 / 2
 options['use_non_dominated_sorting'] = True
 options['use_crowding_distance'] = True
+
+
 if __name__ == '__main__':
     ga = Genetic_Algorithm.genetic_algorithm(options)
 
