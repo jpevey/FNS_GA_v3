@@ -15,8 +15,8 @@ class individual:
         self.grid_x = options['grid_x']
         self.grid_y = options['grid_y']
         self.options = options
-        self.total_flux = 0.0
         self.ind_count = individual_count
+        self.total_flux = 0.0
         self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
         self.keff_input_file_string = "keff_" + self.input_file_string
         self.create_random_pattern()
