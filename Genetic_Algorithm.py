@@ -494,6 +494,7 @@ class genetic_algorithm:
                                 individual.representativity = self.mcnp_file_handler.calculate_representativity(individual.flux_values, individual.flux_uncertainty)
                             if individual.acceptable_eigenvalue == False:
                                 individual.representativity = 0.0
+                                individual.total_flux = 0.0
 
                         print("individual.representativity", individual.representativity)
 

@@ -4,7 +4,7 @@
     <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -472,7 +472,14 @@
       <option name="project" value="LOCAL" />
       <updated>1597799953778</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="fixing total flux data pull">
+      <created>1597849739831</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1597849739831</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -495,17 +502,18 @@
     <MESSAGE value="updated mcnp keff pulling function to grep &quot;final result&quot;" />
     <MESSAGE value="removed importances from source calc" />
     <MESSAGE value="adding constraint and total flux to evaluate function" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding constraint and total flux to evaluate function" />
+    <MESSAGE value="fixing total flux data pull" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixing total flux data pull" />
   </component>
   <component name="WindowStateProjectService">
     <state x="503" y="67" key="#Run_GA" timestamp="1593705666402">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1597799952999">
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1597849738279">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1597799952999" />
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1597849738279" />
     <state width="1537" height="248" key="GridCell.Tab.0.bottom" timestamp="1597849228440">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
