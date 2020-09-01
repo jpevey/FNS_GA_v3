@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="fixing total flux data pull">
+    <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -485,7 +485,14 @@
       <option name="project" value="LOCAL" />
       <updated>1598975786462</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="fixing total flux data pull">
+      <created>1598975926331</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1598975926331</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -516,10 +523,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1598975892193">
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1598975925533">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1598975892193" />
+    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1598975925533" />
     <state width="1537" height="248" key="GridCell.Tab.0.bottom" timestamp="1597849228440">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

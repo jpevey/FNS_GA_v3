@@ -3,8 +3,8 @@ import Genetic_Algorithm
 import Individual_v1
 
 options = collections.OrderedDict()
-options['skip_waiting_on_jobs_debug'] = True
-options['fake_fitness_debug'] = True
+options['skip_waiting_on_jobs_debug'] = False
+options['fake_fitness_debug'] = False
 options['skip_writing_files'] = False
 options['verify_fuel_mass_after_mutation'] = False
 options['verify_fuel_mass_after_crossover'] = False
@@ -12,7 +12,7 @@ options['enforce_fuel_count'] = False
 options['enforce_material_number'] = 1
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 100
+options['number_of_generations'] = 50
 options['number_of_individuals'] = 100
 options['number_of_parents'] = 20
 options['minimum_fuel_elements'] = 0
@@ -20,7 +20,7 @@ options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
 options['mutation_rate'] = 0.10  # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
-                                      # to mutate to other material based on mutation_rate
+# to mutate to other material based on mutation_rate
 options['material_types'] = [1, 2, 3, 4]
 # When doing crossover, select a parent based on specified method (default is uniformly at random)
 # Parent_2 is chosen at random with probabilities based on the diversity score
@@ -50,7 +50,7 @@ options['template_keywords'] = collections.OrderedDict()
 options['keywords_list'] = []
 options['keywords_template'] = 'mat_'
 for x in range(options['grid_x']):
-    options['keywords_list'].append(options['keywords_template'] + str(x+1))
+    options['keywords_list'].append(options['keywords_template'] + str(x + 1))
 for val in options['keywords_list']:
     options['template_keywords'][val] = ""
 options['write_output_csv'] = True
@@ -67,7 +67,8 @@ options['default_mcnp_mat_count_and_density'][3] = '2 -18.94'
 options['default_mcnp_mat_count_and_density'][4] = '3 -0.971'
 options['output_all_individuals_at_end_of_calculation'] = True
 options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
-options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity', 'total_flux','front_rank', 'crowding_distance','number_of_fuel',
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity',
+                                     'total_flux', 'front_rank', 'crowding_distance', 'number_of_fuel',
                                      'write_out_parents', 'write_out_average_diversity_score', 'materials']
 # options['scale_script_template'] = \
 # """#!/bin/bash
@@ -88,15 +89,15 @@ options['scale_script_template'] = \
     #PBS -q fill
     #PBS -V
     #PBS -l nodes=1:ppn=8
-    
+
     module unload mpi
     module load openmpi/1.8.8-gnu
     module load scale/dev
     cat ${PBS_NODEFILE}
     #NP=$(grep -c node ${PBS_NODEFILE})
-    
+
     cd $PBS_O_WORKDIR
-    
+
     #echo $NP
     scalerte -m -N 8 -M ${PBS_NODEFILE} -T /home/tmp_scale/$USER/scale.$$ %%%input%%%
     grep -a "final result" %%%input%%%.out > %%%input%%%_done.dat
