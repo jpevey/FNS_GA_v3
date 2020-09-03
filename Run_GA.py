@@ -162,4 +162,4 @@ options['fuel_index_multiplier'] = 2.54 / 2
 
 if __name__ == '__main__':
     ga = Genetic_Algorithm.genetic_algorithm(options)
-
+    plots = Genetic_Algorithm.Post_Processing().post_plotting()
