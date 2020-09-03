@@ -54,8 +54,11 @@ class genetic_algorithm:
         ### Creating output csv if needed
         if self.options['write_output_csv']:
             output_csv = open(self.options['output_filename'] + '.csv', 'w')
+            ### Writing out options for this run
             for flag in self.options:
                 output_csv.write("{},{}\n".format(flag, self.options[flag]))
+            output_csv.write("%%%begin_data%%%\n")
+            output_csv.write(self.create_header())
             output_csv.close()
 
 
@@ -858,3 +861,14 @@ class genetic_algorithm:
                         write_string += "N/A,"
 
         return write_string
+
+    def create_header(self):
+        header_string = ""
+        for val in self.options['output_writeout_values']:
+            if val == 'materials':
+                for _ in range(self.options['total_materials']):
+                    header_string += val + str(_)+ ","
+            else:
+                header_string += val + ","
+
+        return header_string
