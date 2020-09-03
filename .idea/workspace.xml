@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="fixing total flux data pull">
+    <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,13 +156,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1593656828288</updated>
-    </task>
-    <task id="LOCAL-00001" summary="test">
-      <created>1593658012575</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1593658012575</updated>
     </task>
     <task id="LOCAL-00002" summary="adding mcnp support">
       <created>1593663882939</created>
@@ -499,7 +493,14 @@
       <option name="project" value="LOCAL" />
       <updated>1598975972855</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="fixing total flux data pull">
+      <created>1599166900816</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1599166900817</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -530,26 +531,26 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="277" y="0" width="1259" height="800" key="CommitChangelistDialog2" timestamp="1598978856584">
+    <state x="277" y="0" width="1259" height="800" key="CommitChangelistDialog2" timestamp="1599166899865">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="277" y="0" width="1259" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1598978856584" />
-    <state width="1537" height="248" key="GridCell.Tab.0.bottom" timestamp="1598977516187">
+    <state x="277" y="0" width="1259" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1599166899865" />
+    <state width="1537" height="248" key="GridCell.Tab.0.bottom" timestamp="1599168234888">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1598977516187" />
-    <state width="1537" height="248" key="GridCell.Tab.0.center" timestamp="1598977516187">
+    <state width="1537" height="248" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
+    <state width="1537" height="248" key="GridCell.Tab.0.center" timestamp="1599168234888">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1598977516187" />
-    <state width="1537" height="248" key="GridCell.Tab.0.left" timestamp="1598977516187">
+    <state width="1537" height="248" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
+    <state width="1537" height="248" key="GridCell.Tab.0.left" timestamp="1599168234888">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1598977516187" />
-    <state width="1537" height="248" key="GridCell.Tab.0.right" timestamp="1598977516187">
+    <state width="1537" height="248" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
+    <state width="1537" height="248" key="GridCell.Tab.0.right" timestamp="1599168234888">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1598977516187" />
+    <state width="1537" height="248" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
     <state width="1537" height="270" key="GridCell.Tab.1.bottom" timestamp="1594783440648">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

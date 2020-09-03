@@ -58,7 +58,7 @@ class genetic_algorithm:
             for flag in self.options:
                 output_csv.write("{},{}\n".format(flag, self.options[flag]))
             output_csv.write("%%%begin_data%%%\n")
-            output_csv.write(self.create_header())
+            output_csv.write(self.create_header() +"\n")
             output_csv.close()
 
 
@@ -815,6 +815,9 @@ class genetic_algorithm:
     def write_options_funct(self, output_file, individual):
         write_string = ""
         for write_option in self.options['output_writeout_values']:
+            if "#" in write_option:
+                write_option_split = write_option.split("#")
+                write_option = write_option_split[0]
             if write_option == 'generation':
                 write_string += str(self.generation) + ","
             if write_option == 'individual_count':
@@ -859,14 +862,18 @@ class genetic_algorithm:
                         write_string += str(average_tds) + ','
                     except:
                         write_string += "N/A,"
-
+                else:
+                    write_string += "N/A,"
         return write_string
 
     def create_header(self):
         header_string = ""
         for val in self.options['output_writeout_values']:
-            if val == 'materials':
-                for _ in range(self.options['total_materials']):
+            if "#" in val:
+                val_split = val.split("#")
+                val = val_split[0]
+                val_range = int(val_split[1])
+                for _ in range(val_range):
                     header_string += val + str(_)+ ","
             else:
                 header_string += val + ","

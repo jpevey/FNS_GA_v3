@@ -13,9 +13,9 @@ options['enforce_fuel_count'] = False
 options['enforce_material_number'] = 1
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 50
-options['number_of_individuals'] = 100
-options['number_of_parents'] = 20
+options['number_of_generations'] = 3
+options['number_of_individuals'] = 5
+options['number_of_parents'] = 3
 options['minimum_fuel_elements'] = 0
 options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
@@ -70,7 +70,7 @@ options['output_all_individuals_at_end_of_calculation'] = True
 options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity',
                                      'total_flux', 'front_rank', 'crowding_distance', 'number_of_fuel',
-                                     'write_out_parents', 'write_out_average_diversity_score', 'materials']
+                                     'write_out_parents#2', 'write_out_average_diversity_score', 'materials#30']
 # options['scale_script_template'] = \
 # """#!/bin/bash
 #
