@@ -4,7 +4,7 @@ import math
 import random
 import copy
 import time
-
+import addedfuncv3
 
 import Individual_v1 as individual
 import MCNP_File_Handler
@@ -879,3 +879,20 @@ class genetic_algorithm:
                 header_string += val + ","
 
         return header_string
+
+class Post_Processing():
+### What to do when you instantiate (which means you you create the object by calling the class) the class
+    def __init__(self):
+        print("Post Processing Initiated")
+            
+    ### A function called post_plotting which sets the object's variable "run_postproc" to the output of the function
+    ### "run_postproc" which is found in the file "addedfuncv3"
+    def post_plotting(self):
+        my_file = ("_output.csv")
+        if os.path.exists(my_file):
+            # path exists
+            print("Creating Your Plots..")
+            self.run_postproc = addedfuncv3.run_postproc()
+        else:
+            pass
+        return
