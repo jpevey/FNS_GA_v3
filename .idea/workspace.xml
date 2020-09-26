@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -156,13 +155,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1593656828288</updated>
-    </task>
-    <task id="LOCAL-00004" summary="fixing how fuel is added to individuals">
-      <created>1593705875948</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1593705875948</updated>
     </task>
     <task id="LOCAL-00005" summary="fixing how fuel is added to individuals">
       <created>1593711038420</created>
@@ -500,7 +492,14 @@
       <option name="project" value="LOCAL" />
       <updated>1601080460743</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Removed zeroing out of keff (so that ind's with a k above .95 are printed)">
+      <created>1601080746991</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1601080746991</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -533,10 +532,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="277" y="0" width="1259" height="800" key="CommitChangelistDialog2" timestamp="1601080459767">
+    <state x="158" y="0" width="1259" height="800" key="CommitChangelistDialog2" timestamp="1601080746223">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="277" y="0" width="1259" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1601080459767" />
+    <state x="158" y="0" width="1259" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1601080746223" />
     <state width="1537" height="248" key="GridCell.Tab.0.bottom" timestamp="1599168234888">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
