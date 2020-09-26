@@ -20,7 +20,7 @@ class individual:
         self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
         self.keff_input_file_string = "keff_" + self.input_file_string
         self.create_random_pattern()
-        self.parent_string = "random_initialized,"
+        self.parent_string = "random_initialized,N/A,"
         self.born_from_crossover = False
         self.ran_source_calculation = False
 

@@ -191,7 +191,6 @@ class genetic_algorithm:
                     if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
                         print("keff, ", ind.keff, "too high. Skipping source calculation")
                         ind.acceptable_eigenvalue = False
-                        ind.keff = 0.0
                     else:
                         ind.acceptable_eigenvalue = True
             #if 'scale' in self.options['solver']:
@@ -761,22 +760,15 @@ class genetic_algorithm:
         number_of_children_needed = self.options['number_of_individuals'] - self.options['number_of_parents']
         number_of_inds_from_current_generation = 0
         for ind_count, individual in enumerate(self.individuals):
-
-            # print("Writing ind", ind_count, self.options['number_of_parents']  - 1)
-
             if ind_count <= self.options['number_of_parents'] - 1:
                 write_string = self.write_options_funct(output_file, individual)
-                # print("WRITING PARENTS!", self.generation, ind_count, write_string)
                 output_file.write(write_string + "\n")
-
                 if individual.generation == self.generation:
                     number_of_inds_from_current_generation += 1
 
                 continue
             if individual.generation == self.generation:
-
                 write_string = self.write_options_funct(output_file, individual)
-                # print("writing out child:", self.generation, ind_count, write_string)
                 output_file.write(write_string + "\n")
                 if individual.generation == self.generation:
                     number_of_inds_from_current_generation += 1
@@ -786,7 +778,6 @@ class genetic_algorithm:
                 if number_of_children_needed > number_of_inds_from_current_generation:
                     continue
                 write_string = self.write_options_funct(output_file, individual)
-                # print("writing out filler:", self.generation, ind_count, write_string)
                 output_file.write(write_string + "\n")
                 continue
         output_file.close()
