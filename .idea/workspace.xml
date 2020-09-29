@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/simplecyl_50x25in.inp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simplecyl_keff_50x25in.inp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simplecyl_30x15in.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl_30x15in.inp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" beforeDir="false" afterPath="$PROJECT_DIR$/simplecyl_keff_30x15in.inp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,7 +40,13 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\John\PycharmProjects\FNS_GA_v3" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.Run_GA">
     <configuration name="Genetic_Algorithm" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -155,20 +165,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1593656828288</updated>
-    </task>
-    <task id="LOCAL-00005" summary="fixing how fuel is added to individuals">
-      <created>1593711038420</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1593711038420</updated>
-    </task>
-    <task id="LOCAL-00006" summary="fixing how fuel is added to individuals">
-      <created>1593712291824</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1593712291824</updated>
     </task>
     <task id="LOCAL-00007" summary="fixing syntax in get_flux, propagate_uncertainty and calculate_representivity">
       <created>1594226262860</created>
@@ -499,7 +495,21 @@
       <option name="project" value="LOCAL" />
       <updated>1601080746991</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="Removed zeroing out of keff (so that ind's with a k above .95 are printed)">
+      <created>1601080812666</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1601080812666</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Adding natural uranium to the template file and adjusted material 2 density to 18.95 for nat u.">
+      <created>1601080851487</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1601080851487</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -525,33 +535,34 @@
     <MESSAGE value="fixing total flux data pull" />
     <MESSAGE value="adding headers to output file" />
     <MESSAGE value="Removed zeroing out of keff (so that ind's with a k above .95 are printed)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed zeroing out of keff (so that ind's with a k above .95 are printed)" />
+    <MESSAGE value="Adding natural uranium to the template file and adjusted material 2 density to 18.95 for nat u." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding natural uranium to the template file and adjusted material 2 density to 18.95 for nat u." />
   </component>
   <component name="WindowStateProjectService">
     <state x="503" y="67" key="#Run_GA" timestamp="1593705666402">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="158" y="0" width="1259" height="800" key="CommitChangelistDialog2" timestamp="1601080811887">
+    <state x="158" y="0" width="1259" height="800" key="CommitChangelistDialog2" timestamp="1601080850662">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="158" y="0" width="1259" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1601080811887" />
-    <state width="1537" height="248" key="GridCell.Tab.0.bottom" timestamp="1599168234888">
+    <state x="158" y="0" width="1259" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1601080850662" />
+    <state width="767" height="248" key="GridCell.Tab.0.bottom" timestamp="1601339319394">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
-    <state width="1537" height="248" key="GridCell.Tab.0.center" timestamp="1599168234888">
+    <state width="767" height="248" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1601339319394" />
+    <state width="767" height="248" key="GridCell.Tab.0.center" timestamp="1601339319394">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
-    <state width="1537" height="248" key="GridCell.Tab.0.left" timestamp="1599168234888">
+    <state width="767" height="248" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1601339319394" />
+    <state width="767" height="248" key="GridCell.Tab.0.left" timestamp="1601339319393">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
-    <state width="1537" height="248" key="GridCell.Tab.0.right" timestamp="1599168234888">
+    <state width="767" height="248" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1601339319393" />
+    <state width="767" height="248" key="GridCell.Tab.0.right" timestamp="1601339319394">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1599168234888" />
+    <state width="767" height="248" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1601339319394" />
     <state width="1537" height="270" key="GridCell.Tab.1.bottom" timestamp="1594783440648">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -592,9 +603,9 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="550" y="129" key="git4idea.branch.GitSmartOperationDialog/0.0.1536.824@0.0.1536.824" timestamp="1594844835589" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1594846858831">
+    <state x="430" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1601339658637">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1594846858831" />
+    <state x="430" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1601339658637" />
   </component>
 </project>
