@@ -220,6 +220,11 @@ class genetic_algorithm:
 
                 #for individual in self.individuals:
                 #    individual.get_scale_keff()
+
+            ### If "default_sort" in constraint definition, sorting individuals by
+            if "default_sort" in constraint_type:
+                list_of_individuals.sort(key=lambda x: x.keff, reverse=False)
+
         return list_of_individuals
 
     def non_dominated_sorting(self):
