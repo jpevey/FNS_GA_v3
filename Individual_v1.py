@@ -29,7 +29,7 @@ class individual:
         self.default_materials = collections.OrderedDict()
 
     def create_random_pattern(self):
-        print("Creating random pattern for ind:", self.ind_count)
+        #print("Creating random pattern for ind:", self.ind_count)
         self.pattern = collections.OrderedDict()
         number_of_fuel = random.randint(self.options['minimum_fuel_elements'], self.options['maximum_fuel_elements'])
         self.fuel_locations = []
@@ -65,9 +65,9 @@ class individual:
 
     def find_fuel_location(self):
         for count, mat in enumerate(self.material_matrix):
-            print(count, mat[0])
+            #print(count, mat[0])
             if mat[0] == self.options['fuel_index']:
-                print("Found fuel in location index: ", count, 2.54 / 4 + count * self.options['fuel_index_multiplier'])
+                #print("Found fuel in location index: ", count, 2.54 / 4 + count * self.options['fuel_index_multiplier'])
                 return 2.54 / 4 + count * self.options['fuel_index_multiplier']
 
     def create_discrete_material_mcnp_dictionary(self, keywords_list = []):
@@ -157,7 +157,7 @@ class individual:
         if self.options['geometry'] == 'grid':
             ### Making a string for the input file
             material_string = ""
-            print(self.material_matrix)
+            #print(self.material_matrix)
             for row_materials in self.material_matrix:
                 for material in row_materials:
                     material_string = material_string + str(material) + " "

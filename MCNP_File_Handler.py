@@ -218,7 +218,7 @@ class mcnp_file_handler():
         # print(R)
         R[np.isnan(R)] = 0
         R_unc[np.isnan(R_unc)] = 0
-        print(R, R_unc)
+        #print(R, R_unc)
         return R[0][0]
 
     def run_mcnp_input(self, input_file):

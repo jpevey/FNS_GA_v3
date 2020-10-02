@@ -259,7 +259,7 @@ class genetic_algorithm:
             #for fitness_index, fitness_ in enumerate(self.options['fitness']):
             if individual.number_of_inds_that_dominate_individual == 0:
                 individual.front_rank = 0
-                print("Ind is rank one:", individual.input_file_string, individual.representativity, individual.keff)
+                #print("Ind is rank one:", individual.input_file_string, individual.representativity, individual.keff)
                 front[0].append(individual)
         ### Front counter
 
@@ -300,19 +300,19 @@ class genetic_algorithm:
         for front in self.pareto_front:
             if front == []:
                 continue
-            print("Front:", len(front))
+            #print("Front:", len(front))
             if len(front) < (self.options['number_of_parents'] - len(parents_list)):
-                print("Length of parent list!!!", len(parents_list))
+                #print("Length of parent list!!!", len(parents_list))
                 parents_list = parents_list + front
-                print("Length of parent list!!!", len(parents_list))
+                #print("Length of parent list!!!", len(parents_list))
             else:
 
                 front = self.crowding_distance(front)
-                print(len(front), self.options['number_of_parents'], len(parents_list))
+                #print(len(front), self.options['number_of_parents'], len(parents_list))
                 front.sort(key=lambda x: x.crowding_distance, reverse=True)
 
                 ind_count = 0
-                print("Adding parents to parents list")
+                #print("Adding parents to parents list")
                 while self.options['number_of_parents'] != len(parents_list):
                     parents_list.append(front[ind_count])
                     ind_count += 1
@@ -383,7 +383,7 @@ class genetic_algorithm:
     def remake_duplicate_children(self, list_of_children, comparison_list):
 
         for child in list_of_children:
-            print("Checking child:", child.material_matrix, comparison_list)
+            #print("Checking child:", child.material_matrix, comparison_list)
             for comparison_ind in comparison_list:
                 #print("comparison", child.material_matrix, comparison_ind.material_matrix)
                 comparison_score = 0
@@ -391,10 +391,10 @@ class genetic_algorithm:
                     if child_mat == comp_mat:
                         comparison_score += 1
                     if comparison_score == self.options['total_materials']:
-                        print("Duplicate child found! Forcing mutation")
-                        print("Before", child.material_matrix)
+                        #print("Duplicate child found! Forcing mutation")
+                        #print("Before", child.material_matrix)
                         child.material_matrix = self.single_bit_mutation(child.material_matrix, force_mutation=True, force_mutation_per_material_sublist=2)
-                        print("After", child.material_matrix)
+                        #print("After", child.material_matrix)
                 #print(child.material_matrix, comparison_ind.material_matrix)
                 #if child.material_matrix == comparison_ind.material_matrix:
                 #    child.create_random_pattern()
@@ -541,7 +541,7 @@ class genetic_algorithm:
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
-            print("Evaluating diversity of parents")
+            #print("Evaluating diversity of parents")
             self.evaluate_bitwise_diversity_of_parents()
 
         number_of_children = self.options['number_of_individuals'] - \
@@ -648,11 +648,11 @@ class genetic_algorithm:
 
     def mutate(self, list_of_individuals):
         ### Currently only works on a material-basis
-        print("MUTATING!!!")
+        #print("MUTATING!!!")
         if self.options['mutation_type'] == 'bitwise':
-            print("BITWISE!", len(list_of_individuals))
+            #print("BITWISE!", len(list_of_individuals))
             for ind_count, individual in enumerate(list_of_individuals):
-                print("MUTATING:", ind_count)
+                #print("MUTATING:", ind_count)
                 original_material_matrix = copy.deepcopy(individual.material_matrix)
                 individual.material_matrix = self.single_bit_mutation(original_material_matrix)
 
@@ -680,9 +680,9 @@ class genetic_algorithm:
                 rand_val = random.randint(0, len(material_matrix) - 1)
                 while rand_val in force_mutation_index:
                     rand_val = random.randint(0, len(material_matrix) - 1)
-                    print(rand_val, force_mutation_index)
+                    #print(rand_val, force_mutation_index)
                 force_mutation_index.append(rand_val)
-            print("FORCING A MUTATION! at index(es):", force_mutation_index)
+            #print("FORCING A MUTATION! at index(es):", force_mutation_index)
 
         for material_list in material_matrix:
             material_matrix_sublist = []
@@ -697,7 +697,7 @@ class genetic_algorithm:
                 if force_mutation:
                     if material_count in force_mutation_index:
                         random_val = self.options['mutation_rate']
-                        print("Forcing a mutation in material:", material_count)
+                        #print("Forcing a mutation in material:", material_count)
 
 
                 if random_val <= self.options['mutation_rate']:
