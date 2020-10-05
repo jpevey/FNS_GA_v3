@@ -105,7 +105,7 @@ M2    92232.70c -0.000000002
 c Sodium metal -0.971 g/cc
 M3    11023.70c 1
 mode n
-sdef par=n erg=2.2 pos=0 0 0 vec=1 0 0 dir=1
+sdef par=n erg=2.5 pos=0 0 0 vec=1 0 0 dir=1
 F2:n 32
 E2    1.000E-10
       5.000E-10
