@@ -39,12 +39,10 @@ class genetic_algorithm:
         if self.options['include_pattern']:
             print("Including a pattern in initial population!")
             for ind_count, pattern_to_include in enumerate(self.options['pattern_to_include']):
-                for _ in self.individuals[ind_count].material_matrix:
-                    print(_)
-                self.individuals[ind_count].material_matrix = pattern_to_include
+                self.individuals[ind_count].material_matrix = []
+                for material in pattern_to_include:
+                    self.individuals[ind_count].material_matrix.append([material])
                 self.individuals[ind_count].make_material_string_scale('%array%1')
-                for _ in self.individuals[ind_count].material_matrix:
-                    print(_)
 
         if self.options['enforce_fuel_count']:
             print("enforcing material",self.options['enforce_material_number'],' count:', self.options['enforced_fuel_count_value'])

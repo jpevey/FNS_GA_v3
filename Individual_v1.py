@@ -54,7 +54,7 @@ class individual:
             minor_material = []
             for __ in range(self.grid_y):
                 material_count += 1
-                material_index = random.randint(2, len(self.options['material_types']))
+                material_index = random.randint(1, len(self.options['material_types']))
                 material = self.options['material_types'][material_index - 1]
                 if material_count in self.fuel_locations:
                     material = 1
