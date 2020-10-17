@@ -9,15 +9,15 @@ options['python_random_number_seed'] = 865
 options['skip_writing_files'] = False
 options['verify_fuel_mass_after_mutation'] = False
 options['verify_fuel_mass_after_crossover'] = False
-options['enforce_fuel_count'] = False
+options['enforce_material_count'] = False
 options['enforce_material_number'] = 1
+options['minimum_material_elements'] = 0
+options['maximum_material_elements'] = 3
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
 options['number_of_generations'] = 3
 options['number_of_individuals'] = 30
 options['number_of_parents'] = 20
-options['minimum_fuel_elements'] = 0
-options['maximum_fuel_elements'] = 3
 options['remake_duplicate_children'] = True
 options['mutation_rate'] = 0.10  # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
@@ -146,34 +146,15 @@ if options['read_parents_from_file']:
 
         options['pattern_to_include'].append(whole_pattern)
 
-options['cyl_scale_template'] = [
-    'cylinder material 1 10.83396326 2.54 0.0',
-    'cylinder material 1 15.32153778 2.54 0.0',
-    'cylinder material 1 18.76497482 2.54 0.0',
-    'cylinder material 1 21.66792653 2.54 0.0',
-    'cylinder material 1 24.22547832 2.54 0.0',
-    'cylinder material 1 26.53768189 2.54 0.0',
-    'cylinder material 1 28.66397251 2.54 0.0',
-    'cylinder material 1 30.64307556 2.54 0.0',
-    'cylinder material 1 32.50188979 2.54 0.0',
-    'cylinder material 1 34.26 2.54 0.0',
-    'cylinder material 1 35.93219114 2.54 0.0',
-    'cylinder material 1 37.52994964 2.54 0.0',
-    'cylinder material 1 39.06241006 2.54 0.0',
-    'cylinder material 1 40.53697867 2.54 0.0',
-    'cylinder material 1 41.95975929 2.54 0.0',
-    'cylinder material 1 43.33585305 2.54 0.0',
-    'cylinder material 1 44.66957488 2.54 0.0',
-    'cylinder material 1 45.96461335 2.54 0.0',
-    'cylinder material 1 47.22415102 2.54 0.0',
-    'cylinder material 1 48.45095663 2.54 0.0'
-]
 options['fuel_index'] = 3
 options['fuel_index_multiplier'] = 2.54 / 2
 options['use_non_dominated_sorting'] = True
 options['use_crowding_distance'] = True
 
+def main():
+    ga = Genetic_Algorithm.genetic_algorithm(options)
+
 
 if __name__ == '__main__':
-    ga = Genetic_Algorithm.genetic_algorithm(options)
+    main()
 

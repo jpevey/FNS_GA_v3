@@ -31,18 +31,15 @@ class individual:
     def create_random_pattern(self):
         #print("Creating random pattern for ind:", self.ind_count)
         self.pattern = collections.OrderedDict()
-        number_of_fuel = random.randint(self.options['minimum_fuel_elements'], self.options['maximum_fuel_elements'])
-        self.fuel_locations = []
-        total_number_of_locations = self.grid_y * self.grid_x
-        #print("NUMBER OF FUEL: " , number_of_fuel, self.ind_count)
-        ### Assigning fuel locations
-        for _ in range(number_of_fuel):
-            fuel_location = random.randint(1, total_number_of_locations)
-            while fuel_location in self.fuel_locations:
-                fuel_location = random.randint(1, total_number_of_locations )
-            self.fuel_locations.append(fuel_location)
-
-        #print("fuel locations:", self.fuel_locations)
+        if self.options['enforce_material_count'] == True:
+            number_of_material = random.randint(self.options['minimum_material_elements'], self.options['maximum_material_elements'])
+            self.material_locations = []
+            total_number_of_locations = self.grid_y * self.grid_x
+            for _ in range(number_of_material):
+                material_location = random.randint(1, total_number_of_locations)
+                while material_location in self.material_locations:
+                    material_location = random.randint(1, total_number_of_locations)
+                self.material_locations.append(material_location)
 
         self.create_material_matrix()
 
@@ -56,8 +53,9 @@ class individual:
                 material_count += 1
                 material_index = random.randint(1, len(self.options['material_types']))
                 material = self.options['material_types'][material_index - 1]
-                if material_count in self.fuel_locations:
-                    material = 1
+                if self.options['enforce_material_count'] == True:
+                    if material_count in self.material_locations:
+                        material = self.options['enforce_material_number']
                 minor_material.append(material)
             material_matrix.append(minor_material)
         self.material_matrix = material_matrix

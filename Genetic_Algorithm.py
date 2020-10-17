@@ -44,10 +44,10 @@ class genetic_algorithm:
                     self.individuals[ind_count].material_matrix.append([material])
                 self.individuals[ind_count].make_material_string_scale('%array%1')
 
-        if self.options['enforce_fuel_count']:
+        if self.options['enforce_material_count']:
             print("enforcing material",self.options['enforce_material_number'],' count:', self.options['enforced_fuel_count_value'])
             for ind_count, ind in enumerate(self.individuals):
-                ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
+                ind.enforce_material_count(self.options['enforce_material_number'], self.options['enforced_fuel_count_value'])
 
         ### Creating output csv if needed
         if self.options['write_output_csv']:
@@ -96,10 +96,10 @@ class genetic_algorithm:
                 list_of_mutated_children = self.remake_duplicate_children(list_of_mutated_children, self.all_individuals)
                 self.all_individuals += list_of_mutated_children
 
-            if self.options['enforce_fuel_count']:
+            if self.options['enforce_material_count']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
                 for ind_count, ind in enumerate(list_of_mutated_children):
-                    ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
+                    ind.enforce_material_count(self.options['enforce_material_number'], self.options['enforced_fuel_count_value'])
 
             print("evaluating children")
             self.evaluate(self.options['fitness'], list_of_mutated_children)
