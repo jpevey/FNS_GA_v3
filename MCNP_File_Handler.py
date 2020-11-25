@@ -179,9 +179,9 @@ class mcnp_file_handler():
         f2 = np.array(flux)
         f2_unc = np.array(flux_unc)
 
-        energy = ebins.reshape(1, 252)
-        flux1 = f1.reshape(1, 252)
-        flux2 = f2.reshape(1, 252)
+        energy = ebins.reshape(1, len(nums))
+        flux1 = f1.reshape(1, len(nums))
+        flux2 = f2.reshape(1, len(nums))
         flux1_unc = flux1 * f1_unc
         flux2_unc = flux2 * f2_unc
 
@@ -209,10 +209,10 @@ class mcnp_file_handler():
         dR_dflux2 = np.dot(1 / (denomenator4), dnumerator_dflux2) - np.dot(numerator / denomenator4 ** 2, ddenomenator4_flux2)
 
         uncertainty0 = np.concatenate([flux1_unc, flux2_unc])
-        uncertainty = np.reshape(uncertainty0, (1, 504))
+        uncertainty = np.reshape(uncertainty0, (1, len(nums)*2))
 
         derivative0 = np.concatenate([dR_dflux1, dR_dflux2])
-        derivative = np.reshape(derivative0, (1, 504))
+        derivative = np.reshape(derivative0, (1, len(nums)*2))
 
         R_unc = self.propagate_uncertainty(derivative, uncertainty)
         # print(R)

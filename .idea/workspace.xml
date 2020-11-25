@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="Fixed &quot;include parent&quot; option to work reliably. &#10;Changed initial population to sample all materials (was not sampling material 1 like it should have been)">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

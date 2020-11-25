@@ -319,7 +319,6 @@ class genetic_algorithm:
             #print(parent.input_file_string, parent.keff, parent.representativity, parent.crowding_distance)
         return parents_list
 
-
     def crowding_distance(self, front):
         if front == []:
             return
@@ -375,8 +374,6 @@ class genetic_algorithm:
                 return False
 
         return True
-
-
 
     def remake_duplicate_children(self, list_of_children, comparison_list):
 
