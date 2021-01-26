@@ -1,0 +1,417 @@
+c This template file is of 3 zones with 3 seperate cassette types per zone.                                                                                                                                      
+c Cassette Definitions
+c *1 is center, *2 is cardinal directions, *3 is diagonal
+c Zone 1                                                 
+  411    0  -301 302 -303 304  u=11 lat=1 $ROW 1
+           fill=0:9 0:0 0:0
+       mat_1 mat_2 mat_3 mat_4 mat_5 
+       mat_6 mat_7 mat_8 mat_9 mat_10
+c Zone 1                                                 
+  412    0  -301 302 -303 304  u=12 lat=1 $ROW 1
+           fill=0:19 0:0 0:0
+       mat_11 mat_12 mat_13 mat_14 mat_15 mat_16 mat_17 mat_18 mat_19 mat_20 mat_21 mat_22 mat_23 mat_24 mat_25 mat_26 mat_27 mat_28 mat_29 mat_30
+c Zone 1                                                 
+  413    0  -301 302 -303 304  u=13 lat=1 $ROW 1
+           fill=0:19 0:0 0:0
+       mat_31 mat_32 mat_33 mat_34 mat_35 mat_36 mat_37 mat_38 mat_39 mat_40 mat_41 mat_42 mat_43 mat_44 mat_45 mat_46 mat_47 mat_48 mat_49 mat_50
+c Zone 2                                                   
+  421   0  -301 302 -303 304  u=21 lat=1 $ROW 1
+           fill=0:19 0:0 0:0
+       mat_51 mat_52 mat_53 mat_54 mat_55 mat_56 mat_57 mat_58 mat_59 mat_60 mat_61 mat_62 mat_63 mat_64 mat_65 mat_66 mat_67 mat_68 mat_69 mat_70
+c Zone 2 
+  422   0  -301 302 -303 304  u=22 lat=1 $ROW 1
+           fill=0:19 0:0 0:0
+       mat_71 mat_72 mat_73 mat_74 mat_75 mat_76 mat_77 mat_78 mat_79 mat_80 mat_81 mat_82 mat_83 mat_84 mat_85 mat_86 mat_87 mat_88 mat_89 mat_90
+c Zone 2 
+  423   0  -301 302 -303 304  u=23 lat=1 $ROW 1
+           fill=0:19 0:0 0:0
+       mat_91 mat_92 mat_93 mat_94 mat_95 mat_96 mat_97 mat_98 mat_99 mat_100 mat_101 mat_102 mat_103 mat_104 mat_105 mat_106 mat_107 mat_108 mat_109 mat_110
+c Zone 3       
+c comment: Center cell is unused in this model and is commented out                       
+c  431    0  -301 302 -303 304  u=31 lat=1 $ROW 1
+c           fill=0:19 0:0 0:0
+c       $$$zone_33$$$ 
+  432    0  -301 302 -303 304  u=32 lat=1 $ROW 1
+           fill=0:19 0:0 0:0
+       mat_111 mat_112 mat_113 mat_114 mat_115 mat_116 mat_117 mat_118 mat_119 mat_120 mat_121 mat_122 mat_123 mat_124 mat_125 mat_126 mat_127 mat_128 mat_129 mat_130
+  433    0  -301 302 -303 304  u=33 lat=1 $ROW 1
+           fill=0:19 0:0 0:0
+       mat_131 mat_132 mat_133 mat_134 mat_135 mat_136 mat_137 mat_138 mat_139 mat_140 mat_141 mat_142 mat_143 mat_144 mat_145 mat_146 mat_147 mat_148 mat_149 mat_150
+c Fast zone moderator cassette     ***************                                              
+  161  0 -301 302 -303 304  u=99 lat=1 $ROW 1
+           fill=0:39 0:0 0:0
+      4 4 4 4 4
+      4 4 4 4 4
+      4 4 4 4 4
+      4 4 4 4 4
+      4 4 4 4 4
+      4 4 4 4 4
+      4 4 4 4 4
+      4 4 4 4 4
+c Thermal full coolant    ***************                                          
+  163    0 -301 302 -303 304  u=98 lat=1 $ROW 1
+           fill=0:39 0:0 0:0
+      2 2 2 2 2
+      2 2 2 2 2
+      2 2 2 2 2
+      2 2 2 2 2
+      2 2 2 2 2
+      2 2 2 2 2
+      2 2 2 2 2
+      2 2 2 2 2
+c Plate definitions
+c Zone 1 Plates
+c -----------------------------$Void$---------------------
+300 0         10  -11 u=1
+c -----------------------------$Poly$---------------------
+320 1   -0.93 10  -11 u=2
+c -----------------------------$Fuel$---------------------
+340 2  -18.95 10  -11 u=3
+c -----------------------------$Other Moderator$--------------------- 
+360 3  -0.971 10  -11 u=4
+c ---------------------------------CASSETTES----------------------------
+c cassette box                                                                  
+    12     5  -2.7 1 -2  $ Cassette material in original case.
+c Cassette: ('Zone, Row, Cassette', 1, 1, 1)                                    
+   13    6   -8.05 -501 
+ c fueled cassette innards                                                       
+    1     0         -1       fill=99
+c Cassette: ('Zone, Row, Cassette', 1, 1, 3)                                    
+   14     5  -2.7 1 -2  trcl=(0 16.002 0 )
+   15     0         -1  trcl=(0 16.002 0 ) fill=99 $5
+c Cassette: ('Zone, Row, Cassette', 1, 1, 4)                                    
+   16     5  -2.7 1 -2  trcl=(0 32.004 0 )
+   17     0         -1  trcl=(0 32.004 0 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 1, 1, 5)                                    
+   18    6   -8.05 -502 
+c 
+c Cassette: ('Zone, Row, Cassette', 1, 2, 1)                                    
+   19     5  -2.7 1 -2  trcl=(0 -16.002 15.875 )
+   20     0         -1  trcl=(0 -16.002 15.875 ) fill=99 $1
+c Cassette: ('Zone, Row, Cassette', 1, 2, 2)                                    
+   21     5  -2.7 1 -2  trcl=(0 0 15.875 )
+   22     0         -1  trcl=(0 0 15.875 ) fill=13 $5
+c Cassette: ('Zone, Row, Cassette', 1, 2, 3)                                    
+   23     5  -2.7 1 -2  trcl=(0 16.002 15.875 )
+   24     0         -1  trcl=(0 16.002 15.875 ) fill=12 $5
+c Cassette: ('Zone, Row, Cassette', 1, 2, 4)                                    
+   25     5  -2.7 1 -2  trcl=(0 32.004 15.875 )
+   26     0         -1  trcl=(0 32.004 15.875 ) fill=13 $5
+c Cassette: ('Zone, Row, Cassette', 1, 2, 5)                                    
+   27     5  -2.7 1 -2  trcl=(0 48.006 15.875 )
+   28     0         -1  trcl=(0 48.006 15.875 ) fill=99
+c
+c Cassette: ('Zone, Row, Cassette', 1, 3, 1)                                    
+   29     5  -2.7 1 -2  trcl=(0 -16.002 31.75 )
+   30     0         -1  trcl=(0 -16.002 31.75 ) fill=99 $5
+c Cassette: ('Zone, Row, Cassette', 1, 3, 2)                                    
+   31     5  -2.7 1 -2  trcl=(0 0 31.75 )
+   32     0         -1  trcl=(0 0 31.75 ) fill=12 $5
+c Cassette: ('Zone, Row, Cassette', 1, 3, 3)                                    
+c Cassette: ('Zone, Row, Cassette', 1, 3, 4)                                    
+   33     5  -2.7 1 -2  trcl=(0 32.004 31.75 )
+   34     0         -1  trcl=(0 32.004 31.75 ) fill=12 $5
+c Cassette: ('Zone, Row, Cassette', 1, 3, 5)                                    
+   35     5  -2.7 1 -2  trcl=(0 48.006 31.75 )
+   36     0         -1  trcl=(0 48.006 31.75 ) fill=99
+c
+c Cassette: ('Zone, Row, Cassette', 1, 4, 1)                                    
+   37     5  -2.7 1 -2  trcl=(0 -16.002 47.625 )
+   38     0         -1  trcl=(0 -16.002 47.625 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 1, 4, 2)                                    
+   39     5  -2.7 1 -2  trcl=(0 0 47.625 )
+   40     0         -1  trcl=(0 0 47.625 ) fill=13 $5
+c Cassette: ('Zone, Row, Cassette', 1, 4, 3)                                    
+   41     5  -2.7 1 -2  trcl=(0 16.002 47.625 )
+   42     0         -1  trcl=(0 16.002 47.625 ) fill=12 $5
+c Cassette: ('Zone, Row, Cassette', 1, 4, 4)                                    
+   43     5  -2.7 1 -2  trcl=(0 32.004 47.625 )
+   44     0         -1  trcl=(0 32.004 47.625 ) fill=13 $5
+c Cassette: ('Zone, Row, Cassette', 1, 4, 5)                                    
+   45     5  -2.7 1 -2  trcl=(0 48.006 47.625 )
+   46     0         -1  trcl=(0 48.006 47.625 ) fill=99
+c
+c Cassette: ('Zone, Row, Cassette', 1, 5, 1)                                    
+   47    6   -8.05 -503 
+c Cassette: ('Zone, Row, Cassette', 1, 5, 2)                                    
+   48     5  -2.7 1 -2  trcl=(0 0 63.5 )
+   49     0         -1  trcl=(0 0 63.5 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 1, 5, 3)                                    
+   50     5  -2.7 1 -2  trcl=(0 16.002 63.5 )
+   51     0         -1  trcl=(0 16.002 63.5 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 1, 5, 4)                                    
+   52     5  -2.7 1 -2  trcl=(0 32.004 63.5 )
+   53     0         -1  trcl=(0 32.004 63.5 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 1, 5, 5)                                    
+   54    6   -8.05 -504 
+c
+c Zone 2
+c
+c Cassette: ('Zone, Row, Cassette', 2, 1, 1)                                    
+   55    6   -8.05 -505 
+c Cassette: ('Zone, Row, Cassette', 2, 1, 2)                                    
+   56     5  -2.7 1 -2  trcl=(26.682 0 0 )
+   57     0         -1  trcl=(26.682 0 0 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 1, 3)                                    
+   58     5  -2.7 1 -2  trcl=(26.682 16.002 0 )
+   59     0         -1  trcl=(26.682 16.002 0 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 1, 4)                                    
+   60     5  -2.7 1 -2  trcl=(26.682 32.004 0 )
+   61     0         -1  trcl=(26.682 32.004 0 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 1, 5)                                    
+   62    6   -8.05 -506
+c   
+c Cassette: ('Zone, Row, Cassette', 2, 2, 1)                                    
+   63     5  -2.7 1 -2  trcl=(26.682 -16.002 15.875 )
+   64     0         -1  trcl=(26.682 -16.002 15.875 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 2, 2)                                    
+   65     5  -2.7 1 -2  trcl=(26.682 0 15.875 )
+   66     0         -1  trcl=(26.682 0 15.875 ) fill=23
+c Cassette: ('Zone, Row, Cassette', 2, 2, 3)                                    
+   67     5  -2.7 1 -2  trcl=(26.682 16.002 15.875 )
+   68     0         -1  trcl=(26.682 16.002 15.875 ) fill=22
+c Cassette: ('Zone, Row, Cassette', 2, 2, 4)                                    
+   69     5  -2.7 1 -2  trcl=(26.682 32.004 15.875 )
+   70     0         -1  trcl=(26.682 32.004 15.875 ) fill=23
+c Cassette: ('Zone, Row, Cassette', 2, 2, 5)                                    
+   71     5  -2.7 1 -2  trcl=(26.682 48.006 15.875 )
+   72     0         -1  trcl=(26.682 48.006 15.875 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 3, 1)                                    
+   73     5  -2.7 1 -2  trcl=(26.682 -16.002 31.75 )
+   74     0         -1  trcl=(26.682 -16.002 31.75 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 3, 2)                                    
+   75     5  -2.7 1 -2  trcl=(26.682 0 31.75 )
+   76     0         -1  trcl=(26.682 0 31.75 ) fill=22
+c Cassette: ('Zone, Row, Cassette', 2, 3, 3)                                    
+   77     5  -2.7 1 -2  trcl=(26.682 16.002 31.75 )
+   78     0         -1  trcl=(26.682 16.002 31.75 ) fill=21
+c Cassette: ('Zone, Row, Cassette', 2, 3, 4)                                    
+   79     5  -2.7 1 -2  trcl=(26.682 32.004 31.75 )
+   80     0         -1  trcl=(26.682 32.004 31.75 ) fill=22
+c Cassette: ('Zone, Row, Cassette', 2, 3, 5)                                    
+   81     5  -2.7 1 -2  trcl=(26.682 48.006 31.75 )
+   82     0         -1  trcl=(26.682 48.006 31.75 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 4, 1)                                    
+   83     5  -2.7 1 -2  trcl=(26.682 -16.002 47.625 )
+   84     0         -1  trcl=(26.682 -16.002 47.625 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 4, 2)                                    
+   85     5  -2.7 1 -2  trcl=(26.682 0 47.625 )
+   86     0         -1  trcl=(26.682 0 47.625 ) fill=23
+c Cassette: ('Zone, Row, Cassette', 2, 4, 3)                                    
+   87     5  -2.7 1 -2  trcl=(26.682 16.002 47.625 )
+   88     0         -1  trcl=(26.682 16.002 47.625 ) fill=22
+c Cassette: ('Zone, Row, Cassette', 2, 4, 4)                                    
+   89     5  -2.7 1 -2  trcl=(26.682 32.004 47.625 )
+   90     0         -1  trcl=(26.682 32.004 47.625 ) fill=23
+c Cassette: ('Zone, Row, Cassette', 2, 4, 5)                                    
+   91     5  -2.7 1 -2  trcl=(26.682 48.006 47.625 )
+   92     0         -1  trcl=(26.682 48.006 47.625 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 5, 1)                                    
+   93    6   -8.05 -507 
+c Cassette: ('Zone, Row, Cassette', 2, 5, 2)                                    
+   94     5  -2.7 1 -2  trcl=(26.682 0 63.5 )
+   95     0         -1  trcl=(26.682 0 63.5 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 5, 3)                                    
+   96     5  -2.7 1 -2  trcl=(26.682 16.002 63.5 )
+   97     0         -1  trcl=(26.682 16.002 63.5 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 5, 4)                                    
+   98     5  -2.7 1 -2  trcl=(26.682 32.004 63.5 )
+   99     0         -1  trcl=(26.682 32.004 63.5 ) fill=99
+c Cassette: ('Zone, Row, Cassette', 2, 5, 5)                                    
+  100    6   -8.05 -508 
+c
+c Zone 3
+c
+c Cassette: ('Zone, Row, Cassette', 3, 1, 1)                                    
+  101    6   -8.05 -509 
+c Cassette: ('Zone, Row, Cassette', 3, 1, 2)                                    
+  102     5  -2.7 1 -2  trcl=(53.35230    0 0 )
+  103     0         -1  trcl=(53.35230    0 0 ) fill=98 $1
+c Cassette: ('Zone, Row, Cassette', 3, 1, 3)                                    
+  104     5  -2.7 1 -2  trcl=(53.35230    16.002 0 )
+  105     0         -1  trcl=(53.35230    16.002 0 ) fill=98
+c Cassette: ('Zone, Row, Cassette', 3, 1, 4)                                    
+  106     5  -2.7 1 -2  trcl=(53.35230    32.004 0 )
+  107     0         -1  trcl=(53.35230    32.004 0 ) fill=98 $6
+c Cassette: ('Zone, Row, Cassette', 3, 1, 5)                                    
+  108    6   -8.05 -510 
+c
+c Cassette: ('Zone, Row, Cassette', 3, 2, 1)                                    
+  109     5  -2.7 1 -2  trcl=(53.35230    -16.002 15.875 )
+  110     0         -1  trcl=(53.35230    -16.002 15.875 ) fill=98 $1
+c Cassette: ('Zone, Row, Cassette', 3, 2, 2)                                    
+  111     5  -2.7 1 -2  trcl=(53.35230    0 15.875 )
+  112     0         -1  trcl=(53.35230    0 15.875 ) fill=33
+c Cassette: ('Zone, Row, Cassette', 3, 2, 3)                                    
+  113     5  -2.7 1 -2  trcl=(53.35230    16.002 15.875 )
+  114     0         -1  trcl=(53.35230    16.002 15.875 ) fill=32
+c Cassette: ('Zone, Row, Cassette', 3, 2, 4)                                    
+  115     5  -2.7 1 -2  trcl=(53.35230    32.004 15.875 )
+  116     0         -1  trcl=(53.35230    32.004 15.875 ) fill=33
+c Cassette: ('Zone, Row, Cassette', 3, 2, 5)                                    
+  117     5  -2.7 1 -2  trcl=(53.35230    48.006 15.875 )
+  118     0         -1  trcl=(53.35230    48.006 15.875 ) fill=98 $6
+c
+c Cassette: ('Zone, Row, Cassette', 3, 3, 1)                                    
+  119     5  -2.7 1 -2  trcl=(53.35230    -16.002 31.75 )
+  120     0         -1  trcl=(53.35230    -16.002 31.75 ) fill=98
+c Cassette: ('Zone, Row, Cassette', 3, 3, 2)                                    
+  121     5  -2.7 1 -2  trcl=(53.35230    0 31.75 )
+  122     0         -1  trcl=(53.35230    0 31.75 ) fill=32
+c Cassette: ('Zone, Row, Cassette', 3, 3, 3)                                    
+c  123     0        -511                                                        
+c Cassette: ('Zone, Row, Cassette', 3, 3, 4)                                    
+  124     5  -2.7 1 -2  trcl=(53.35230    32.004 31.75 )
+  125     0         -1  trcl=(53.35230    32.004 31.75 ) fill=32
+c Cassette: ('Zone, Row, Cassette', 3, 3, 5)                                    
+  126     5  -2.7 1 -2  trcl=(53.35230    48.006 31.75 )
+  127     0         -1  trcl=(53.35230    48.006 31.75 ) fill=98
+c Cassette: ('Zone, Row, Cassette', 3, 4, 1)                                    
+  128     5  -2.7 1 -2  trcl=(53.35230    -16.002 47.625 )
+  129     0         -1  trcl=(53.35230    -16.002 47.625 ) fill=98 $7
+c Cassette: ('Zone, Row, Cassette', 3, 4, 2)                                    
+  130     5  -2.7 1 -2  trcl=(53.35230    0 47.625 )
+  131     0         -1  trcl=(53.35230    0 47.625 ) fill=33
+c Cassette: ('Zone, Row, Cassette', 3, 4, 3)                                    
+  132     5  -2.7 1 -2  trcl=(53.35230    16.002 47.625 )
+  133     0         -1  trcl=(53.35230    16.002 47.625 ) fill=32
+c Cassette: ('Zone, Row, Cassette', 3, 4, 4)                                    
+  134     5  -2.7 1 -2  trcl=(53.35230    32.004 47.625 )
+  135     0         -1  trcl=(53.35230    32.004 47.625 ) fill=33
+c Cassette: ('Zone, Row, Cassette', 3, 4, 5)                                    
+  136     5  -2.7 1 -2  trcl=(53.35230    48.006 47.625 )
+  137     0         -1  trcl=(53.35230    48.006 47.625 ) fill=98 $8
+c Cassette: ('Zone, Row, Cassette', 3, 5, 1)                                    
+  138    6   -8.05 -512 
+c Cassette: ('Zone, Row, Cassette', 3, 5, 2)                                    
+  139     5  -2.7 1 -2  trcl=(53.35230    0 63.5 )
+  140     0         -1  trcl=(53.35230    0 63.5 ) fill=98 $7
+c Cassette: ('Zone, Row, Cassette', 3, 5, 3)                                    
+  141     5  -2.7 1 -2  trcl=(53.35230    16.002 63.5 )
+  142     0         -1  trcl=(53.35230    16.002 63.5 ) fill=98
+c Cassette: ('Zone, Row, Cassette', 3, 5, 4)                                    
+  143     5  -2.7 1 -2  trcl=(53.35230    32.004 63.5 )
+  144     0         -1  trcl=(53.35230    32.004 63.5 ) fill=98 $8
+c Cassette: ('Zone, Row, Cassette', 3, 5, 5)                                    
+  145    6   -8.05 -513      
+c Cassette: Half cassette in fast zone 1                                  
+  148     5  -2.7 1 -2 305 #150 trcl=(0 16.002 31.75 )
+  149     0         -1 -305 #150 trcl=(12.7 16.002 31.75 ) fill=11
+  150     5  -2.7 -306 
+  999     0         -500 -400 2 #13 #14 #15 #16 #17 #18 #148 #149 #150 #19 #20
+           #21 #22 #23 #24 #25 #26 #27 #28 #29 #30 #31 #32 #33 #34 #35 #36 #37
+           #38 #39 #40 #41 #42 #43 #44 #45 #46 #47 #48 #49 #50 #51 #52 #53 #54 
+             516
+ 1000     0         -500 400 -401 #55 #56 #57 #58 #59 #60 #61 #62 #155 #63 #64
+           #65 #66 #67 #68 #69 #70 #71 #72 #73 #74 #75 #76 #77 #78 #79 #80 #81 
+           #82 #83 #84 #85 #86 #87 #88 #89 #90 #91 #92 #93 #94 #95 #96 #97 #98
+             #99 #100
+ 1001     0         -500 401 #101 #102 #103 #104 #105 #106 #107 #108 $ #123
+             #156 #109 #110 #111 #112 #113 #114 #115 #116 #117 #118 #119 #120
+             #121 #122 #124 #125 #126 #127 #128 #129 #130 #131 #132 #133 #134
+             #135 #136 #137 #138 #139 #140 #141 #142 #143 #144 #145 
+  146     6   -8.05 402 403 500 -514 -401 
+c reflector on thermal side:                                                  
+  157     6   -8.05 401 -514 402 403 500
+  c shutdown rods 155, 156 boron: 8   -2.52                                    
+  155    0         -402 
+  156    0  -403 $ 8 -2.52
+  c                                                                             
+  153    0 -515 
+  998 0 -516
+c outside bounds of model:
+  147     0         514 515 
+                                                    
+c SURFACE CARD   
+c fast fuel definition
+    1       rpp -1.27 24.13 -1.27 13.97 -1.27 13.97 
+    2       rpp -1.5875 24.4475 -1.5875 14.2875 -1.5875 14.2875 
+   10        px -1.2701
+   11        px 0.00000000001
+  301        px 0
+  302        px -1.27 
+  303        py 100  
+  304        py -100  
+c end of half cassette                                                          
+  305        px 11.43 
+  306       rpp 11.1125 11.43 14.4145 30.2895 30.1625 46.0375              
+c These split the core into 3 parts, MCNP definition work-around                
+  400        px 24.45  
+  401        px 51.1297 
+c the shutdown rods     Fast/Fast and Fast/Thermal      
+  402       rpp 24.451 25.086 -21.5265 65.9765 -6.1275 86.1375 
+  403       rpp 51.1298 51.76479 -21.5265 65.9765 -6.1275 86.1375 
+c inner void of assembly, the cutout for the assembly within the steel
+  500       rpp -2.8575 79.1456 -18.9865 63.4365 -1.5875 89.2175 
+c
+  501       rpp -1.5875 24.45 -17.5895 -1.7145 -1.5875 14.2875 
+  502       rpp -1.5875 24.45 46.4185 62.2935 -1.5875 14.2875 
+  503       rpp -1.5875 24.45 -17.5895 -1.7145 61.9125 77.7875 
+  504       rpp -1.5875 24.45 46.4185 62.2935 61.9125 77.7875 
+  505       rpp 25.086   51.1296 -17.5895 -1.7145 -1.5875 14.2875 
+  506       rpp 25.086   51.1296 46.4185 62.2935 -1.5875 14.2875 
+  507       rpp 25.086   51.1296 -17.5895 -1.7145 61.9125 77.7875 
+  508       rpp 25.086   51.1296 46.4185 62.2935 61.9125 77.7875 
+  509       rpp 51.7648 77.7988 -17.5895 -1.7145 -1.5875 14.2875 
+  510       rpp 51.7648 77.7988 46.4185 62.2935 -1.5875 14.2875 
+  511       rpp 51.7648 77.7988 14.6685 30.3 30.1625 45.9 
+  512       rpp 51.7648 77.7988 -17.5895 -1.7145 61.9125 77.7875 
+  513       rpp 51.7648 77.7988 46.4185 62.2935 61.9125 77.7875 
+c outer steel reflector dims
+  514       rpp -28.2575 104.5456 -44.3865 88.8365 -11.7475 99.3775
+c concrete pedestal                                                             
+  515       rpp -43.4975 121.2228 -59.6265 104.0765 -72.7075 -11.7475
+c experiment volume
+  516 rpp -1.6 11.1125 14.3 30.4 30.18 45.89
+                            
+c DATA CARD     
+c -------------------------------------SOURCE INFORMATION-----------
+kcode 5000 1.000000 20 120 45000
+ksrc   27.7246 22.6372 30.0729
+c ----------------------------------------MATERIALS-----------------
+c Polyethylene, PNNL Doc -0.93 g/cc
+m1    1001.70c -0.143716
+      6000.70c -0.856284
+c FNS 9.75% Enrich. Fuel, -18.94 g/cc
+m2    92232.70c -0.000000002
+      92234.70c -0.0026
+      92235.70c -0.0975
+      92236.70c -0.0046
+      92238.70c -0.895299998
+c Sodium metal -0.971 g/cc
+m3    11023.70c 1
+c Aluminum -2.7 g/cc
+m5    13027.70c                1 
+c Carbon Steel
+m6    6000.70c        0.022831 
+      26054.70c       0.057164445
+      26056.70c       0.896553475
+      26057.70c       0.020716004
+      26058.70c       0.002736076
+c  Regular Concrete per pnnl pdf doc    -2.3 g/cc
+m7    1001.70c       0.168038
+      8016.70c       0.563183
+      11023.70c      0.021365
+      13027.70c      0.021343
+      14028.70c      0.187378982
+      14029.70c      0.009551857
+      14030.70c      0.006300161
+      20040.70c      0.018026179
+      20042.70c      0.00012031
+      20043.70c      2.51033E-05
+      20044.70c      0.000387892
+      20046.70c      7.438E-07
+      20048.70c      3.47727E-05
+      26054.70c      0.000248391
+      26056.70c      0.003895705
+      26057.70c      9.00152E-05
+      26058.70c      1.18888E-05
+c Natural Uranium, -18.95 g/cc
+m13   92234.70c        -5.7e-005
+      92235.70c        -0.007204
+      92238.70c        -0.992739
+c --------------------------------------OTHER-----------------------------------
+imp:n   1 159r       0             
+c --------------------------------------TALLY DESC------------------------------
+rand hist 865
+print
