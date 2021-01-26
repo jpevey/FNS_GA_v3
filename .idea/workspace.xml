@@ -3,10 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -489,7 +485,14 @@
       <option name="project" value="LOCAL" />
       <updated>1597377469692</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="backup from cluster. little_boy_calc">
+      <created>1611670595703</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1611670595703</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -514,13 +517,18 @@
     <MESSAGE value="added keff to output" />
     <MESSAGE value="added print" />
     <MESSAGE value="working on adding nondominated sort/crowding distance. changed output to be just parents (still outputting all at the end)" />
-    <option name="LAST_COMMIT_MESSAGE" value="working on adding nondominated sort/crowding distance. changed output to be just parents (still outputting all at the end)" />
+    <MESSAGE value="backup from cluster. little_boy_calc" />
+    <option name="LAST_COMMIT_MESSAGE" value="backup from cluster. little_boy_calc" />
   </component>
   <component name="WindowStateProjectService">
     <state x="503" y="67" key="#Individual_v1" timestamp="1611670472180">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="503" y="67" key="#Individual_v1/0.0.1536.824@0.0.1536.824" timestamp="1611670472180" />
+    <state x="175" y="12" key="CommitChangelistDialog2" timestamp="1611670594959">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="175" y="12" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1611670594959" />
     <state width="767" height="239" key="GridCell.Tab.0.bottom" timestamp="1611670552416">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
