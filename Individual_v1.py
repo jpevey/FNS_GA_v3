@@ -16,33 +16,33 @@ class individual:
         self.grid_y = options['grid_y']
         self.options = options
         self.ind_count = individual_count
+        self.total_flux = 0.0
         self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
         self.keff_input_file_string = "keff_" + self.input_file_string
         self.create_random_pattern()
-        self.parent_string = "random_initialized,"
+        self.parent_string = "random_initialized,N/A,"
         self.born_from_crossover = False
         self.ran_source_calculation = False
 
         self.acceptable_eigenvalue = True
 
         self.default_materials = collections.OrderedDict()
+        print("MATERIAL MATERIX FOR REALS", self.material_matrix)
 
     def create_random_pattern(self):
-        print("Creating random pattern for ind:", self.ind_count)
+        #print("Creating random pattern for ind:", self.ind_count)
         self.pattern = collections.OrderedDict()
-        number_of_fuel = random.randint(self.options['minimum_fuel_elements'], self.options['maximum_fuel_elements'])
-        self.fuel_locations = []
-        total_number_of_locations = self.grid_y * self.grid_x
-        #print("NUMBER OF FUEL: " , number_of_fuel, self.ind_count)
-        ### Assigning fuel locations
-        for _ in range(number_of_fuel):
-            fuel_location = random.randint(1, total_number_of_locations)
-            while fuel_location in self.fuel_locations:
-                fuel_location = random.randint(1, total_number_of_locations )
-            self.fuel_locations.append(fuel_location)
+        if self.options['enforce_material_count_on_creation'] == True:
+            number_of_material = random.randint(self.options['minimum_material_elements'], self.options['maximum_material_elements'])
+            self.material_locations = []
+            total_number_of_locations = self.grid_y * self.grid_x
+            for _ in range(number_of_material):
+                material_location = random.randint(1, total_number_of_locations)
+                while material_location in self.material_locations:
+                    material_location = random.randint(1, total_number_of_locations)
+                self.material_locations.append(material_location)
 
-        #print("fuel locations:", self.fuel_locations)
-
+            #print("Force material locations!!!",  self.material_locations)
         self.create_material_matrix()
 
     def create_material_matrix(self):
@@ -53,20 +53,27 @@ class individual:
             minor_material = []
             for __ in range(self.grid_y):
                 material_count += 1
-                material_index = random.randint(2, len(self.options['material_types']))
+                material_index = random.randint(1, len(self.options['material_types']))
                 material = self.options['material_types'][material_index - 1]
-                if material_count in self.fuel_locations:
-                    material = 1
+                if self.options['enforce_material_count_on_creation'] == True:
+                    if material_count in self.material_locations:
+                        print("HERE!!!")
+                        material = self.options['enforce_material_number']
+                    else:
+                        material_index = random.randint(1, len(self.options['material_types']))
+                        while material_index == self.options['enforce_material_number']:
+                            material_index = random.randint(1, len(self.options['material_types']))
+                        material = self.options['material_types'][material_index - 1]
                 minor_material.append(material)
             material_matrix.append(minor_material)
         self.material_matrix = material_matrix
-        print("Material Matrix:", self.material_matrix)
+        #print("Material Matrix:", self.material_matrix)
 
     def find_fuel_location(self):
         for count, mat in enumerate(self.material_matrix):
-            print(count, mat[0])
+            #print(count, mat[0])
             if mat[0] == self.options['fuel_index']:
-                print("Found fuel in location index: ", count, 2.54 / 4 + count * self.options['fuel_index_multiplier'])
+                #print("Found fuel in location index: ", count, 2.54 / 4 + count * self.options['fuel_index_multiplier'])
                 return 2.54 / 4 + count * self.options['fuel_index_multiplier']
 
     def create_discrete_material_mcnp_dictionary(self, keywords_list = []):
@@ -74,6 +81,7 @@ class individual:
             keywords_list = self.options['keywords_list']
 
         material_dictionary = collections.OrderedDict()
+        #print("material matrix 2!!!",self.ind_count, self.material_matrix)
         for count, item in enumerate(keywords_list):
             #print('self.material_matrix[count]', self.material_matrix[count][0], self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]])
             material_dictionary[item] = self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]]
@@ -156,7 +164,7 @@ class individual:
         if self.options['geometry'] == 'grid':
             ### Making a string for the input file
             material_string = ""
-            print(self.material_matrix)
+            #print(self.material_matrix)
             for row_materials in self.material_matrix:
                 for material in row_materials:
                     material_string = material_string + str(material) + " "

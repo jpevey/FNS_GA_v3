@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9deacb61-e054-454e-a86e-c67c82024d51" name="Default Changelist" comment="working on adding nondominated sort/crowding distance. changed output to be just parents (still outputting all at the end)">
+    <list default="true" id="efb79066-1565-4c2f-b2a6-01605106c614" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Genetic_Algorithm.py" beforeDir="false" afterPath="$PROJECT_DIR$/Genetic_Algorithm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Individual_v1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Individual_v1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MCNP_File_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/MCNP_File_Handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Run_GA.py" beforeDir="false" afterPath="$PROJECT_DIR$/Run_GA.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -21,7 +23,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="non_dominated_sorting_and_crowding_dist" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -128,9 +130,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.Run_GA" />
-        <item itemvalue="Python.Genetic_Algorithm" />
         <item itemvalue="Python.MCNP_File_Handler" />
         <item itemvalue="Python.Individual_v1" />
+        <item itemvalue="Python.Genetic_Algorithm" />
         <item itemvalue="Python.Run_GA" />
       </list>
     </recent_temporary>
@@ -515,85 +517,25 @@
     <option name="LAST_COMMIT_MESSAGE" value="working on adding nondominated sort/crowding distance. changed output to be just parents (still outputting all at the end)" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="503" y="67" key="#Run_GA" timestamp="1593705666402">
+    <state x="503" y="67" key="#Individual_v1" timestamp="1611670472180">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="503" y="67" key="#Run_GA/0.0.1536.824@0.0.1536.824" timestamp="1593705666402" />
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2" timestamp="1597444837568">
+    <state x="503" y="67" key="#Individual_v1/0.0.1536.824@0.0.1536.824" timestamp="1611670472180" />
+    <state width="767" height="239" key="GridCell.Tab.0.bottom" timestamp="1611670552416">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="282" y="0" width="1134" height="800" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1597444837568" />
-    <state x="180" y="124" width="1242" height="646" key="DiffContextDialog" timestamp="1597279948110">
+    <state width="767" height="239" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1611670552416" />
+    <state width="767" height="239" key="GridCell.Tab.0.center" timestamp="1611670552415">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="180" y="124" width="1242" height="646" key="DiffContextDialog/0.0.1536.824@0.0.1536.824" timestamp="1597279948110" />
-    <state x="549" y="171" key="FileChooserDialogImpl" timestamp="1596138059591">
+    <state width="767" height="239" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1611670552415" />
+    <state width="767" height="239" key="GridCell.Tab.0.left" timestamp="1611670552415">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="549" y="171" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1596138059591" />
-    <state width="1537" height="248" key="GridCell.Tab.0.bottom" timestamp="1597375887016">
+    <state width="767" height="239" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1611670552415" />
+    <state width="767" height="239" key="GridCell.Tab.0.right" timestamp="1611670552415">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1597375887016" />
-    <state width="1537" height="248" key="GridCell.Tab.0.center" timestamp="1597375887016">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1597375887016" />
-    <state width="1537" height="248" key="GridCell.Tab.0.left" timestamp="1597375887016">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1597375887016" />
-    <state width="1537" height="248" key="GridCell.Tab.0.right" timestamp="1597375887016">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1537" height="248" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1597375887016" />
-    <state width="1537" height="270" key="GridCell.Tab.1.bottom" timestamp="1597375129183">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1597375129183" />
-    <state width="1537" height="270" key="GridCell.Tab.1.center" timestamp="1597375129183">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1597375129183" />
-    <state width="1537" height="270" key="GridCell.Tab.1.left" timestamp="1597375129183">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1597375129183" />
-    <state width="1537" height="270" key="GridCell.Tab.1.right" timestamp="1597375129183">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="1537" height="270" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1597375129183" />
-    <state x="481" y="131" key="MultipleFileMergeDialog" timestamp="1597279966157">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="481" y="131" key="MultipleFileMergeDialog/0.0.1536.824@0.0.1536.824" timestamp="1597279966157" />
-    <state x="389" y="66" key="SettingsEditor" timestamp="1594324261495">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="389" y="66" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1594324261495" />
-    <state width="242" height="198" key="ShowFilterAction_Filter_Popup" timestamp="1594846858400">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state width="242" height="198" key="ShowFilterAction_Filter_Popup/0.0.1536.824@0.0.1536.824" timestamp="1594846858400" />
-    <state x="93" y="93" width="1350" height="638" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1594250119996">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="93" y="93" width="1350" height="638" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1536.824@0.0.1536.824" timestamp="1594250119996" />
-    <state x="666" y="138" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog" timestamp="1595348843166">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="666" y="138" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog/0.0.1536.824@0.0.1536.824" timestamp="1595348843166" />
-    <state x="964" y="344" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1597377781607">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="964" y="344" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1597377781607" />
-    <state x="1015" y="141" key="git4idea.branch.GitSmartOperationDialog" timestamp="1597279957353">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="1015" y="141" key="git4idea.branch.GitSmartOperationDialog/0.0.1536.824@0.0.1536.824" timestamp="1597279957353" />
-    <state x="430" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1597366484876">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="430" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1597366484876" />
+    <state width="767" height="239" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1611670552415" />
   </component>
 </project>

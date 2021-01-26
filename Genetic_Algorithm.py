@@ -4,7 +4,7 @@ import math
 import random
 import copy
 import time
-random.seed(865)
+
 
 import Individual_v1 as individual
 import MCNP_File_Handler
@@ -18,15 +18,20 @@ class genetic_algorithm:
         ### List of current generation individuals
         self.individuals = []
 
-
+        random.seed(self.options['python_random_number_seed'])
 
         self.generation = 0
         self.individual_count = 0
         ### Creating initial population
         for ind in range(self.options['number_of_individuals']):
-            self.individuals.append(individual.individual(options_dict, self.generation, self.individual_count))
-            self.individual_count += 1
+            ind_ = individual.individual(options_dict, self.generation, self.individual_count)
+            self.individuals.append(ind_)
+            print("outside ind matrix", ind_.material_matrix)
 
+            self.individual_count += 1
+        print("TESTING IND MATERIAL MATRII")
+        for ind in self.individuals:
+            print(ind.material_matrix)
         if self.options['remake_duplicate_children'] == True:
             self.all_individuals = copy.deepcopy(self.individuals)
             print("All individuals:", self.all_individuals)
@@ -39,29 +44,25 @@ class genetic_algorithm:
         if self.options['include_pattern']:
             print("Including a pattern in initial population!")
             for ind_count, pattern_to_include in enumerate(self.options['pattern_to_include']):
-                for _ in self.individuals[ind_count].material_matrix:
-                    print(_)
-                self.individuals[ind_count].material_matrix = pattern_to_include
+                self.individuals[ind_count].material_matrix = []
+                for material in pattern_to_include:
+                    self.individuals[ind_count].material_matrix.append([material])
                 self.individuals[ind_count].make_material_string_scale('%array%1')
-                for _ in self.individuals[ind_count].material_matrix:
-                    print(_)
-
-        if self.options['enforce_fuel_count']:
-            print("enforcing material",self.options['enforce_material_number'],' count:', self.options['enforced_fuel_count_value'])
-            for ind_count, ind in enumerate(self.individuals):
-                ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
 
         ### Creating output csv if needed
         if self.options['write_output_csv']:
             output_csv = open(self.options['output_filename'] + '.csv', 'w')
+            ### Writing out options for this run
             for flag in self.options:
                 output_csv.write("{},{}\n".format(flag, self.options[flag]))
+            output_csv.write("%%%begin_data%%%\n")
+            output_csv.write(self.create_header() +"\n")
             output_csv.close()
 
 
         ### Running eigenvalue calcs if needed
-        if self.options['enforced_maximum_eigenvalue'] == True:
-            getattr(self, self.options['check_eigenvalue_function'])()
+        #if self.options['enforced_maximum_eigenvalue'] == True:
+        #    getattr(self, self.options['check_eigenvalue_function'])()
 
         ### Evaluating initial population, gen 0
         print("Evaluating initial population")
@@ -95,10 +96,10 @@ class genetic_algorithm:
                 list_of_mutated_children = self.remake_duplicate_children(list_of_mutated_children, self.all_individuals)
                 self.all_individuals += list_of_mutated_children
 
-            if self.options['enforce_fuel_count']:
+            if self.options['enforce_material_count_before_evaluation']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
                 for ind_count, ind in enumerate(list_of_mutated_children):
-                    ind.enforce_material_count(1, self.options['enforced_fuel_count_value'])
+                    ind.enforce_material_count(self.options['enforce_material_number'], self.options['enforced_fuel_count_value'])
 
             print("evaluating children")
             self.evaluate(self.options['fitness'], list_of_mutated_children)
@@ -142,7 +143,82 @@ class genetic_algorithm:
             self.write_output_v2(list_of_individuals = self.all_individuals, output_file_name = self.options['output_all_individuals_at_end_of_calculation_file_name'])
 
 
+    def apply_constraint(self, list_of_individuals, constraint_type):
+        print("Applying constraint:", constraint_type)
+        meet_constraint = False
+        ### Seperating constraint and options, etc.
+        constraint_split = constraint_type.split("#")
 
+        constraint_type_ = constraint_split[0]
+        constraint_run_location = constraint_split[1]
+        constraint_options = constraint_split[2]
+
+        if constraint_type_ == 'keff':
+            if 'mcnp' in self.options['solver']:
+                self.mcnp_keff_inputs = []
+                self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
+                for individual in list_of_individuals:
+                    ### Building MCNP input file
+                    data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(
+                        self.options['keywords_list'])
+                    ### Finding and adding the fuel location to geometry dictionary
+                    data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
+                    ### Building MCNP input
+                    self.mcnp_file_handler.write_mcnp_input(
+                        template_file=self.options['mcnp_keff_template_file_string'],
+                        dictionary_of_replacements=data_dictionary_,
+                        input_file_str=individual.keff_input_file_string)
+                    ### Building MCNP input script for cluster
+                    self.mcnp_file_handler.build_mcnp_running_script(individual.keff_input_file_string)
+                    ### Running MCNP input
+                    self.mcnp_file_handler.run_mcnp_input(individual.keff_input_file_string)
+                    ### Adding input name to list, used to determine if the jobs have completed or not
+                    self.mcnp_keff_inputs.append(individual.keff_input_file_string)
+
+                ### Waits on the jobs to be completed (looking for "_done.dat" files)
+                self.wait_on_jobs('mcnp_keff')
+
+                ### Grabs keff from the output files
+                for ind in list_of_individuals:
+                    if self.options['fake_fitness_debug']:
+                        ind.keff = random.uniform(0.5, 1.5)
+                    else:
+                        ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
+
+                    ### If that keff is above a set threshold, sets acceptable_eigenvalue to false. Else, sets it True.
+                    if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
+                        print("keff, ", ind.keff, "too high. Skipping source calculation")
+                        ind.acceptable_eigenvalue = False
+                    else:
+                        ind.acceptable_eigenvalue = True
+            #if 'scale' in self.options['solver']:
+                ### create scale inputs, add filenames to list
+                #for individual in self.individuals:
+                    #if individual.evaluated_keff == False:
+                        #if self.options['geometry'] == 'cyl':
+                        #    individual.make_material_string_scale('cyl_materials')
+                        #elif self.options['geometry'] == 'grid':
+                        #    individual.make_material_string_scale('%array%1')
+                        #else:
+                        #    print("Geometry not handled in evaluate function")
+                        #    exit()
+                        #scale_inputs.append(individual.setup_scale(self.generation))
+                        #individual.evaluated_keff = True
+                        #if self.options['fake_fitness_debug']:
+                        #    individual.keff = random.uniform(0.5, 1.5)
+                #self.scale_inputs = scale_inputs
+                ### submitting all jobs and waiting on all jobs
+                #if self.options['solver_location'] == 'necluster':
+                #    self.submit_jobs(self.scale_inputs)
+                #    self.wait_on_jobs('scale')
+
+                #if self.options['solver_location'] == 'local':
+                #    print("Cant run scale locally... yet... fix this")
+                #    exit()
+
+                #for individual in self.individuals:
+                #    individual.get_scale_keff()
+        return list_of_individuals
 
     def non_dominated_sorting(self):
         ###
@@ -178,7 +254,7 @@ class genetic_algorithm:
             #for fitness_index, fitness_ in enumerate(self.options['fitness']):
             if individual.number_of_inds_that_dominate_individual == 0:
                 individual.front_rank = 0
-                print("Ind is rank one:", individual.input_file_string, individual.representativity, individual.keff)
+                #print("Ind is rank one:", individual.input_file_string, individual.representativity, individual.keff)
                 front[0].append(individual)
         ### Front counter
 
@@ -219,19 +295,19 @@ class genetic_algorithm:
         for front in self.pareto_front:
             if front == []:
                 continue
-            print("Front:", len(front))
+            #print("Front:", len(front))
             if len(front) < (self.options['number_of_parents'] - len(parents_list)):
-                print("Length of parent list!!!", len(parents_list))
+                #print("Length of parent list!!!", len(parents_list))
                 parents_list = parents_list + front
-                print("Length of parent list!!!", len(parents_list))
+                #print("Length of parent list!!!", len(parents_list))
             else:
 
                 front = self.crowding_distance(front)
-                print(len(front), self.options['number_of_parents'], len(parents_list))
+                #print(len(front), self.options['number_of_parents'], len(parents_list))
                 front.sort(key=lambda x: x.crowding_distance, reverse=True)
 
                 ind_count = 0
-                print("Adding parents to parents list")
+                #print("Adding parents to parents list")
                 while self.options['number_of_parents'] != len(parents_list):
                     parents_list.append(front[ind_count])
                     ind_count += 1
@@ -239,7 +315,6 @@ class genetic_algorithm:
         #for parent in parents_list:
             #print(parent.input_file_string, parent.keff, parent.representativity, parent.crowding_distance)
         return parents_list
-
 
     def crowding_distance(self, front):
         if front == []:
@@ -297,12 +372,10 @@ class genetic_algorithm:
 
         return True
 
-
-
     def remake_duplicate_children(self, list_of_children, comparison_list):
 
         for child in list_of_children:
-            print("Checking child:", child.material_matrix, comparison_list)
+            #print("Checking child:", child.material_matrix, comparison_list)
             for comparison_ind in comparison_list:
                 #print("comparison", child.material_matrix, comparison_ind.material_matrix)
                 comparison_score = 0
@@ -310,10 +383,10 @@ class genetic_algorithm:
                     if child_mat == comp_mat:
                         comparison_score += 1
                     if comparison_score == self.options['total_materials']:
-                        print("Duplicate child found! Forcing mutation")
-                        print("Before", child.material_matrix)
+                        #print("Duplicate child found! Forcing mutation")
+                        #print("Before", child.material_matrix)
                         child.material_matrix = self.single_bit_mutation(child.material_matrix, force_mutation=True, force_mutation_per_material_sublist=2)
-                        print("After", child.material_matrix)
+                        #print("After", child.material_matrix)
                 #print(child.material_matrix, comparison_ind.material_matrix)
                 #if child.material_matrix == comparison_ind.material_matrix:
                 #    child.create_random_pattern()
@@ -386,6 +459,12 @@ class genetic_algorithm:
     def evaluate(self, evaluation_types, list_of_individuals = "Default"):
         if list_of_individuals == "Default":
             list_of_individuals = self.individuals
+
+        ### Updating list of individuals based on whether they meet the constraints in the constraint options
+        for constraint in self.options['constraint']:
+            if 'evaluate' in constraint:
+                list_of_individuals = self.apply_constraint(list_of_individuals, constraint)
+
         for evaluation_type in evaluation_types:
             if "#" in evaluation_type:
                 evaluation_type, evaluation_options = evaluation_type.split("#")
@@ -405,105 +484,20 @@ class genetic_algorithm:
                     for individual in list_of_individuals:
                         if self.options['fake_fitness_debug'] == True:
                             individual.representativity = random.uniform(0, 1.0)
+                            individual.total_flux = random.uniform(0, 1.0)
                         else:
                             if individual.acceptable_eigenvalue == True:
-                                current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                                individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
+                                individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(individual.input_file_string + "o")
+                                individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(individual.flux_values)
                             if individual.acceptable_eigenvalue == False:
                                 individual.representativity = 0.0
+                                individual.total_flux = 0.0
 
                         print("individual.representativity", individual.representativity)
 
-            if evaluation_type == 'total_flux':
-                print("Evaluating Total Flux")
-                if 'mcnp' in self.options['solver']:
-                    self.mcnp_inputs = []
-                    for individual in list_of_individuals:
-                        if individual.ran_source_calculation == False:
-                            if individual.acceptable_eigenvalue == True:
-                                ### Building MCNP input file
-                                self.build_mcnp_source_input(individual)
-                                individual.ran_source_calculations = True
 
-                    self.wait_on_jobs('mcnp')
 
-                    for individual in list_of_individuals:
-                        if self.options['fake_fitness_debug'] == True:
-                            individual.representativity = random.uniform(0, 1.0)
-                        else:
-                            if individual.acceptable_eigenvalue == True:
-                                current_vals, current_unc = self.mcnp_file_handler.get_flux(individual.input_file_string + "o")
-                                individual.representativity = self.mcnp_file_handler.calculate_representativity(current_vals, current_unc)
-                            if individual.acceptable_eigenvalue == False:
-                                individual.representativity = 0.0
 
-                        print("individual.representativity", individual.representativity)
-
-            if evaluation_type == 'keff':
-                if 'mcnp' in self.options['solver']:
-                    self.mcnp_keff_inputs = []
-                    self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
-                    for individual in list_of_individuals:
-
-                        ### Building MCNP input file
-                        data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(self.options['keywords_list'])
-                        ### Finding and adding the fuel location to geometry dictionary
-                        data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
-                        ### Building MCNP input
-                        self.mcnp_file_handler.write_mcnp_input(template_file = self.options['mcnp_keff_template_file_string'],
-                                                           dictionary_of_replacements = data_dictionary_,
-                                                           input_file_str = individual.keff_input_file_string)
-                        ### Building MCNP input script for cluster
-                        self.mcnp_file_handler.build_mcnp_running_script(individual.keff_input_file_string)
-                        ### Running MCNP input
-                        self.mcnp_file_handler.run_mcnp_input(individual.keff_input_file_string)
-                        ### Adding input name to list, used to determine if the jobs have completed or not
-                        self.mcnp_keff_inputs.append(individual.keff_input_file_string)
-
-                    ### Waits on the jobs to be completed (looking for "_done.dat" files)
-                    self.wait_on_jobs('mcnp_keff')
-
-                    ### Grabs keff from the output files
-                    for ind in list_of_individuals:
-                        if self.options['fake_fitness_debug']:
-                            ind.keff = random.uniform(0.5, 1.5)
-                        else:
-                            ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
-
-                        ### If that keff is above a set threshold, sets acceptable_eigenvalue to false. Else, sets it True.
-                        if float(ind.keff) >= self.options['enforced_maximum_eigenvalue']:
-                            print("keff, ", ind.keff, "too high. Skipping source calculation")
-                            ind.acceptable_eigenvalue = False
-                            ind.keff = 0.0
-                        else:
-                            ind.acceptable_eigenvalue = True
-                if 'scale' in self.options['solver']:
-                    ### create scale inputs, add filenames to list
-                    for individual in self.individuals:
-                        if individual.evaluated_keff == False:
-                            if self.options['geometry'] == 'cyl':
-                                individual.make_material_string_scale('cyl_materials')
-                            elif self.options['geometry'] == 'grid':
-                                individual.make_material_string_scale('%array%1')
-                            else:
-                                print("Geometry not handled in evaluate function")
-                                exit()
-                            scale_inputs.append(individual.setup_scale(self.generation))
-                            individual.evaluated_keff = True
-                            if self.options['fake_fitness_debug']:
-                                individual.keff = random.uniform(0.5, 1.5)
-                    self.scale_inputs = scale_inputs
-                    ### submitting all jobs and waiting on all jobs
-                    if self.options['solver_location']  == 'necluster':
-                        self.submit_jobs(self.scale_inputs)
-                        self.wait_on_jobs('scale')
-
-                    if self.options['solver_location'] == 'local':
-                        print("Cant run scale locally... yet... fix this")
-                        exit()
-
-                    for individual in self.individuals:
-                        individual.get_scale_keff()
 
             #if 'cnn' in self.options['solver']:
             #    print("solving for k with cnn")
@@ -528,20 +522,36 @@ class genetic_algorithm:
 
     #        self.individuals[pred_count].keff = prediction[0]
 
+    def check_number_of_inds_meeting_constraint(self, checking_value = 'acceptable_eigenvalue'):
+        ### Checking to see if any individuals have met keff constraint, if not, sorting by keff
+        number_of_acceptable_individuals = 0
+        for ind in self.parents_list:
+            if getattr(ind, checking_value):
+                number_of_acceptable_individuals += 1
+        print(number_of_acceptable_individuals, "meet", checking_value)
+        return number_of_acceptable_individuals
+
     ### The crossover function creates total population - number of parents
     def crossover(self):
 
         if self.options['use_non_dominated_sorting'] == True:
             self.parents_list = self.non_dominated_sorting()
+            ### TODO: check on eigenvalue constraint more general, right now it is hardcoded
+            if self.check_number_of_inds_meeting_constraint(checking_value='acceptable_eigenvalue') == 0:
+                self.parents_list.sort(key=lambda x: x.keff, reverse=False)
         else:
-            self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
+            if self.check_number_of_inds_meeting_constraint(checking_value = 'acceptable_eigenvalue') > 0:
+                self.individuals.sort(key=lambda x: getattr(x, self.options['fitness_sort_by']), reverse=True)
+            else:
+                self.individuals.sort(key=lambda x: x.keff, reverse=False)
             ### Pairing down individuals to be specified number
             self.individuals = self.individuals[:self.options['number_of_individuals']]
-            self.parents_list = self.individuals[:10]
+            self.parents_list = self.individuals[:self.options['number_of_parents']]
+
 
         ### Evaluating diversity of population
         if self.options['choose_parent_based_on_bitwise_diversity']:
-            print("Evaluating diversity of parents")
+            #print("Evaluating diversity of parents")
             self.evaluate_bitwise_diversity_of_parents()
 
         number_of_children = self.options['number_of_individuals'] - \
@@ -648,11 +658,11 @@ class genetic_algorithm:
 
     def mutate(self, list_of_individuals):
         ### Currently only works on a material-basis
-        print("MUTATING!!!")
+        #print("MUTATING!!!")
         if self.options['mutation_type'] == 'bitwise':
-            print("BITWISE!", len(list_of_individuals))
+            #print("BITWISE!", len(list_of_individuals))
             for ind_count, individual in enumerate(list_of_individuals):
-                print("MUTATING:", ind_count)
+                #print("MUTATING:", ind_count)
                 original_material_matrix = copy.deepcopy(individual.material_matrix)
                 individual.material_matrix = self.single_bit_mutation(original_material_matrix)
 
@@ -680,9 +690,9 @@ class genetic_algorithm:
                 rand_val = random.randint(0, len(material_matrix) - 1)
                 while rand_val in force_mutation_index:
                     rand_val = random.randint(0, len(material_matrix) - 1)
-                    print(rand_val, force_mutation_index)
+                    #print(rand_val, force_mutation_index)
                 force_mutation_index.append(rand_val)
-            print("FORCING A MUTATION! at index(es):", force_mutation_index)
+            #print("FORCING A MUTATION! at index(es):", force_mutation_index)
 
         for material_list in material_matrix:
             material_matrix_sublist = []
@@ -697,7 +707,7 @@ class genetic_algorithm:
                 if force_mutation:
                     if material_count in force_mutation_index:
                         random_val = self.options['mutation_rate']
-                        print("Forcing a mutation in material:", material_count)
+                        #print("Forcing a mutation in material:", material_count)
 
 
                 if random_val <= self.options['mutation_rate']:
@@ -710,7 +720,7 @@ class genetic_algorithm:
                     material = self.options['material_types'][new_index]
                 material_matrix_sublist.append(material)
             new_material_matrix.append(material_matrix_sublist)
-        print("new_material_matrix:", new_material_matrix)
+        #print("new_material_matrix:", new_material_matrix)
 
         return new_material_matrix
 
@@ -763,22 +773,15 @@ class genetic_algorithm:
         number_of_children_needed = self.options['number_of_individuals'] - self.options['number_of_parents']
         number_of_inds_from_current_generation = 0
         for ind_count, individual in enumerate(self.individuals):
-
-            # print("Writing ind", ind_count, self.options['number_of_parents']  - 1)
-
             if ind_count <= self.options['number_of_parents'] - 1:
                 write_string = self.write_options_funct(output_file, individual)
-                # print("WRITING PARENTS!", self.generation, ind_count, write_string)
                 output_file.write(write_string + "\n")
-
                 if individual.generation == self.generation:
                     number_of_inds_from_current_generation += 1
 
                 continue
             if individual.generation == self.generation:
-
                 write_string = self.write_options_funct(output_file, individual)
-                # print("writing out child:", self.generation, ind_count, write_string)
                 output_file.write(write_string + "\n")
                 if individual.generation == self.generation:
                     number_of_inds_from_current_generation += 1
@@ -788,7 +791,6 @@ class genetic_algorithm:
                 if number_of_children_needed > number_of_inds_from_current_generation:
                     continue
                 write_string = self.write_options_funct(output_file, individual)
-                # print("writing out filler:", self.generation, ind_count, write_string)
                 output_file.write(write_string + "\n")
                 continue
         output_file.close()
@@ -817,6 +819,9 @@ class genetic_algorithm:
     def write_options_funct(self, output_file, individual):
         write_string = ""
         for write_option in self.options['output_writeout_values']:
+            if "#" in write_option:
+                write_option_split = write_option.split("#")
+                write_option = write_option_split[0]
             if write_option == 'generation':
                 write_string += str(self.generation) + ","
             if write_option == 'individual_count':
@@ -831,6 +836,11 @@ class genetic_algorithm:
             if write_option == 'crowding_distance':
                 try:
                     write_string += str(individual.crowding_distance) + ","
+                except:
+                    write_string += "N/A,"
+            if write_option == 'total_flux':
+                try:
+                    write_string += str(individual.total_flux) + ","
                 except:
                     write_string += "N/A,"
             if write_option == 'representativity':
@@ -856,5 +866,20 @@ class genetic_algorithm:
                         write_string += str(average_tds) + ','
                     except:
                         write_string += "N/A,"
-
+                else:
+                    write_string += "N/A,"
         return write_string
+
+    def create_header(self):
+        header_string = ""
+        for val in self.options['output_writeout_values']:
+            if "#" in val:
+                val_split = val.split("#")
+                val = val_split[0]
+                val_range = int(val_split[1])
+                for _ in range(val_range):
+                    header_string += val + str(_)+ ","
+            else:
+                header_string += val + ","
+
+        return header_string

@@ -3,6 +3,7 @@ import collections
 import copy
 import numpy as np
 import xlrd
+import math
 
 np.set_printoptions(precision=None, suppress=None)
 
@@ -18,7 +19,7 @@ mcnp_script_templates = collections.OrderedDict()
 
 mcnp_script_templates['6.1'] = """#!/bin/bash
 #PBS -V
-#PBS -q fill
+#PBS -q corei7
 #PBS -l nodes=1:ppn=8
 
 hostname
@@ -51,7 +52,7 @@ class mcnp_file_handler():
     def __init__(self, mcnp_version = "6.1"):
         print("Let's play with some MCNP files!")
         self.mcnp_script_template = mcnp_script_templates[mcnp_version]
-
+        self.target_flux = 'N/A'
     def write_mcnp_input(self, template_file, dictionary_of_replacements, input_file_str):
         print("Building MCNP model from template")
 
@@ -108,7 +109,43 @@ class mcnp_file_handler():
             print('Waiting 15 seconds')
             os.wait(15)
 
-    def get_flux(self, input_name):
+    def get_f4_flux_from_output(self, input_name, tally_number = '4'):
+
+        with open(input_name, 'r') as inputfile:
+            in_tally = False
+            in_data = False
+            fluxes, uncerts = [], []
+
+            for line in inputfile:
+                line_ = line.split()
+
+                if line.strip() == "":
+                    continue
+
+                if line_[0] == '1tally':
+                    if line_[1] == tally_number:
+                        if line_[2] == 'nps':
+                            in_tally = True
+                            continue
+                if in_tally:
+                    if line_[0] == 'energy':
+                        in_data = True
+                        continue
+
+                    elif line_[0] == 'total':
+                        print(line_, line)
+                        return fluxes, uncerts, line_[1], line_[2]
+
+                    elif in_data == True:
+                        fluxes.append(line_[1])
+                        uncerts.append(line_[2])
+
+                    else:
+                        continue
+
+
+
+    def get_flux_dep(self, input_name):
         inputfile = open(input_name, 'r')
 
         current_vals = []
@@ -135,9 +172,40 @@ class mcnp_file_handler():
                 total_unc = current_unc.pop(252)
             # bins.pop(239)
             i = i + 1
-        return current_vals, current_unc
+        return current_vals, current_unc, total, total_unc
 
 
+    def sum_product(self, list_1, list_2):
+        sum_ = 0.0
+        for item_1, item_2 in zip(list_1, list_2):
+            sum_ += float(item_1) * float(item_2)
+        return sum_
+
+    def get_target_rep_values(self, target_file = "Target_Flux_Data.csv"):
+        data, data_uncert = [], []
+        with open(target_file) as target_flux_file:
+            for line in target_flux_file:
+                if line.startswith("#"):
+                    continue
+                line_ = line.split(',')
+                try:
+                    data.append(line_[1])
+                    data_uncert.append(line[2])
+                except:
+                    pass
+        return data
+
+    def calculate_representativity_v2(self, other_values):
+
+        ### Getting target flux value
+        if self.target_flux == 'N/A':
+            self.target_flux = self.get_target_rep_values()
+
+        val_target_to_target = self.sum_product(self.target_flux, self.target_flux)
+        val_target_to_other  = self.sum_product(self.target_flux, other_values)
+        val_other_to_other   = self.sum_product(other_values, other_values)
+        print(val_target_to_target, val_target_to_other, val_other_to_other)
+        return val_target_to_other / math.sqrt(val_target_to_target * val_other_to_other)
 
     def propagate_uncertainty(self, derivative, uncertainty):
         #print(derivative)
@@ -153,7 +221,7 @@ class mcnp_file_handler():
         ### show how well output is representative of sfr flux data
 
         ### SFR flux data
-        workbook = xlrd.open_workbook("SFR_Flux_Data.xlsx")
+        workbook = xlrd.open_workbook("Target_Flux_data.xlsx")
         sheet = workbook.sheet_by_index(2)
         bins = []
         nums = []
@@ -179,9 +247,9 @@ class mcnp_file_handler():
         f2 = np.array(flux)
         f2_unc = np.array(flux_unc)
 
-        energy = ebins.reshape(1, 252)
-        flux1 = f1.reshape(1, 252)
-        flux2 = f2.reshape(1, 252)
+        energy = ebins.reshape(1, len(nums))
+        flux1 = f1.reshape(1, len(nums))
+        flux2 = f2.reshape(1, len(nums))
         flux1_unc = flux1 * f1_unc
         flux2_unc = flux2 * f2_unc
 
@@ -209,16 +277,16 @@ class mcnp_file_handler():
         dR_dflux2 = np.dot(1 / (denomenator4), dnumerator_dflux2) - np.dot(numerator / denomenator4 ** 2, ddenomenator4_flux2)
 
         uncertainty0 = np.concatenate([flux1_unc, flux2_unc])
-        uncertainty = np.reshape(uncertainty0, (1, 504))
+        uncertainty = np.reshape(uncertainty0, (1, len(nums)*2))
 
         derivative0 = np.concatenate([dR_dflux1, dR_dflux2])
-        derivative = np.reshape(derivative0, (1, 504))
+        derivative = np.reshape(derivative0, (1, len(nums)*2))
 
         R_unc = self.propagate_uncertainty(derivative, uncertainty)
         # print(R)
         R[np.isnan(R)] = 0
         R_unc[np.isnan(R_unc)] = 0
-        print(R, R_unc)
+        #print(R, R_unc)
         return R[0][0]
 
     def run_mcnp_input(self, input_file):
@@ -239,8 +307,8 @@ class mcnp_file_handler():
         try:
             output_file = open(output_file_string, 'r')
         except:
-            print("Unable to open output file:", output_file_string, "returning 0 and continuing")
-            return 0.0
+            print("Unable to find a keff for input " + output_file_string, "returning 10 and continuing")
+            return 10.0
 
         found_keff = False
         for line in output_file:
@@ -252,3 +320,9 @@ class mcnp_file_handler():
             print("Unable to find a keff for input " + output_file_string, "returning 10 and continuing")
             return 10.0
         return keff
+
+#mfh = mcnp_file_handler()
+
+#flux, uncert, total, total_uncert = mfh.get_f4_flux_from_output("source_calc__gen_0_ind_0.inpo")
+
+#print(mfh.calculate_representativity_v2(flux))
