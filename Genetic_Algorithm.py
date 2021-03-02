@@ -29,7 +29,7 @@ class genetic_algorithm:
             print("outside ind matrix", ind_.material_matrix)
 
             self.individual_count += 1
-        print("TESTING IND MATERIAL MATRII")
+
         for ind in self.individuals:
             print(ind.material_matrix)
         if self.options['remake_duplicate_children'] == True:
@@ -81,7 +81,7 @@ class genetic_algorithm:
             print("Evaluating diversity of parents")
             self.evaluate_bitwise_diversity_of_parents()
 
-        self.write_output_v2(self.parents_list)
+        #self.write_output_v2(self.individuals)
         self.generation += 1
 
         ### Running GA algo
@@ -117,13 +117,13 @@ class genetic_algorithm:
 
 
 
-            print("All individuals in this generation!")
-            for ind_count, ind_ in enumerate(self.individuals):
-                print(ind_count, ind_.ind_count, ind_.generation, ind_.keff, ind_.representativity)
+
+            #for ind_count, ind_ in enumerate(self.individuals):
+                #print(ind_count, ind_.ind_count, ind_.generation, ind_.keff, ind_.representativity)
 
             print("write output")
             if self.options['write_output_csv']:
-                self.write_output_v2(self.parents_list)
+                self.write_output_v2(self.individuals)
 
             self.generation += 1
 
@@ -249,7 +249,7 @@ class genetic_algorithm:
 
             individual.dominated_list = dominated_list
             individual.number_of_inds_that_dominate_individual = number_of_inds_that_dominate_individual
-            #print(individual.input_file_string, individual.keff, individual.representativity, len(individual.dominated_list), individual.number_of_inds_that_dominate_individual)
+            print(individual.input_file_string, individual.keff, individual.representativity, len(individual.dominated_list), individual.number_of_inds_that_dominate_individual)
 
             #for fitness_index, fitness_ in enumerate(self.options['fitness']):
             if individual.number_of_inds_that_dominate_individual == 0:
@@ -275,15 +275,15 @@ class genetic_algorithm:
                         if individual_.front_rank == 'none':
                             individual_.front_rank = pareto_front + 1
                             current_front.append(individual_)
-                    #print(individual_.input_file_string, individual_.front_rank, current_front)
+                    #print("Ranks:", individual_.input_file_string, individual_.front_rank, current_front)
 
             front.append(current_front)
             pareto_front += 1
-        #print("Pareto fronts:")
-        #for front_count, front_list in enumerate(front):
-            #print(front_list)
-            #for ind in front_list:
-                #print(front_count, ind.representativity, ind.keff)
+        print("Pareto fronts:")
+        for front_count, front_list in enumerate(front):
+            print(front_list)
+            for ind in front_list:
+                print(front_count, ind.input_file_string, ind.representativity, ind.keff)
         self.pareto_front = front
 
         #for individual_ in self.individuals:
@@ -349,6 +349,9 @@ class genetic_algorithm:
                 ind_n_minus_one = float(getattr(front[count+1],fitness))
                 try:
                     ind.crowding_distance = ind.crowding_distance + (ind_n_plus_one - ind_n_minus_one)/(diff_max_min)
+                    if ind.crowding_distance < 0.0:
+                        print("Crowding distance below 0!", ind.crowding_distance)
+                        exit()
                 except:
                     continue
                 #print("CROWDING DISTANCE!!!", ind.crowding_distance, count, len(front))
@@ -483,8 +486,11 @@ class genetic_algorithm:
 
                     for individual in list_of_individuals:
                         if self.options['fake_fitness_debug'] == True:
-                            individual.representativity = random.uniform(0, 1.0)
-                            individual.total_flux = random.uniform(0, 1.0)
+                            individual.representativity = 0.0
+                            individual.total_flux = 0.0
+                            if individual.keff < individual.options['enforced_maximum_eigenvalue']:
+                                individual.representativity = random.uniform(0, 1.0)
+                                individual.total_flux = random.uniform(0, 1.0)
                         else:
                             if individual.acceptable_eigenvalue == True:
                                 individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(individual.input_file_string + "o")
@@ -493,7 +499,7 @@ class genetic_algorithm:
                                 individual.representativity = 0.0
                                 individual.total_flux = 0.0
 
-                        print("individual.representativity", individual.representativity)
+
 
 
 

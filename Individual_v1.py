@@ -27,7 +27,6 @@ class individual:
         self.acceptable_eigenvalue = True
 
         self.default_materials = collections.OrderedDict()
-        print("MATERIAL MATERIX FOR REALS", self.material_matrix)
 
     def create_random_pattern(self):
         #print("Creating random pattern for ind:", self.ind_count)
@@ -57,7 +56,7 @@ class individual:
                 material = self.options['material_types'][material_index - 1]
                 if self.options['enforce_material_count_on_creation'] == True:
                     if material_count in self.material_locations:
-                        print("HERE!!!")
+
                         material = self.options['enforce_material_number']
                     else:
                         material_index = random.randint(1, len(self.options['material_types']))
