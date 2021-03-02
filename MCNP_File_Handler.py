@@ -320,7 +320,7 @@ class mcnp_file_handler():
             print("Unable to find a keff for input " + output_file_string, "returning 10 and continuing")
             return 10.0
         return keff
-
+#
 #mfh = mcnp_file_handler()
 
 #flux, uncert, total, total_uncert = mfh.get_f4_flux_from_output("source_calc__gen_0_ind_0.inpo")

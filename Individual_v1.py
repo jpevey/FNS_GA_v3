@@ -44,6 +44,10 @@ class individual:
             #print("Force material locations!!!",  self.material_locations)
         self.create_material_matrix()
 
+    def debug_fake_fitness(self, fitness_type):
+        setattr(self, fitness_type, random.uniform(0, 1.0))
+        return
+
     def create_material_matrix(self):
         ### Creating list of materials in this ind.
         material_matrix = []

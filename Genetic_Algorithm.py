@@ -17,6 +17,7 @@ class genetic_algorithm:
         self.options = options_dict
         ### List of current generation individuals
         self.individuals = []
+        self.mcnp_inputs = []
 
         random.seed(self.options['python_random_number_seed'])
 
@@ -468,42 +469,96 @@ class genetic_algorithm:
             if 'evaluate' in constraint:
                 list_of_individuals = self.apply_constraint(list_of_individuals, constraint)
 
+        ### This loop builds and runs required MCNP files to evaluate individuals
         for evaluation_type in evaluation_types:
+            ### Getting options from 'fitness' list
             if "#" in evaluation_type:
                 evaluation_type, evaluation_options = evaluation_type.split("#")
-            scale_inputs = []
+            self.mcnp_inputs = []
+
             if evaluation_type == 'representativity':
                 print("Evaluating Representativity")
                 if 'mcnp' in self.options['solver']:
-                    self.mcnp_inputs = []
+
                     for individual in list_of_individuals:
                         if individual.ran_source_calculation == False:
                             if individual.acceptable_eigenvalue == True:
-                                ### Building MCNP input file
-                                self.build_mcnp_source_input(individual)
+                                ### Building and submitting MCNP input file
+                                self.build_and_run_mcnp_evaluation_input(individual)
                                 individual.ran_source_calculations = True
-                    self.wait_on_jobs('mcnp')
 
+            if evaluation_type == 'total_flux':
+                print("Evaluating Total Flux")
+                if 'mcnp' in self.options['solver']:
                     for individual in list_of_individuals:
-                        if self.options['fake_fitness_debug'] == True:
-                            individual.representativity = 0.0
-                            individual.total_flux = 0.0
-                            if individual.keff < individual.options['enforced_maximum_eigenvalue']:
-                                individual.representativity = random.uniform(0, 1.0)
-                                individual.total_flux = random.uniform(0, 1.0)
-                        else:
+                        if individual.ran_source_calculation == False:
                             if individual.acceptable_eigenvalue == True:
-                                individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(individual.input_file_string + "o")
-                                individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(individual.flux_values)
-                            if individual.acceptable_eigenvalue == False:
-                                individual.representativity = 0.0
-                                individual.total_flux = 0.0
+                                ### Building and submitting MCNP input file
+                                self.build_and_run_mcnp_evaluation_input(individual)
+                                individual.ran_source_calculations = True
 
 
+            if evaluation_type == 'integral_keff':
+                print("Evaluating integral keff of individuals")
+                if 'mcnp' in self.options['solver']:
+                    for individual in list_of_individuals:
+                        if individual.acceptable_eigenvalue == True:
+                            ### Building and submitting MCNP input file
+                            self.build_and_run_mcnp_evaluation_input(individual,
+                                                         integral_experiment=True)
+        self.wait_on_jobs('mcnp')
 
+        ### Pulling evaluation data
+        for individual in list_of_individuals:
 
+            ### Returning fake fitness value for debug purposes
+            if self.options['fake_fitness_debug'] == True:
+                for evaluation_type in evaluation_types:
+                    individual.debug_fake_fitness(evaluation_type)
+            else:
 
+                if evaluation_type == 'representativity':
+                    if individual.acceptable_eigenvalue == True:
+                        individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(
+                            individual.input_file_string + "o")
+                        individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(
+                            individual.flux_values)
+                    if individual.acceptable_eigenvalue == False:
+                        individual.representativity = 0.0
 
+                if evaluation_type == 'total_flux':
+                    if individual.acceptable_eigenvalue == True:
+                        individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(
+                            individual.input_file_string + "o")
+                        individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(
+                            individual.flux_values)
+                    if individual.acceptable_eigenvalue == False:
+                        individual.representativity = 0.0
+                        individual.total_flux = 0.0
+
+                if evaluation_type == 'integral_keff':
+                    if individual.acceptable_eigenvalue == True:
+                        individual.integral_keff_value = self.mcnp_file_handler.get_keff(individual.integral_keff_input_file_string)
+                        ### Todo: Verify that taking the absolute value is correct for integral exp. score. Do we want experiments that add reactivity?
+                        individual.integral_keff = math.abs(individual.keff - individual.integral_keff_value)
+
+                    if individual.acceptable_eigenvalue == False:
+                        individual.integral_keff = 0.0
+                        individual.integral_keff_value = 0.0
+
+            if self.options['fake_fitness_debug'] == True:
+                individual.representativity = 0.0
+                individual.total_flux = 0.0
+                if individual.keff < individual.options['enforced_maximum_eigenvalue']:
+                    individual.representativity = random.uniform(0, 1.0)
+                    individual.total_flux = random.uniform(0, 1.0)
+            else:
+                if individual.acceptable_eigenvalue == True:
+                    individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(individual.input_file_string + "o")
+                    individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(individual.flux_values)
+                if individual.acceptable_eigenvalue == False:
+                    individual.representativity = 0.0
+                    individual.total_flux = 0.0
 
             #if 'cnn' in self.options['solver']:
             #    print("solving for k with cnn")
@@ -528,6 +583,7 @@ class genetic_algorithm:
 
     #        self.individuals[pred_count].keff = prediction[0]
 
+
     def check_number_of_inds_meeting_constraint(self, checking_value = 'acceptable_eigenvalue'):
         ### Checking to see if any individuals have met keff constraint, if not, sorting by keff
         number_of_acceptable_individuals = 0
@@ -540,7 +596,7 @@ class genetic_algorithm:
     ### The crossover function creates total population - number of parents
     def crossover(self):
 
-        if self.options['use_non_dominated_sorting'] == True:
+        if self.options['use_non_dominated_sorting']:
             self.parents_list = self.non_dominated_sorting()
             ### TODO: check on eigenvalue constraint more general, right now it is hardcoded
             if self.check_number_of_inds_meeting_constraint(checking_value='acceptable_eigenvalue') == 0:
@@ -608,16 +664,28 @@ class genetic_algorithm:
 
         return list_of_children
 
-    def build_mcnp_source_input(self, individual_):
+    def build_and_run_mcnp_evaluation_input(self, individual_,
+                                integral_experiment=False):
+
+        ### Setting template file and input file string based on type of evaluation
+        if integral_experiment:
+            template_file_ = self.options['mcnp_keff_exp_template_file_string']
+            input_file_string_ = individual_.keff_input_file_string.split('.inp')
+            input_file_string = input_file_string_[0] + "_integral_exp.inp"
+            individual_.integral_keff_input_file_string = input_file_string
+        else:
+            template_file_ = self.options['mcnp_template_file_string']
+            input_file_string = individual_.input_file_string
+
         ### Building MCNP input file
-        self.mcnp_file_handler.write_mcnp_input(template_file=self.options['mcnp_template_file_string'],
+        self.mcnp_file_handler.write_mcnp_input(template_file=template_file_,
                                                 dictionary_of_replacements=individual_.create_discrete_material_mcnp_dictionary(
                                                     self.options['keywords_list']),
-                                                input_file_str=individual_.input_file_string)
-        self.mcnp_file_handler.build_mcnp_running_script(individual_.input_file_string)
+                                                input_file_str=input_file_string)
+        self.mcnp_file_handler.build_mcnp_running_script(input_file_string)
 
-        self.mcnp_file_handler.run_mcnp_input(individual_.input_file_string)
-        self.mcnp_inputs.append(individual_.input_file_string)
+        self.mcnp_file_handler.run_mcnp_input(input_file_string)
+        self.mcnp_inputs.append(input_file_string)
         return
 
     def bitwise_crossover(self, parent_1, parent_2):

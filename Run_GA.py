@@ -17,8 +17,8 @@ options['enforce_material_count_before_evaluation'] = False
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
 options['number_of_generations'] = 1
-options['number_of_individuals'] = 100
-options['number_of_parents'] = 20
+options['number_of_individuals'] = 5
+options['number_of_parents'] = 3
 options['remake_duplicate_children'] = True
 options['mutation_rate'] = 0.10  # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
@@ -39,6 +39,7 @@ options['grid_y'] = 1
 options['total_materials'] = options['grid_x'] * options['grid_y']
 options['scale_template_file_string'] = '11x11_grid_array_template.inp'
 options['mcnp_template_file_string'] = '3d_FNS_template_source.txt'
+options['mcnp_keff_exp_template_file_string'] = '3d_FNS_integral_exp_template_keff.txt'
 options['mcnp_keff_template_file_string'] = '3d_FNS_template_keff.txt'
 options['file_keyword'] = 'source_calc_'
 options['solver'] = 'mcnp'
@@ -58,7 +59,7 @@ for val in options['keywords_list']:
 options['write_output_csv'] = True
 options['output_filename'] = '_output'
 ### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
-options['fitness'] = ['representativity', 'total_flux']
+options['fitness'] = ['representativity', 'total_flux', 'integral_keff']
 options['constraint'] = ['keff#evaluate#threshold#default_sort']
 #options['constraint'] = ['']
 options['enforced_maximum_eigenvalue'] = 0.95
@@ -70,7 +71,7 @@ options['default_mcnp_mat_count_and_density'][3] = '3'
 #options['default_mcnp_mat_count_and_density'][4] = '4'
 options['output_all_individuals_at_end_of_calculation'] = True
 options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
-options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'representativity',
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'integral_keff_value', 'representativity',
                                      'total_flux', 'front_rank', 'crowding_distance', 'number_of_fuel',
                                      'write_out_parents#2', 'write_out_average_diversity_score', 'materials#30']
 # options['scale_script_template'] = \
