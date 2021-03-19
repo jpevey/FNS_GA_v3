@@ -33,9 +33,7 @@ class genetic_algorithm:
 
         for ind in self.individuals:
             print(ind.material_matrix)
-        if self.options['remake_duplicate_children'] == True:
-            self.all_individuals = copy.deepcopy(self.individuals)
-            print("All individuals:", self.all_individuals)
+
         ### Loading CNN if needed
         #if 'cnn' in self.options['solver']:
         #    model_string = "CNN_3d_11x11_fm_cad_4x4_kern_v2.hdf5"
@@ -69,6 +67,10 @@ class genetic_algorithm:
         print("Evaluating initial population")
         self.evaluate(self.options['fitness'])
 
+        if self.options['remake_duplicate_children'] == True:
+            self.all_individuals = copy.deepcopy(self.individuals)
+            print("All individuals:", self.all_individuals)
+
         if self.options['use_non_dominated_sorting'] == True:
             self.parents_list = self.non_dominated_sorting()
         else:
@@ -88,32 +90,36 @@ class genetic_algorithm:
         ### Running GA algo
         for generation in range(self.options['number_of_generations']):
             print("Generation: ", self.generation)
+            for constraint in self.options['constraint']:
+                if "linearSimAnneal" in constraint:
+                    print("Applying linearSimAnneal to all previous individuals")
+                    self.all_individuals = self.apply_constraint(self.all_individuals, constraint)
+
             print("crossover")
             list_of_children = self.crossover()
             print("mutating")
             list_of_mutated_children = self.mutate(list_of_children)
 
-            if self.options['remake_duplicate_children'] == True:
+            if self.options['remake_duplicate_children']:
                 list_of_mutated_children = self.remake_duplicate_children(list_of_mutated_children, self.all_individuals)
-                self.all_individuals += list_of_mutated_children
 
             if self.options['enforce_material_count_before_evaluation']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
                 for ind_count, ind in enumerate(list_of_mutated_children):
                     ind.enforce_material_count(self.options['enforce_material_number'], self.options['enforced_fuel_count_value'])
 
+
+
+
             print("evaluating children")
-            self.evaluate(self.options['fitness'], list_of_mutated_children)
-            #for ind_count, ind_ in enumerate(list_of_mutated_children):
-            #    print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
-            #print("CHILDREN:::")
-            #for ind_count, ind_ in enumerate(list_of_mutated_children):
-                #print(ind_count, ind_.ind_count, ind_.generation, ind_.representativity)
+            evaluated_children = self.evaluate(self.options['fitness'], list_of_mutated_children)
 
-            ### Checking if any of the children have already been created/evaluated
+            ### Adding now evaluated children to master list of all individuals
+            self.all_individuals += evaluated_children
 
-            ### combining now evaluated children with previous list of individuals
-            self.individuals = self.parents_list + list_of_mutated_children
+
+            ### combining now evaluated children with previous list of parents
+            self.individuals = self.parents_list + evaluated_children
 
 
 
@@ -122,14 +128,14 @@ class genetic_algorithm:
             #for ind_count, ind_ in enumerate(self.individuals):
                 #print(ind_count, ind_.ind_count, ind_.generation, ind_.keff, ind_.representativity)
 
-            print("write output")
+            print("Write output")
             if self.options['write_output_csv']:
-                self.write_output_v2(self.individuals)
+                if self.options['sort_all_possible_individuals']:
+                    self.write_output_v2(self.parents_list+evaluated_children)
+                else:
+                    self.write_output_v2(self.individuals)
 
             self.generation += 1
-
-            if self.options['remake_duplicate_children'] == True:
-                self.all_individuals += list_of_mutated_children
 
             #print("Printing all individuals!")
             #for ind_ in self.all_individuals:
@@ -182,7 +188,7 @@ class genetic_algorithm:
                 ### Grabs keff from the output files
                 for ind in list_of_individuals:
                     if self.options['fake_fitness_debug']:
-                        ind.keff = random.uniform(0.5, 1.5)
+                        ind.keff = random.uniform(0.1, 1.0)
                     else:
                         ind.keff = self.mcnp_file_handler.get_keff(ind.keff_input_file_string)
 
@@ -219,14 +225,60 @@ class genetic_algorithm:
 
                 #for individual in self.individuals:
                 #    individual.get_scale_keff()
+
+        if constraint_type_ == 'representativity':
+            constraint_options_split = constraint_options.split(",")
+
+            ### This linear constraint applies a penalty to individuals whose
+            ### objective function is not at a threshold.
+            ### With linearSimAnneal this threshold builds linearly to be in full
+            ### effect at generation specified in the second option "gen_XXX"
+            ### The target is given in the second option as
+            ### "(target objective function)_(target value)"
+            ### Example: "representativity#postevaluate#linearSimAnneal,gen_50,val_0.95"
+
+            if constraint_options_split[0] == "linearSimAnneal":
+                print("Applying linearSimAnneal constraint")
+                assert len(constraint_options_split) == 3, "Not enough options specified in linearSimAnneal"
+
+                _, gen_val = constraint_options_split[1].split('_')
+                _, target_val = constraint_options_split[2].split('_')
+
+                gen_val = int(gen_val)
+                target_val = float(target_val)
+
+                ### Setting linearSimAnneal_threshold based on current generation
+                ### If beyond the specified generation, setting it to be the target_val
+                try:
+                    linearSimAnneal_threshold = (self.generation / gen_val) * target_val
+                except ZeroDivisionError:
+                    linearSimAnneal_threshold = 0.0
+                if self.generation >= gen_val:
+                    linearSimAnneal_threshold = target_val
+
+                ### Applying linearSimAnneal constraint to individuals
+                for individual in list_of_individuals:
+                    if getattr(individual, constraint_type_) < linearSimAnneal_threshold:
+                        for objective_function in self.options['fitness']:
+                            setattr(individual, objective_function, 0.0)
+
+                        print("Setting individual:", individual.ind_count, getattr(individual, constraint_type_),constraint_type_,'to 0.0', linearSimAnneal_threshold)
+                    else:
+                        print("Individual Ok!", individual.input_file_string, getattr(individual, constraint_type_), 'greater than', linearSimAnneal_threshold)
+
         return list_of_individuals
 
     def non_dominated_sorting(self):
-        ###
         front = [[]]
-        for individual in self.individuals:
+
+        individuals_to_sort = self.individuals
+        if self.options['sort_all_possible_individuals']:
+            individuals_to_sort = self.all_individuals
+
+        for individual in individuals_to_sort:
             individual.front_rank = 'none'
-            print("Nondominated sorting", individual.input_file_string, individual.keff, individual.representativity)
+            print(individual.ind_count)
+            print("Nondominated sorting", individual.ind_count, individual.keff, individual.representativity)
             ### Initializing lists
             dominated_list = []
             number_of_inds_that_dominate_individual = 0
@@ -235,7 +287,7 @@ class genetic_algorithm:
             #number_of_inds_that_dominate_individual.append(0)
 
             ### Iterating over all individuals, comparing fitnesses
-            for individual_ in self.individuals:
+            for individual_ in individuals_to_sort:
                 if individual == individual_:
                     continue
                 individual_.front_number = 0
@@ -258,8 +310,6 @@ class genetic_algorithm:
                 #print("Ind is rank one:", individual.input_file_string, individual.representativity, individual.keff)
                 front[0].append(individual)
         ### Front counter
-
-
         pareto_front = 0
         while front[pareto_front] != []:
             current_front = []
@@ -331,6 +381,7 @@ class genetic_algorithm:
             if "#" in fitness:
                 fitness = fitness.split("#")
                 fitness = fitness[0]
+
             ### Setting highest and lowest ind's to have large crowding distance
             front.sort(key=lambda x: getattr(x, fitness), reverse=True)
             front[0].crowding_distance = 99999999999999999.0
@@ -338,6 +389,7 @@ class genetic_algorithm:
             max_value = float(getattr(front[0],fitness))
             min_value = float(getattr(front[-1], fitness))
             diff_max_min = max_value - min_value
+
             ### Adding crowding distance for this fitness
             for count, ind in enumerate(front):
 
@@ -355,7 +407,7 @@ class genetic_algorithm:
                         exit()
                 except:
                     continue
-                #print("CROWDING DISTANCE!!!", ind.crowding_distance, count, len(front))
+                print("CROWDING DISTANCE!!!", ind.crowding_distance, count, len(front))
 
         return front
 
@@ -464,31 +516,36 @@ class genetic_algorithm:
         if list_of_individuals == "Default":
             list_of_individuals = self.individuals
 
+
+
         ### Updating list of individuals based on whether they meet the constraints in the constraint options
         for constraint in self.options['constraint']:
-            if 'evaluate' in constraint:
+            if 'preevaluate' in constraint:
                 list_of_individuals = self.apply_constraint(list_of_individuals, constraint)
 
         ### This loop builds and runs required MCNP files to evaluate individuals
+
         for evaluation_type in evaluation_types:
             ### Getting options from 'fitness' list
             if "#" in evaluation_type:
                 evaluation_type, evaluation_options = evaluation_type.split("#")
-            self.mcnp_inputs = []
+
 
             if evaluation_type == 'representativity':
                 print("Evaluating Representativity")
                 if 'mcnp' in self.options['solver']:
-
+                    self.mcnp_inputs = []
                     for individual in list_of_individuals:
                         if individual.ran_source_calculation == False:
                             if individual.acceptable_eigenvalue == True:
                                 ### Building and submitting MCNP input file
                                 self.build_and_run_mcnp_evaluation_input(individual)
                                 individual.ran_source_calculations = True
+                    self.wait_on_jobs('mcnp')
 
             if evaluation_type == 'total_flux':
                 print("Evaluating Total Flux")
+                self.mcnp_inputs = []
                 if 'mcnp' in self.options['solver']:
                     for individual in list_of_individuals:
                         if individual.ran_source_calculation == False:
@@ -496,74 +553,90 @@ class genetic_algorithm:
                                 ### Building and submitting MCNP input file
                                 self.build_and_run_mcnp_evaluation_input(individual)
                                 individual.ran_source_calculations = True
-
+                    self.wait_on_jobs('mcnp')
 
             if evaluation_type == 'integral_keff':
                 print("Evaluating integral keff of individuals")
+                self.mcnp_inputs = []
                 if 'mcnp' in self.options['solver']:
                     for individual in list_of_individuals:
                         if individual.acceptable_eigenvalue == True:
                             ### Building and submitting MCNP input file
                             self.build_and_run_mcnp_evaluation_input(individual,
                                                          integral_experiment=True)
-        self.wait_on_jobs('mcnp')
+                self.wait_on_jobs('mcnp')
 
         ### Pulling evaluation data
         for individual in list_of_individuals:
 
             ### Returning fake fitness value for debug purposes
             if self.options['fake_fitness_debug'] == True:
+
                 for evaluation_type in evaluation_types:
-                    individual.debug_fake_fitness(evaluation_type)
+                    individual.debug_fake_fitness(evaluation_type, individual.acceptable_eigenvalue)
+
+                    if evaluation_type == 'integral_keff':
+                        if individual.acceptable_eigenvalue:
+                            individual.integral_keff_value = individual.integral_keff
+                            individual.integral_keff = abs(float(individual.keff) - float(individual.integral_keff_value))
+                        else:
+                            individual.integral_keff_value = 0.0
+                            individual.integral_keff = 0.0
+                #print("Faking individual fitness:",individual.ind_count,individual.keff,individual.representativity,individual.total_flux, individual.integral_keff)
             else:
+                for evaluation_type in evaluation_types:
+                    if evaluation_type == 'representativity':
+                        if individual.acceptable_eigenvalue == True:
+                            individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(
+                                individual.input_file_string + "o")
+                            individual.representativity = self.mcnp_file_handler.calculate_representativity_v3(
+                                individual.flux_values, self.options['energy_bins'])
+                        if individual.acceptable_eigenvalue == False:
+                            individual.representativity = 0.0
 
-                if evaluation_type == 'representativity':
-                    if individual.acceptable_eigenvalue == True:
-                        individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(
-                            individual.input_file_string + "o")
-                        individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(
-                            individual.flux_values)
-                    if individual.acceptable_eigenvalue == False:
-                        individual.representativity = 0.0
+                    if evaluation_type == 'total_flux':
+                        if individual.acceptable_eigenvalue == True:
+                            individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(
+                                individual.input_file_string + "o")
+                            individual.representativity = self.mcnp_file_handler.calculate_representativity_v3(
+                                individual.flux_values, self.options['energy_bins'])
+                        if individual.acceptable_eigenvalue == False:
+                            individual.representativity = 0.0
+                            individual.total_flux = 0.0
 
-                if evaluation_type == 'total_flux':
-                    if individual.acceptable_eigenvalue == True:
-                        individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(
-                            individual.input_file_string + "o")
-                        individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(
-                            individual.flux_values)
-                    if individual.acceptable_eigenvalue == False:
-                        individual.representativity = 0.0
-                        individual.total_flux = 0.0
+                    if evaluation_type == 'integral_keff':
+                        if individual.acceptable_eigenvalue == True:
+                            individual.integral_keff_value = self.mcnp_file_handler.get_keff(individual.integral_keff_input_file_string)
+                            ### Todo: Verify that taking the absolute value is correct for integral exp. score. Do we want experiments that add reactivity?
+                            individual.integral_keff = abs(float(individual.keff) - float(individual.integral_keff_value))
 
-                if evaluation_type == 'integral_keff':
-                    if individual.acceptable_eigenvalue == True:
-                        individual.integral_keff_value = self.mcnp_file_handler.get_keff(individual.integral_keff_input_file_string)
-                        ### Todo: Verify that taking the absolute value is correct for integral exp. score. Do we want experiments that add reactivity?
-                        individual.integral_keff = math.abs(individual.keff - individual.integral_keff_value)
+                        if individual.acceptable_eigenvalue == False:
+                            individual.integral_keff = 0.0
+                            individual.integral_keff_value = 0.0
 
-                    if individual.acceptable_eigenvalue == False:
-                        individual.integral_keff = 0.0
-                        individual.integral_keff_value = 0.0
-
-            if self.options['fake_fitness_debug'] == True:
-                individual.representativity = 0.0
-                individual.total_flux = 0.0
-                if individual.keff < individual.options['enforced_maximum_eigenvalue']:
-                    individual.representativity = random.uniform(0, 1.0)
-                    individual.total_flux = random.uniform(0, 1.0)
-            else:
-                if individual.acceptable_eigenvalue == True:
-                    individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(individual.input_file_string + "o")
-                    individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(individual.flux_values)
-                if individual.acceptable_eigenvalue == False:
-                    individual.representativity = 0.0
-                    individual.total_flux = 0.0
+            #if self.options['fake_fitness_debug'] == True:
+            #    individual.representativity = 0.0
+            #    individual.total_flux = 0.0
+            #    if individual.keff < individual.options['enforced_maximum_eigenvalue']:
+            #        individual.representativity = random.uniform(0, 1.0)
+            #        individual.total_flux = random.uniform(0, 1.0)
+            #else:
+            #    if individual.acceptable_eigenvalue == True:
+            #        individual.flux_values, individual.flux_uncertainty, individual.total_flux, individual.total_flux_unc = self.mcnp_file_handler.get_f4_flux_from_output(individual.input_file_string + "o")
+            #        individual.representativity = self.mcnp_file_handler.calculate_representativity_v2(individual.flux_values)
+             #   if individual.acceptable_eigenvalue == False:
+             #       individual.representativity = 0.0
+             #       individual.total_flux = 0.0
 
             #if 'cnn' in self.options['solver']:
             #    print("solving for k with cnn")
             #    self.create_cnn_input()
             #    self.solve_for_keff_with_cnn()
+
+        for constraint in self.options['constraint']:
+            if 'postevaluate' in constraint:
+                list_of_individuals = self.apply_constraint(list_of_individuals, constraint)
+
         return list_of_individuals
     #def create_cnn_input(self):
     #    data_array = self.cnn_handler.build_individuals_array(self.individuals, generation=self.generation)
@@ -814,12 +887,12 @@ class genetic_algorithm:
             for file in os.listdir():
                 if "gen_" + str(self.generation) in file:
                     if "_done.dat" in file:
-                        if unique_flag in file:
-                            file_temp = file.split("_done.dat")
-                            script_str = file_temp[0]
-                            if script_str in temp_file_list:
-                                temp_file_list.remove(file_temp[0])
-                                jobs_completed += 1
+                        #if unique_flag in file:
+                        file_temp = file.split("_done.dat")
+                        script_str = file_temp[0]
+                        if script_str in temp_file_list:
+                            temp_file_list.remove(file_temp[0])
+                            jobs_completed += 1
             if jobs_completed == len(jobs_to_be_waited_on):
                 print("All jobs are complete, continuing")
                 return
@@ -910,6 +983,16 @@ class genetic_algorithm:
             if write_option == 'crowding_distance':
                 try:
                     write_string += str(individual.crowding_distance) + ","
+                except:
+                    write_string += "N/A,"
+            if write_option == 'integral_keff':
+                try:
+                    write_string += str(individual.integral_keff) + ","
+                except:
+                    write_string += "N/A,"
+            if write_option == 'integral_keff_value':
+                try:
+                    write_string += str(individual.integral_keff_value) + ","
                 except:
                     write_string += "N/A,"
             if write_option == 'total_flux':

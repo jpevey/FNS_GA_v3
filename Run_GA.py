@@ -16,14 +16,14 @@ options['maximum_material_elements'] = 15
 options['enforce_material_count_before_evaluation'] = False
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 1
-options['number_of_individuals'] = 5
-options['number_of_parents'] = 3
+options['number_of_generations'] = 10
+options['number_of_individuals'] = 20
+options['number_of_parents'] = 5
 options['remake_duplicate_children'] = True
 options['mutation_rate'] = 0.10  # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
 # to mutate to other material based on mutation_rate
-options['material_types'] = [1, 2, 3]
+options['material_types'] = [1, 2, 3, 4]
 # When doing crossover, select a parent based on specified method (default is uniformly at random)
 # Parent_2 is chosen at random with probabilities based on the diversity score
 # For example, given 3 parents the first is chosen at random (default)
@@ -41,7 +41,7 @@ options['scale_template_file_string'] = '11x11_grid_array_template.inp'
 options['mcnp_template_file_string'] = '3d_FNS_template_source.txt'
 options['mcnp_keff_exp_template_file_string'] = '3d_FNS_integral_exp_template_keff.txt'
 options['mcnp_keff_template_file_string'] = '3d_FNS_template_keff.txt'
-options['file_keyword'] = 'source_calc_'
+options['file_keyword'] = 'source_calc'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
 options['solver_location'] = 'necluster'
@@ -58,9 +58,10 @@ for val in options['keywords_list']:
     options['template_keywords'][val] = ""
 options['write_output_csv'] = True
 options['output_filename'] = '_output'
-### Currently uses single fitness function, 'keff' (doesn't work yet), or 'representativity'
+### Current fitness functions: 'representativity', 'total_flux', 'integral_keff'
 options['fitness'] = ['representativity', 'total_flux', 'integral_keff']
-options['constraint'] = ['keff#evaluate#threshold#default_sort']
+options['constraint'] = ['keff#preevaluate#threshold#default_sort',
+                         'representativity#postevaluate#linearSimAnneal,gen_5,val_0.95']
 #options['constraint'] = ['']
 options['enforced_maximum_eigenvalue'] = 0.95
 options['fitness_sort_by'] = 'representativity'
@@ -68,12 +69,43 @@ options['default_mcnp_mat_count_and_density'] = collections.OrderedDict()
 options['default_mcnp_mat_count_and_density'][1] = '1'
 options['default_mcnp_mat_count_and_density'][2] = '2'
 options['default_mcnp_mat_count_and_density'][3] = '3'
-#options['default_mcnp_mat_count_and_density'][4] = '4'
+options['default_mcnp_mat_count_and_density'][4] = '4'
 options['output_all_individuals_at_end_of_calculation'] = True
+options['sort_all_possible_individuals'] = True
 options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_output'
+# Todo: automate output creation more... headers are hardcoded
+options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'integral_keff_value', 'representativity',
+                                     'total_flux', 'integral_keff', 'front_rank', 'crowding_distance', 'number_of_fuel',
+                                     'write_out_parents#2', 'write_out_average_diversity_score', 'materials#30']
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'integral_keff_value', 'representativity',
                                      'total_flux', 'front_rank', 'crowding_distance', 'number_of_fuel',
                                      'write_out_parents#2', 'write_out_average_diversity_score', 'materials#30']
+options['energy_bins'] = [1.00E-10,5.00E-10,7.50E-10,1.00E-09,1.20E-09,1.50E-09,2.00E-09,2.50E-09,3.00E-09,4.00E-09,
+                          5.00E-09,7.50E-09,1.00E-08,2.53E-08,3.00E-08,4.00E-08,5.00E-08,6.00E-08,7.00E-08,8.00E-08,
+                          9.00E-08,1.00E-07,1.25E-07,1.50E-07,1.75E-07,2.00E-07,2.25E-07,2.50E-07,2.75E-07,3.00E-07,
+                          3.25E-07,3.50E-07,3.75E-07,4.00E-07,4.50E-07,5.00E-07,5.50E-07,6.00E-07,6.25E-07,6.50E-07,
+                          7.00E-07,7.50E-07,8.00E-07,8.50E-07,9.00E-07,9.25E-07,9.50E-07,9.75E-07,1.00E-06,1.01E-06,
+                          1.02E-06,1.03E-06,1.04E-06,1.05E-06,1.06E-06,1.07E-06,1.08E-06,1.09E-06,1.10E-06,1.11E-06,
+                          1.12E-06,1.13E-06,1.14E-06,1.15E-06,1.18E-06,1.20E-06,1.23E-06,1.25E-06,1.30E-06,1.35E-06,
+                          1.40E-06,1.45E-06,1.50E-06,1.59E-06,1.68E-06,1.77E-06,1.86E-06,1.94E-06,2.00E-06,2.12E-06,
+                          2.21E-06,2.30E-06,2.38E-06,2.47E-06,2.57E-06,2.67E-06,2.77E-06,2.87E-06,2.97E-06,3.00E-06,
+                          3.10E-06,3.20E-06,3.50E-06,3.73E-06,4.10E-06,4.70E-06,5.00E-06,5.40E-06,6.00E-06,6.25E-06,
+                          6.50E-06,6.75E-06,6.88E-06,7.00E-06,7.15E-06,8.10E-06,9.10E-06,1.00E-05,1.15E-05,1.19E-05,
+                          1.29E-05,1.44E-05,1.60E-05,1.70E-05,1.85E-05,1.94E-05,2.00E-05,2.05E-05,2.12E-05,2.18E-05,
+                          2.25E-05,2.50E-05,2.75E-05,3.00E-05,3.13E-05,3.18E-05,3.33E-05,3.38E-05,3.50E-05,3.55E-05,
+                          3.60E-05,3.70E-05,3.71E-05,3.73E-05,3.76E-05,3.80E-05,3.91E-05,3.96E-05,4.10E-05,4.24E-05,
+                          4.40E-05,4.52E-05,4.83E-05,5.06E-05,5.34E-05,5.80E-05,6.10E-05,6.30E-05,6.50E-05,6.75E-05,
+                          7.20E-05,7.60E-05,8.00E-05,8.17E-05,9.00E-05,9.70E-05,1.01E-04,1.05E-04,1.08E-04,1.13E-04,
+                          1.16E-04,1.18E-04,1.19E-04,1.22E-04,1.43E-04,1.70E-04,1.80E-04,1.88E-04,1.89E-04,1.92E-04,
+                          1.93E-04,2.02E-04,2.07E-04,2.10E-04,2.20E-04,2.40E-04,2.85E-04,3.05E-04,5.50E-04,6.70E-04,
+                          6.83E-04,9.50E-04,1.15E-03,1.50E-03,1.55E-03,1.80E-03,2.20E-03,2.25E-03,2.50E-03,3.00E-03,
+                          3.74E-03,3.90E-03,5.70E-03,8.03E-03,9.50E-03,1.30E-02,1.70E-02,2.00E-02,3.00E-02,4.50E-02,
+                          5.00E-02,5.20E-02,6.00E-02,7.30E-02,7.50E-02,8.20E-02,8.50E-02,1.00E-01,1.28E-01,1.49E-01,
+                          2.00E-01,2.70E-01,3.30E-01,4.00E-01,4.20E-01,4.40E-01,4.70E-01,4.92E-01,5.50E-01,5.73E-01,
+                          6.00E-01,6.70E-01,6.79E-01,7.50E-01,8.20E-01,8.61E-01,8.75E-01,9.00E-01,9.20E-01,1.01E+00,
+                          1.10E+00,1.20E+00,1.25E+00,1.32E+00,1.36E+00,1.40E+00,1.50E+00,1.85E+00,2.35E+00,2.48E+00,
+                          3.00E+00,4.30E+00,4.80E+00,6.43E+00,8.19E+00,1.00E+01,1.28E+01,1.38E+01,1.46E+01,1.57E+01,
+                          1.73E+01,2.00E+01]
 # options['scale_script_template'] = \
 # """#!/bin/bash
 #

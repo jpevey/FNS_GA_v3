@@ -26,7 +26,7 @@ hostname
 module unload mpi
 module load intel/12.1.6
 module load openmpi/1.6.5-intel-12.1
-module load MCNP6
+module load MCNP6/1.0
 
 RTP="/tmp/runtp--".`date "+%R%N"`
 cd $PBS_O_WORKDIR
@@ -40,7 +40,7 @@ mcnp_script_templates['6.2']= """#!/bin/bash
 #PBS -l nodes=1:ppn=8
 
 hostname
-module load MCNP6/2.0
+module load MCNP6
 
 RTP="/tmp/runtp--".`date "+%R%N"`
 cd $PBS_O_WORKDIR
@@ -195,6 +195,41 @@ class mcnp_file_handler():
                     pass
         return data
 
+    def lethargy_adjustment(self, pre_adjusted_values, bins, minimum_bin_value = 1e-11):
+        adjusted_values = []
+        for count, val in enumerate(pre_adjusted_values):
+            if count == 0:
+                adjusted_values.append(val / math.log10(bins[count] / minimum_bin_value))
+            else:
+                adjusted_values.append(val / math.log10(bins[count] / bins[count - 1]))
+        return adjusted_values
+
+    def calculate_representativity_v3(self, other_values, lethargy_adjustment = True, bins = []):
+
+        ### Getting target flux value
+        if self.target_flux == 'N/A':
+            self.target_flux = self.get_target_rep_values()
+            ### The code assumes that the targt flux passed to it is in energy, not lethargy. Makes the adjustment to lethargy.
+            if lethargy_adjustment:
+                assert len(bins) == len(self.target_flux), "Target flux ({}) and specified energy bins ({}) do not equal each other.".format(
+                len(self.target_flux), len(bins))
+                self.target_flux = self.lethargy_adjustment(self.target_flux, bins)
+
+
+        if lethargy_adjustment:
+            assert len(bins) > 0, "No energy bins passed during represenatitivity calculation. Needed for lethargy adjustment."
+            assert len(bins) == len(other_values), "Calculated flux ({}) and specified energy bins ({}) do not equal each other.".format(
+                len(other_values), len(bins))
+
+            other_values = self.lethargy_adjustment(other_values, bins)
+
+        val_target_to_target = self.sum_product(self.target_flux, self.target_flux)
+        val_target_to_other  = self.sum_product(self.target_flux, other_values)
+        val_other_to_other   = self.sum_product(other_values, other_values)
+        #print(val_target_to_target, val_target_to_other, val_other_to_other)
+
+        return val_target_to_other / math.sqrt(val_target_to_target * val_other_to_other)
+
     def calculate_representativity_v2(self, other_values):
 
         ### Getting target flux value
@@ -204,7 +239,7 @@ class mcnp_file_handler():
         val_target_to_target = self.sum_product(self.target_flux, self.target_flux)
         val_target_to_other  = self.sum_product(self.target_flux, other_values)
         val_other_to_other   = self.sum_product(other_values, other_values)
-        print(val_target_to_target, val_target_to_other, val_other_to_other)
+        #print(val_target_to_target, val_target_to_other, val_other_to_other)
         return val_target_to_other / math.sqrt(val_target_to_target * val_other_to_other)
 
     def propagate_uncertainty(self, derivative, uncertainty):

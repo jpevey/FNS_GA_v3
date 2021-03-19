@@ -17,8 +17,8 @@ class individual:
         self.options = options
         self.ind_count = individual_count
         self.total_flux = 0.0
-        self.input_file_string = self.options['file_keyword']+ "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
-        self.keff_input_file_string = "keff_" + self.input_file_string
+        self.input_file_string = self.options['file_keyword'] + "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
+        self.keff_input_file_string = "keff_" + "gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
         self.create_random_pattern()
         self.parent_string = "random_initialized,N/A,"
         self.born_from_crossover = False
@@ -44,8 +44,11 @@ class individual:
             #print("Force material locations!!!",  self.material_locations)
         self.create_material_matrix()
 
-    def debug_fake_fitness(self, fitness_type):
-        setattr(self, fitness_type, random.uniform(0, 1.0))
+    def debug_fake_fitness(self, fitness_type, keff_is_acceptable):
+        if keff_is_acceptable:
+            setattr(self, fitness_type, random.uniform(0, 1.0))
+        else:
+            setattr(self, fitness_type, 0.0)
         return
 
     def create_material_matrix(self):
