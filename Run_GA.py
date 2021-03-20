@@ -9,6 +9,7 @@ options['python_random_number_seed'] = 865
 options['skip_writing_files'] = False
 options['verify_fuel_mass_after_mutation'] = False
 options['verify_fuel_mass_after_crossover'] = False
+options['fuel_material_number'] = 3
 options['enforce_material_count_on_creation'] = True
 options['enforce_material_number'] = 3
 options['minimum_material_elements'] = 5
@@ -16,9 +17,9 @@ options['maximum_material_elements'] = 15
 options['enforce_material_count_before_evaluation'] = False
 options['enforced_fuel_count_value'] = 0
 options['include_pattern'] = False
-options['number_of_generations'] = 10
-options['number_of_individuals'] = 20
-options['number_of_parents'] = 5
+options['number_of_generations'] = 2
+options['number_of_individuals'] = 3
+options['number_of_parents'] = 2
 options['remake_duplicate_children'] = True
 options['mutation_rate'] = 0.10  # for each individual, % chance that a material flips, 0.05 = 5%
 options['mutation_type'] = 'bitwise'  # bitwise - each material has a chance
@@ -33,14 +34,23 @@ options['choose_parent_based_on_bitwise_diversity'] = False
 options['crossover_type'] = 'bitwise'  # bitwise - each material bit has a chance to come from parent 1 or parent 2
 # options['crossover_type'] = 'singlepoint' # bitwise - each material bit has a chance to come from parent 1 or parent 2
 
-options['grid_x'] = 150  # specifies how big a grid to create for this geometry
+### Inner 3 Dimension FNS: 150
+### If using variable inner cassette: 120
+options['grid_x'] = 120  # specifies how big a grid to create for this geometry
 options['grid_y'] = 1
+
 # options['grid_z'] = 1 need to code 3rd dimension for fns
 options['total_materials'] = options['grid_x'] * options['grid_y']
 options['scale_template_file_string'] = '11x11_grid_array_template.inp'
-options['mcnp_template_file_string'] = '3d_FNS_template_source.txt'
-options['mcnp_keff_exp_template_file_string'] = '3d_FNS_integral_exp_template_keff.txt'
-options['mcnp_keff_template_file_string'] = '3d_FNS_template_keff.txt'
+#options['mcnp_template_file_string'] = '3d_FNS_template_source.txt'
+#options['mcnp_keff_exp_template_file_string'] = '3d_FNS_integral_exp_template_keff.txt'
+#options['mcnp_keff_template_file_string'] = '3d_FNS_template_keff.txt'
+
+### keff_adjustable_cassette_2A
+options['mcnp_template_file_string'] = '3d_FNS_template_adj_cas_2A_source.txt'
+options['mcnp_keff_exp_template_file_string'] = '3d_FNS_integral_exp_template_adj_cas_2A_keff.txt'
+options['mcnp_keff_template_file_string'] = '3d_FNS_template_adj_cas_2A_keff.txt'
+
 options['file_keyword'] = 'source_calc'
 options['solver'] = 'mcnp'
 # solver_location: 'local' or 'necluster'
@@ -58,6 +68,28 @@ for val in options['keywords_list']:
     options['template_keywords'][val] = ""
 options['write_output_csv'] = True
 options['output_filename'] = '_output'
+
+
+options['adjustable_zone_2A_cassette_bool'] = True
+options['variable_cassette_2A_debug'] = True
+options['adjustable_zone_2A_template_file'] = "keff_adjustable_cassette_2A.inp"
+options['adjustable_zone_2A_individual_attributes'] =\
+                    {'number_of_plates_in_cassette_2A':{'init':'random,int%minimum_plates%maximum_plates'} }
+options['adjustable_zone_2A_fixed_values'] = {'maximum_plates':30,
+                                              'minimum_plates':1,
+                                               'maximum_cassette_2A_value_cm': 52.717,
+                                               'cassette_2A_wall_thickness_cm': 0.3175,
+                                               'cassette_2A_plate_thickness_cm': 1.27,
+                                               'cassette_2A_rpp_origin': -1.27,
+                                                'depth_of_exp_volume_cm': 6*2.54}
+options['chance_for_cassette_length_mutation'] = 0.1
+options['chance_for_smaller_cassette_length_mutation'] = 0.5 # Out of 1.0
+options['adjustable_zone_2A_material_types'] = [2, 3, 4]
+options['variable_cassette_2A_debug'] = True
+options['cassette_2A_keywords_template'] = 'mat_2A_'
+
+
+
 ### Current fitness functions: 'representativity', 'total_flux', 'integral_keff'
 options['fitness'] = ['representativity', 'total_flux', 'integral_keff']
 options['constraint'] = ['keff#preevaluate#threshold#default_sort',
@@ -76,10 +108,10 @@ options['output_all_individuals_at_end_of_calculation_file_name'] = 'all_ind_out
 # Todo: automate output creation more... headers are hardcoded
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'integral_keff_value', 'representativity',
                                      'total_flux', 'integral_keff', 'front_rank', 'crowding_distance', 'number_of_fuel',
-                                     'write_out_parents#2', 'write_out_average_diversity_score', 'materials#30']
+                                     'write_out_parents#2', 'write_out_average_diversity_score', 'materials#150']
 options['output_writeout_values'] = ['generation', 'individual_count', 'input_name', 'keff', 'integral_keff_value', 'representativity',
-                                     'total_flux', 'front_rank', 'crowding_distance', 'number_of_fuel',
-                                     'write_out_parents#2', 'write_out_average_diversity_score', 'materials#30']
+                                     'total_flux', 'front_rank', 'crowding_distance', 'number_of_plates_in_cassette_2A',
+                                     'write_out_parents#2', 'materials#120', 'zone_2A_materials#30']
 options['energy_bins'] = [1.00E-10,5.00E-10,7.50E-10,1.00E-09,1.20E-09,1.50E-09,2.00E-09,2.50E-09,3.00E-09,4.00E-09,
                           5.00E-09,7.50E-09,1.00E-08,2.53E-08,3.00E-08,4.00E-08,5.00E-08,6.00E-08,7.00E-08,8.00E-08,
                           9.00E-08,1.00E-07,1.25E-07,1.50E-07,1.75E-07,2.00E-07,2.25E-07,2.50E-07,2.75E-07,3.00E-07,

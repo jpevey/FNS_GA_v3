@@ -70,8 +70,8 @@ class mcnp_file_handler():
                 key = str(key)
                 for split_ in line.split():
                     if key == split_:
-                        line = line.replace(key, dictionary_of_replacements[key])
-            # print("WRITING LINE TO FILE:",output_file_string, line)
+                        line = line.replace(key, str(dictionary_of_replacements[key]))
+            #print("WRITING LINE TO FILE:",output_file_string, line)
             output_file.write(line)
 
         template_file.close()

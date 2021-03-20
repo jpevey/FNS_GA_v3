@@ -11,15 +11,39 @@ class individual:
         self.keyword_strings = collections.OrderedDict()
         self.keff = 0.0
         self.generation = generation
-
-        self.grid_x = options['grid_x']
-        self.grid_y = options['grid_y']
         self.options = options
         self.ind_count = individual_count
         self.total_flux = 0.0
         self.input_file_string = self.options['file_keyword'] + "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
         self.keff_input_file_string = "keff_" + "gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
-        self.create_random_pattern()
+
+        ### building intiial pattern for materials
+        self.create_random_pattern(self.options['enforce_material_count_on_creation'],
+                                   grid_x_value = self.options['grid_x'],
+                                   grid_y_value = self.options['grid_y'])
+
+        ### if using the variable cassette 2 option, building that pattern
+        if options['adjustable_zone_2A_cassette_bool']:
+            self.apply_special_operator(options['adjustable_zone_2A_individual_attributes'],
+                                        options['variable_cassette_2A_debug'])
+
+            ### Building the list of keywords for the adjustable cassette. It defaults to build
+            ### enough keywords for all possible plates, which are "" if beyond the length of the
+            ### cassette
+            self.options['adjustable_zone_2A_keywords_list'] = []
+            for x in range(self.options['adjustable_zone_2A_fixed_values']['maximum_plates']):
+                self.options['adjustable_zone_2A_keywords_list'].append(
+                    self.options['cassette_2A_keywords_template'] + str(x + 1) +"_")
+
+
+            self.create_random_pattern(enforce_material_bool = False,
+                                  material_locations_val = "material_locations_cassette_2A",
+                                  material_matrix_setattr_val = "material_matrix_cassette_2A",
+                                  total_number_of_locations = self.number_of_plates_in_cassette_2A,
+                                  material_types = 'adjustable_zone_2A_material_types',
+                                  grid_x_value = self.number_of_plates_in_cassette_2A,
+                                  grid_y_value = 1)
+
         self.parent_string = "random_initialized,N/A,"
         self.born_from_crossover = False
         self.ran_source_calculation = False
@@ -28,21 +52,87 @@ class individual:
 
         self.default_materials = collections.OrderedDict()
 
-    def create_random_pattern(self):
-        #print("Creating random pattern for ind:", self.ind_count)
-        self.pattern = collections.OrderedDict()
-        if self.options['enforce_material_count_on_creation'] == True:
-            number_of_material = random.randint(self.options['minimum_material_elements'], self.options['maximum_material_elements'])
-            self.material_locations = []
-            total_number_of_locations = self.grid_y * self.grid_x
-            for _ in range(number_of_material):
-                material_location = random.randint(1, total_number_of_locations)
-                while material_location in self.material_locations:
-                    material_location = random.randint(1, total_number_of_locations)
-                self.material_locations.append(material_location)
+    def apply_special_operator(self, operator_dict, debug=False):
+        if debug:
+            print("operator_dict", operator_dict)
 
-            #print("Force material locations!!!",  self.material_locations)
-        self.create_material_matrix()
+        for val in operator_dict:
+            if debug:
+                print(val)
+
+            val_options = operator_dict[val]
+            init_type, init_options = val_options['init'].split(",")
+            init_options = init_options.split("%")
+            if debug:
+                print("init_type, init_options", init_type, init_options)
+
+            assert init_type == 'random', "Special operator {} not handled. Only 'random' works right now...".format(
+                init_type)
+
+            if init_type == 'random':
+                if init_options[0] == 'int':
+
+                    if init_options[1] in self.options['adjustable_zone_2A_fixed_values']:
+                        minimum_value = self.options['adjustable_zone_2A_fixed_values'][init_options[1]]
+                    else:
+                        minimum_value = init_options[1]
+
+                    if init_options[2] in self.options['adjustable_zone_2A_fixed_values']:
+                        maximum_value = self.options['adjustable_zone_2A_fixed_values'][init_options[2]]
+                    else:
+                        maximum_value = init_options[2]
+
+                    init_value = random.randint(int(minimum_value), int(maximum_value))
+
+                    if debug:
+                        print("minimum value {}, maximum value {}, init value {}".format(minimum_value, maximum_value,
+                                                                                         init_value))
+
+            setattr(self, val, init_value)
+
+    def create_random_pattern(self, enforce_material_bool,
+                              grid_x_value,
+                              grid_y_value,
+                              material_locations_val = "material_locations",
+                              material_matrix_setattr_val = "material_matrix",
+                              minimum_material_elements = "minimum_material_elements",
+                              maximum_material_elements = "maximum_material_elements",
+                              total_number_of_locations = "default",
+                              material_types = 'material_types',
+                              option_enforce_material_number = 'enforce_material_number'):
+
+        #self.options['enforce_material_count_on_creation']
+        #print("Creating random pattern for ind:", self.ind_count)
+        if enforce_material_bool == True:
+            ### Setting minimum and maximum values for specified material
+            minimum_number = self.options[minimum_material_elements]
+            maximum_number = self.options[maximum_material_elements]
+
+            ### The default behavior. Modifying it to account for variable cassette 2A function
+            if total_number_of_locations == "default":
+                total_number_of_locations = self.options["grid_y"] * self.options["grid_x"]
+
+
+            number_of_material = random.randint(minimum_number, maximum_number)
+
+            setattr(self, material_locations_val, [])
+
+            for _ in range(number_of_material):
+                ### Pick a location for the material that the limit is being imposed on
+                material_location = random.randint(1, total_number_of_locations)
+                ### If the value is already in the list "material locations val" it picks another
+                while material_location in getattr(self, material_locations_val):
+                    material_location = random.randint(1, total_number_of_locations)
+                ### Append the value to the list
+                getattr(self, material_locations_val).append(material_location)
+
+        ### Creating the material matrix
+        self.create_material_matrix(material_matrix_setattr_val = material_matrix_setattr_val,
+                                    option_grid_x_val = grid_x_value,
+                                    option_grid_y_val = grid_y_value,
+                                    option_material_types = self.options[material_types],
+                                    option_enforce_material_bool = enforce_material_bool ,
+                                    option_enforce_material_number = self.options[option_enforce_material_number])
 
     def debug_fake_fitness(self, fitness_type, keff_is_acceptable):
         if keff_is_acceptable:
@@ -51,29 +141,39 @@ class individual:
             setattr(self, fitness_type, 0.0)
         return
 
-    def create_material_matrix(self):
+    def create_material_matrix(self,
+                               material_matrix_setattr_val,
+                               option_grid_x_val,
+                               option_grid_y_val,
+                               option_material_types,
+                               option_enforce_material_bool,
+                               option_enforce_material_number):
+
         ### Creating list of materials in this ind.
         material_matrix = []
         material_count = 0
-        for _ in range(self.grid_x):
-            minor_material = []
-            for __ in range(self.grid_y):
-                material_count += 1
-                material_index = random.randint(1, len(self.options['material_types']))
-                material = self.options['material_types'][material_index - 1]
-                if self.options['enforce_material_count_on_creation'] == True:
-                    if material_count in self.material_locations:
 
-                        material = self.options['enforce_material_number']
+        material_types = option_material_types
+        if option_enforce_material_bool:
+            enforce_material_number = option_enforce_material_number
+
+        for _ in range(option_grid_x_val):
+            minor_material = []
+            for __ in range(option_grid_y_val):
+                material_count += 1
+                material_index = random.randint(1, len(material_types))
+                material = material_types[material_index - 1]
+                if option_enforce_material_bool:
+                    if material_count in self.material_locations:
+                        material = enforce_material_number
                     else:
-                        material_index = random.randint(1, len(self.options['material_types']))
-                        while material_index == self.options['enforce_material_number']:
-                            material_index = random.randint(1, len(self.options['material_types']))
-                        material = self.options['material_types'][material_index - 1]
+                        material_index = random.randint(1, len(material_types))
+                        while material_index == enforce_material_number:
+                            material_index = random.randint(1, len(material_types))
+                        material = material_types[material_index - 1]
                 minor_material.append(material)
             material_matrix.append(minor_material)
-        self.material_matrix = material_matrix
-        #print("Material Matrix:", self.material_matrix)
+        setattr(self, material_matrix_setattr_val, material_matrix)
 
     def find_fuel_location(self):
         for count, mat in enumerate(self.material_matrix):
@@ -82,15 +182,54 @@ class individual:
                 #print("Found fuel in location index: ", count, 2.54 / 4 + count * self.options['fuel_index_multiplier'])
                 return 2.54 / 4 + count * self.options['fuel_index_multiplier']
 
-    def create_discrete_material_mcnp_dictionary(self, keywords_list = []):
-        if keywords_list == []:
-            keywords_list = self.options['keywords_list']
+    def build_variable_cassette_2a_dictionary(self, dictionary_):
+        fixed_value_dict = self.options['adjustable_zone_2A_fixed_values']
+        '''options['adjustable_zone_2A_fixed_values'] = {'maximum_plates': 30,
+                                                      'minimum_plates': 1,
+                                                      'maximum_cassette_2A_value_cm': 52.717,
+                                                      'cassette_2A_wall_thickness_cm': 0.3175,
+                                                      'cassette_2A_plate_thickness_cm': 1.27,
+                                                      'cassette_2A_rpp_origin': -1.27,
+                                                      'depth_of_exp_volume_cm': 6*2.54}'''
+        dictionary_['cassette_pattern_2A_fill_value'] = str("fill=0:"+str(int(self.number_of_plates_in_cassette_2A - 1)))
+        dictionary_['cassette_pattern_2A_trcl_value'] = fixed_value_dict['maximum_cassette_2A_value_cm']\
+                                                                   + 2 * fixed_value_dict['cassette_2A_wall_thickness_cm']\
+                                                                   + fixed_value_dict['cassette_2A_rpp_origin'] \
+                                                                   - self.number_of_plates_in_cassette_2A\
+                                                                    * fixed_value_dict['cassette_2A_plate_thickness_cm']
+        dictionary_['cassette_pattern_2A_cassette_inner_length'] = self.number_of_plates_in_cassette_2A\
+                                                                    * fixed_value_dict['cassette_2A_plate_thickness_cm']\
+                                                                    + fixed_value_dict['cassette_2A_rpp_origin']
+        dictionary_['cassette_pattern_2A_cassette_outer_length'] = dictionary_['cassette_pattern_2A_cassette_inner_length']\
+                                                                            + fixed_value_dict['cassette_2A_wall_thickness_cm']
 
-        material_dictionary = collections.OrderedDict()
-        #print("material matrix 2!!!",self.ind_count, self.material_matrix)
+        dictionary_['cassette_pattern_2A_exp_vol_max'] = dictionary_['cassette_pattern_2A_trcl_value']\
+                                                         - fixed_value_dict['cassette_2A_plate_thickness_cm']\
+                                                         - fixed_value_dict['cassette_2A_wall_thickness_cm']
+        dictionary_['cassette_pattern_2A_exp_vol_min'] = dictionary_['cassette_pattern_2A_exp_vol_max']\
+                                                         - fixed_value_dict['depth_of_exp_volume_cm']
+
+        return dictionary_
+
+    def create_discrete_material_mcnp_dictionary(self,material_matrix_val, keywords_list, data_dict = ""):
+        ### Creating the dictionary if not specified
+        if data_dict == "":
+            material_dictionary = collections.OrderedDict()
+        else:
+            material_dictionary = data_dict
+
+        ### Putting in blanks as default values (for variable cassette 2a)
         for count, item in enumerate(keywords_list):
-            #print('self.material_matrix[count]', self.material_matrix[count][0], self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]])
-            material_dictionary[item] = self.options['default_mcnp_mat_count_and_density'][self.material_matrix[count][0]]
+            material_dictionary[item] = ""
+
+        ### Filling data dict with correct values based on material matrix
+        for count, item in enumerate(keywords_list):
+            ### Adding the correct material value that MCNP expects to the dictionary
+            ### If there's not a value in material_matrix_val, continuing
+            try:
+                material_dictionary[item] = self.options['default_mcnp_mat_count_and_density'][getattr(self, material_matrix_val)[count][0]]
+            except:
+                material_dictionary[item] = ""
         return material_dictionary
 
     def setup_scale(self, generation):
@@ -177,16 +316,16 @@ class individual:
                 material_string += "\n"
             self.keyword_strings[keyword] = material_string.strip()
 
-    def make_material_string_csv(self):
+    def make_material_string_csv(self, material_matrix_value, target_string_val):
         ### Making a string for the input file
         material_string = ""
-        for row_materials in self.material_matrix:
-
+        material_matrix = getattr(self, material_matrix_value)
+        for row_materials in material_matrix:
             for material in row_materials:
                 material_string = material_string + str(material) + ","
         # print("Making csv string:", self.ind_count, material_string.strip())
-        self.material_string_csv = material_string.strip()
-        return self.material_string_csv
+        setattr(self, target_string_val, material_string.strip())
+        return material_string.strip()
 
     def count_material(self, material_to_count):
         mat_count = 0

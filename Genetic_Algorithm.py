@@ -96,12 +96,22 @@ class genetic_algorithm:
                     self.all_individuals = self.apply_constraint(self.all_individuals, constraint)
 
             print("crossover")
-            list_of_children = self.crossover()
+            if self.options['adjustable_zone_2A_cassette_bool']:
+                list_of_children = self.crossover()
+            else:
+                list_of_children = self.crossover()
             print("mutating")
-            list_of_mutated_children = self.mutate(list_of_children)
+            list_of_mutated_children = self.mutate(list_of_children, 'material_matrix')
+
+            if self.options['adjustable_zone_2A_cassette_bool']:
+                list_of_mutated_children = self.mutate(list_of_mutated_children,
+                                                       'material_matrix_cassette_2A',
+                                                       do_variable_size_mutation = True)
 
             if self.options['remake_duplicate_children']:
-                list_of_mutated_children = self.remake_duplicate_children(list_of_mutated_children, self.all_individuals)
+                list_of_mutated_children = self.remake_duplicate_children(list_of_mutated_children,
+                                                                          self.all_individuals,
+                                                                          debug = False)
 
             if self.options['enforce_material_count_before_evaluation']:
                 print("enforcing fuel count:", self.options['enforced_fuel_count_value'])
@@ -166,10 +176,27 @@ class genetic_algorithm:
                 self.mcnp_file_handler = MCNP_File_Handler.mcnp_file_handler()
                 for individual in list_of_individuals:
                     ### Building MCNP input file
+                    ### Building initial dict of what to replace in template input file
                     data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(
-                        self.options['keywords_list'])
+                        material_matrix_val = 'material_matrix',
+                        keywords_list = self.options['keywords_list'])
+
+                    ### If doing a variable cassette 2A, adding those values to the data_dictionary_
+                    if self.options['adjustable_zone_2A_cassette_bool']:
+                        data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(
+                            material_matrix_val = 'material_matrix_cassette_2A',
+                            keywords_list = self.options['adjustable_zone_2A_keywords_list'],
+                            data_dict = data_dictionary_)
+
+
+                        data_dictionary_ = individual.build_variable_cassette_2a_dictionary(data_dictionary_)
+
+
                     ### Finding and adding the fuel location to geometry dictionary
                     data_dictionary_['kcode_source_x'] = str(individual.find_fuel_location())
+
+
+
                     ### Building MCNP input
                     self.mcnp_file_handler.write_mcnp_input(
                         template_file=self.options['mcnp_keff_template_file_string'],
@@ -428,24 +455,44 @@ class genetic_algorithm:
 
         return True
 
-    def remake_duplicate_children(self, list_of_children, comparison_list):
-
+    def remake_duplicate_children(self, list_of_children, comparison_list, debug = True):
+        if debug:
+            print("".format())
         for child in list_of_children:
-            #print("Checking child:", child.material_matrix, comparison_list)
+            if debug:
+                print("Child: {}".format(child.ind_count))
             for comparison_ind in comparison_list:
-                #print("comparison", child.material_matrix, comparison_ind.material_matrix)
+                if debug:
+                    print("Comparing to ind:{}".format(comparison_ind.ind_count))
+                ### Setting comparison score to 0
                 comparison_score = 0
+
+                ### Setting maximum score (if all plates are exactly the same)
+                maximum_score = self.options['total_materials']
+
+                ### If doing a variable cassette 2A, adding that length to the maximum score
+                if self.options['adjustable_zone_2A_cassette_bool']:
+                    maximum_score += len(child.material_matrix_cassette_2A)
+
+                if debug:
+                    print("Maximum possible score:{}".format(maximum_score))
                 for child_mat, comp_mat in zip(child.material_matrix, comparison_ind.material_matrix):
                     if child_mat == comp_mat:
                         comparison_score += 1
-                    if comparison_score == self.options['total_materials']:
-                        #print("Duplicate child found! Forcing mutation")
-                        #print("Before", child.material_matrix)
-                        child.material_matrix = self.single_bit_mutation(child.material_matrix, force_mutation=True, force_mutation_per_material_sublist=2)
-                        #print("After", child.material_matrix)
-                #print(child.material_matrix, comparison_ind.material_matrix)
-                #if child.material_matrix == comparison_ind.material_matrix:
-                #    child.create_random_pattern()
+                if debug:
+                    print("    Score after material matrix check:{}".format(comparison_score))
+                if self.options['adjustable_zone_2A_cassette_bool']:
+                    for child_mat, comp_mat in zip(child.material_matrix_cassette_2A, comparison_ind.material_matrix_cassette_2A):
+                        if child_mat == comp_mat:
+                            comparison_score += 1
+                    if debug:
+                        print("    Score after variable cassette 2A check:{}".format(comparison_score))
+                if debug:
+                    print("Score: {} Max Score: {}".format(comparison_score, maximum_score))
+                if comparison_score == maximum_score:
+
+                    child.material_matrix = self.single_bit_mutation(child.material_matrix, force_mutation=True, force_mutation_per_material_sublist=2)
+
         return list_of_children
 
     def evaluate_bitwise_diversity_of_parents(self):
@@ -671,7 +718,7 @@ class genetic_algorithm:
 
         if self.options['use_non_dominated_sorting']:
             self.parents_list = self.non_dominated_sorting()
-            ### TODO: check on eigenvalue constraint more general, right now it is hardcoded
+            ### TODO: check on keff constraint more general, right now it is hardcoded
             if self.check_number_of_inds_meeting_constraint(checking_value='acceptable_eigenvalue') == 0:
                 self.parents_list.sort(key=lambda x: x.keff, reverse=False)
         else:
@@ -693,27 +740,50 @@ class genetic_algorithm:
                              self.options['number_of_parents']
         list_of_children = []
         for new_child_value in range(number_of_children):
-            ### Getting parent values
+            ### Getting parent unique parent number
             parent_1 = random.randint(0, self.options['number_of_parents'] - 1)
             parent_2 = random.randint(0, self.options['number_of_parents'] - 1)
+            ### Ensuring unique parents
             while parent_1 == parent_2:
                 parent_2 = random.randint(0, self.options['number_of_parents'] - 1)
 
+            ### Using bitwise diversity to choose parent, overwriting previously choosen par 2
             if self.options['choose_parent_based_on_bitwise_diversity']:
                 # print("Choosing parent 2 based on diversity score")
                 parent_2 = self.choose_parent_based_on_bitwise_diversity(parent_1)
 
+            ### Getting parent individual objects
             parent_1 = self.parents_list[parent_1]
             parent_2 = self.parents_list[parent_2]
-            if self.options['crossover_type'] == 'bitwise':
-                new_child_ind = self.bitwise_crossover(parent_1, parent_2)
 
-                ### Checking if new child meets fuel # requirement
+            ### Doing bitwise cross over: Child is made by 50/50 chance from each parent
+            if self.options['crossover_type'] == 'bitwise':
+                ### Creating child individual
+                child_ind = individual.individual(self.options, self.generation, self.individual_count)
+                self.individual_count += 1
+
+                new_child_ind = self.bitwise_crossover(parent_1, parent_2, child_ind, material_matrix_value = "material_matrix")
+
+                if self.options['adjustable_zone_2A_cassette_bool']:
+                    new_child_ind = self.bitwise_crossover(parent_1, parent_2, new_child_ind, material_matrix_value = "material_matrix_cassette_2A")
+
+
+                ### Checking if new child meets fuel # requirement, remaking if needed
                 if self.options['verify_fuel_mass_after_crossover']:
                     fuel_count = new_child_ind.count_material(1)
                     while ((fuel_count > self.options['maximum_fuel_elements']) or (
                             fuel_count < self.options['minimum_fuel_elements'])):
-                        new_child_ind = self.bitwise_crossover(parent_1, parent_2)
+                        ### Remaking child, but not updating individual count
+                        child_ind = individual.individual(self.options, self.generation, self.individual_count)
+                        new_child_ind = self.bitwise_crossover(parent_1, parent_2, child_ind,  material_matrix_value="material_matrix_cassette_2A")
+
+                        ### Doing cassetta 2a crossover
+                        if self.options['adjustable_zone_2A_cassette_bool']:
+                            new_child_ind = self.bitwise_crossover(parent_1, parent_2, new_child_ind,
+                                                                   material_matrix_value="material_matrix_cassette_2A")
+
+
+
                         fuel_count = new_child_ind.count_material(1)
 
             if self.options['crossover_type'] == 'singlepoint':
@@ -737,23 +807,36 @@ class genetic_algorithm:
 
         return list_of_children
 
-    def build_and_run_mcnp_evaluation_input(self, individual_,
+    def build_and_run_mcnp_evaluation_input(self, individual,
                                 integral_experiment=False):
 
         ### Setting template file and input file string based on type of evaluation
         if integral_experiment:
             template_file_ = self.options['mcnp_keff_exp_template_file_string']
-            input_file_string_ = individual_.keff_input_file_string.split('.inp')
+            input_file_string_ = individual.keff_input_file_string.split('.inp')
             input_file_string = input_file_string_[0] + "_integral_exp.inp"
-            individual_.integral_keff_input_file_string = input_file_string
+            individual.integral_keff_input_file_string = input_file_string
         else:
             template_file_ = self.options['mcnp_template_file_string']
-            input_file_string = individual_.input_file_string
+            input_file_string = individual.input_file_string
+
+        ### Building dictionary of replacements for the MCNP file
+        data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(
+            material_matrix_val='material_matrix',
+            keywords_list=self.options['keywords_list'])
+
+        ### If doing a variable cassette 2A, adding those values to the data_dictionary_
+        if self.options['adjustable_zone_2A_cassette_bool']:
+            data_dictionary_ = individual.create_discrete_material_mcnp_dictionary(
+                material_matrix_val='material_matrix_cassette_2A',
+                keywords_list=self.options['adjustable_zone_2A_keywords_list'],
+                data_dict=data_dictionary_)
+
+            data_dictionary_ = individual.build_variable_cassette_2a_dictionary(data_dictionary_)
 
         ### Building MCNP input file
         self.mcnp_file_handler.write_mcnp_input(template_file=template_file_,
-                                                dictionary_of_replacements=individual_.create_discrete_material_mcnp_dictionary(
-                                                    self.options['keywords_list']),
+                                                dictionary_of_replacements=data_dictionary_,
                                                 input_file_str=input_file_string)
         self.mcnp_file_handler.build_mcnp_running_script(input_file_string)
 
@@ -761,27 +844,62 @@ class genetic_algorithm:
         self.mcnp_inputs.append(input_file_string)
         return
 
-    def bitwise_crossover(self, parent_1, parent_2):
-        child_ind = individual.individual(self.options, self.generation, self.individual_count)
-        self.individual_count += 1
-        # print("parent 1 pattern:", parent_1.material_matrix)
-        # print("parent 2 pattern:", parent_2.material_matrix)
-        # print("Child pattern before:", child_ind.material_matrix, child_ind.ind_count)
+    def bitwise_crossover(self, parent_1, parent_2, child_ind, material_matrix_value = 'material_matrix'):
+
+        print("parent 1 pattern:", material_matrix_value, getattr(parent_1, material_matrix_value), len(getattr(parent_1, material_matrix_value)))
+        print("parent 2 pattern:", material_matrix_value, getattr(parent_2, material_matrix_value), len(getattr(parent_2, material_matrix_value)))
+        print("Child pattern before:", getattr(child_ind, material_matrix_value), child_ind.ind_count)
+
+        ### Choosing either parent's length
+        parent_selection = random.randint(0, 1)
+
+        material_matrix_ = getattr(parent_1, material_matrix_value)
+        if parent_selection == 1:
+            material_matrix_ = getattr(parent_2, material_matrix_value)
+
         temp_material_master_list = []
-        for material_list_count, material_list in enumerate(parent_1.material_matrix):
+        #for material_list_count, material_list in enumerate(parent_1.material_matrix):
+        for material_list_count, material_list in enumerate(material_matrix_):
             temp_material_list = []
             for material_count, material in enumerate(material_list):
                 selection = random.randint(0, 1)
 
-                material = parent_1.material_matrix[material_list_count][material_count]
+                ### Tries to get parent_1 value, if it cant (the list is too short), defaults to parent 2
+                try:
+                    material = getattr(parent_1, material_matrix_value)[material_list_count][material_count]
+                except:
+                    material = getattr(parent_2, material_matrix_value)[material_list_count][material_count]
 
+                ### Tries to get parent_2 value, if it cant (the list is too short), defaults to parent 1
                 if selection == 1:
-                    material = parent_2.material_matrix[material_list_count][material_count]
+                    try:
+                        material = getattr(parent_2, material_matrix_value)[material_list_count][material]
+                    except:
+                        material = getattr(parent_1, material_matrix_value)[material_list_count][material_count]
 
                 temp_material_list.append(material)
             temp_material_master_list.append(temp_material_list)
-        child_ind.material_matrix = temp_material_master_list
-        # print("Child pattern after:", child_ind.material_matrix)
+        setattr(child_ind, material_matrix_value, temp_material_master_list)
+
+        ### Else, the material matrices are the same length, so they can be crossed over no problem.
+        ### TODO: This loop may be unneeded, the above loop likely would cover this case as well, right?
+        '''else:
+            temp_material_master_list = []
+            #for material_list_count, material_list in enumerate(parent_1.material_matrix):
+            for material_list_count, material_list in enumerate(getattr(parent_1, material_matrix_value)):
+                temp_material_list = []
+                for material_count, material in enumerate(material_list):
+                    selection = random.randint(0, 1)
+
+                    material = getattr(parent_1, material_matrix_value)[material_list_count][material_count]
+                    if selection == 1:
+                        material = getattr(parent_2, material_matrix_value)[material_list_count][material]
+
+                    temp_material_list.append(material)
+                temp_material_master_list.append(temp_material_list)
+            setattr(child_ind, material_matrix_value, temp_material_master_list)'''
+
+        print("Child pattern after:", material_matrix_value, getattr(child_ind, material_matrix_value), len(getattr(child_ind, material_matrix_value)), child_ind.ind_count)
         return child_ind
 
     def singlepoint_crossover(self, parent_1, parent_2):
@@ -803,27 +921,96 @@ class genetic_algorithm:
 
         return child_ind
 
-    def mutate(self, list_of_individuals):
+    def variable_cassette_length_mutation(self, original_material_matrix, mutating_debug = False):
+        new_material_matrix = []
+        original_mm_length_int = len(original_material_matrix)
+        valid_mutation = False
+
+        if mutating_debug:
+            print("Doing variable cassette length mutation. Original length: {}".format(original_mm_length_int))
+
+        for count, value in enumerate(original_material_matrix):
+            add_plate = True
+            ### Catch if trying something more than 1D
+            assert len(value) == 1, "Unable to do length mutation on geometries more complex than 1D"
+            if mutating_debug:
+                print("Attempting mutation on plate #{}".format(count))
+            ### If there hasn't yet been a valid mutation, doing mutation loop.
+            if valid_mutation == False:
+                ### Throwing a random number to see if variable will change
+                if random.uniform(0, 1.0) <= self.options['chance_for_cassette_length_mutation']:
+                    if mutating_debug:
+                        print("There's a length mutation!")
+                    ### A mutation happens. Throwing another random value to see if a plate is added or removed
+                    if random.uniform(0, 1.0) <= self.options['chance_for_smaller_cassette_length_mutation']:
+                        if mutating_debug:
+                            print("The cassette will be made smaller! Skipping plate #{}".format(count))
+                        ### The material matrix is going to be 1 plate smaller, not adding the current plate to
+                        ### the new list
+                        add_plate = False
+                        valid_mutation = True
+                    else:
+                        if mutating_debug:
+                            print("The cassette will be made larger!")
+                        ### If there are already the maximum number of plates, continuing
+                        if original_mm_length_int == self.options['adjustable_zone_2A_fixed_values']['maximum_plates']:
+                            if mutating_debug:
+                                print("There are already a maximum number of plates, cannot add one.")
+                            continue
+                        else:
+                            random_new_material = random.randint(0, len(self.options['adjustable_zone_2A_material_types']))
+                            new_material_matrix.append([self.options['adjustable_zone_2A_material_types'][random_new_material]])
+                            if mutating_debug:
+                                print("Added plate type {} to location {}".format(self.options['adjustable_zone_2A_material_types'][random_new_material], count))
+                            valid_mutation = True
+            else:
+                if mutating_debug:
+                    print("A valid mutation has already been done, adding original material to matrix")
+            if add_plate:
+                new_material_matrix.append(value)
+
+        if mutating_debug:
+            print("original matrix:", original_material_matrix)
+            print("new matrix:", new_material_matrix)
+            print("Finished mutation function. New matrix length: {}".format(len(new_material_matrix)))
+
+        return new_material_matrix
+
+
+
+    def mutate(self, list_of_individuals, material_matrix_value, do_variable_size_mutation = False, mutating_debug = False):
         ### Currently only works on a material-basis
-        #print("MUTATING!!!")
+        if mutating_debug:
+            print("MUTATING!!!")
         if self.options['mutation_type'] == 'bitwise':
-            #print("BITWISE!", len(list_of_individuals))
+            if mutating_debug:
+                print("BITWISE!", len(list_of_individuals))
             for ind_count, individual in enumerate(list_of_individuals):
-                #print("MUTATING:", ind_count)
-                original_material_matrix = copy.deepcopy(individual.material_matrix)
-                individual.material_matrix = self.single_bit_mutation(original_material_matrix)
+                if mutating_debug:
+                    print("MUTATING:", ind_count)
+
+                ### Preserving an original copy of the material matrix
+                original_material_matrix = copy.deepcopy(getattr(individual, material_matrix_value))
+
+                ### Doing single bit mutation
+                setattr(individual, material_matrix_value, self.single_bit_mutation(original_material_matrix))
+
+                ### If the cassette is a variable length, doing that mutation
+                if do_variable_size_mutation:
+                    setattr(individual, material_matrix_value, self.variable_cassette_length_mutation(original_material_matrix, mutating_debug))
+
+                    ### Resetting the number of plates in this individual to the correct value
+                    setattr(individual, "number_of_plates_in_cassette_2A", len(getattr(individual, material_matrix_value)))
+
+
 
                 if self.options['verify_fuel_mass_after_mutation']:
                     ### Checking if new child meets fuel # requirement
-                    fuel_count = individual.count_material(1)
-                    # try_count = 0
+                    fuel_count = individual.count_material(self.options['fuel_material_number'])
                     while ((fuel_count > self.options['maximum_fuel_elements']) or (
                             fuel_count < self.options['minimum_fuel_elements'])):
-                        individual.material_matrix = self.single_bit_mutation(original_material_matrix)
-                        fuel_count = individual.count_material(1)
-                        # print("mutation fuel count:", fuel_count)
-                        # try_count  += 1
-                    # print("fixed mutation in:", try_count, "tries")
+                        setattr(individual, material_matrix_value, self.single_bit_mutation(original_material_matrix))
+                        fuel_count = individual.count_material(self.options['fuel_material_number'])
 
         return list_of_individuals
 
@@ -1005,8 +1192,18 @@ class genetic_algorithm:
                     write_string += str(individual.representativity) + ","
                 except:
                     write_string += "N/A,"
+
+            if write_option == 'number_of_plates_in_cassette_2A':
+                try:
+                    write_string += str(individual.number_of_plates_in_cassette_2A) + ","
+                except:
+                    write_string += "N/A,"
+            if write_option == 'zone_2A_materials':
+                write_string += \
+                    str(individual.make_material_string_csv('material_matrix_cassette_2A',
+                                                            'material_matrix_cassette_2A_str'))
             if write_option == 'materials':
-                write_string += str(individual.make_material_string_csv())
+                write_string += str(individual.make_material_string_csv('material_matrix', 'material_string_csv'))
             if write_option == 'input_name':
                 try:
                     write_string += str(individual.input_file_string) + ','
