@@ -13,7 +13,12 @@ class individual:
         self.generation = generation
         self.options = options
         self.ind_count = individual_count
+
+        self.keff_cnn = 'N/A'
+        self.total_flux_cnn = 'N/A'
+        self.representativity_cnn = 'N/A'
         self.total_flux = 0.0
+        self.evaluated_with_cnn = False
         self.input_file_string = self.options['file_keyword'] + "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
         self.keff_input_file_string = "keff_" + "gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
 
@@ -43,7 +48,7 @@ class individual:
                                   material_types = 'adjustable_zone_2A_material_types',
                                   grid_x_value = self.number_of_plates_in_cassette_2A,
                                   grid_y_value = 1)
-
+#
         self.parent_string = "random_initialized,N/A,"
         self.born_from_crossover = False
         self.ran_source_calculation = False
@@ -51,6 +56,11 @@ class individual:
         self.acceptable_eigenvalue = True
 
         self.default_materials = collections.OrderedDict()
+
+    def update_input_file_strings(self, generation, individual_count ):
+        self.ind_count = individual_count
+        self.input_file_string = self.options['file_keyword'] + "_gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
+        self.keff_input_file_string = "keff_" + "gen_" + str(generation) + "_ind_" + str(individual_count) + ".inp"
 
     def apply_special_operator(self, operator_dict, debug=False):
         if debug:
@@ -250,7 +260,6 @@ class individual:
         # print("Creating scale debug::::", self.ind_count)
         # for key in self.keyword_strings:
         #    print(key, self.keyword_strings[key])
-
         with open(self.options['scale_template_file_string']) as template_file:
             for line in template_file:
                 for keyword in self.options['template_keywords']:
